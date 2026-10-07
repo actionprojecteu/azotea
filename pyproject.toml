@@ -1,0 +1,19 @@
+# ===============================
+# WORKSPACE MASTER PYPROJECT FILE
+# ===============================
+
+# Every subproject here may have a separate entry in PyPi
+# tagging must be per-project. Example: git tag azotea-cli-0.1.0
+[tool.uv.workspace]
+members = [
+    "packages/azotea-cli",
+]
+
+[tool.uv.sources]
+azotea-cli = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "mypy",
+]

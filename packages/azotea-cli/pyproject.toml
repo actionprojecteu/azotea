@@ -1,0 +1,69 @@
+[project]
+name = "azotea-client"
+dynamic = ["version"]
+description = "AZOTEA command line interface"
+readme = "README.md"
+requires-python = ">=3.12"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Rafael González", email = "rafael08@ucm.es"},
+    {name = "Jaime Zamorano", email ="jzamoran@ucm.es"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+
+dependencies = [
+  "SQLAlchemy>=2.0",
+  "alembic",
+  "lica[sqlalchemy]>=2.0", # needs lica library from 2.x on
+  "pytz",
+  "rawpy",
+  "astropy",
+  "validators",
+]
+
+[project.scripts]
+# Create DB schema
+azoschema = "azotea_cli.cli.schema:main"
+# Populate schema with initial values
+azopopulate = "azotea_cli.cli.populate:main"
+# Register images and calculate sky bg statistics
+azotea = "azotea_cli.cli.azotea:main"
+# Provisioning and reporting utility
+azotool = "azotea_cli.cli.azotool:main"
+# Preprocess FITS images to be prcessed by azotea
+azofits = "azotea_cli.cli.azofits:main"
+
+# ------------------------
+# DYNAMIC VERSIONING STUFF
+# ------------------------
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/azotea-cli",]
+only-include = ["src/azotea_cli"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
+
+[tool.uv-dynamic-versioning]
+fallback-version = "0.1.0"
+
+# -----------
+# Other stuff
+# -----------
+
+[tool.ruff]
+line-length = 100
