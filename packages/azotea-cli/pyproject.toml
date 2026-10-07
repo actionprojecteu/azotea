@@ -20,12 +20,12 @@ classifiers = [
 
 dependencies = [
   "SQLAlchemy>=2.0",
-  "alembic",
-  "lica[sqlalchemy]>=2.0", # needs lica library from 2.x on
-  "pytz",
-  "rawpy",
-  "astropy",
-  "validators",
+  "alembic >= 1.20",
+  "lica[sqlalchemy]>=3.0", # needs lica library from 2.x on
+  "pytz >= 2026.5",
+  "rawpy >= 0.27",
+  "astropy >= 8.0",
+  "validators >= 0.35",
 ]
 
 [project.scripts]
