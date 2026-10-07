@@ -76,11 +76,11 @@ class Config(Model):
     __tablename__ = "config_t"
 
     section: Mapped[str] = mapped_column(String(32), primary_key=True)
-    prop: Mapped[str] = mapped_column("property", String(255), primary_key=True)
+    property: Mapped[str] = mapped_column("property", String(255), primary_key=True)
     value: Mapped[str] = mapped_column(String(255))
 
     def __repr__(self) -> str:
-        return f"Config(section={self.section!r}, prop={self.prop!r}, value={self.value!r})"
+        return f"Config(section={self.section!r}, prop={self.property!r}, value={self.value!r})"
 
 
 class Date(Model):

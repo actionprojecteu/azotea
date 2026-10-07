@@ -7,7 +7,7 @@
 # --------------------
 # System wide imports
 # -------------------
-
+import uuid
 import logging
 from datetime import datetime, timedelta
 from itertools import batched
@@ -27,7 +27,7 @@ from lica.cli import execute
 # -------------
 
 from azotea_cli import __version__
-from azotea_cli.dao import Date, Time
+from azotea_cli.dao import Date, Time, Config
 from .util import parser as prs
 
 
@@ -153,12 +153,18 @@ def cli_populate_time(session: Session, args: Namespace) -> None:
                 session.add(obj)
 
 
-
+def cli_populate_config(session: Session, args: Namespace) -> None:
+    with session.begin():
+        id = Config(section="database", property="uuid", value=str(uuid.uuid4()))
+        version = Config(section="database", property="version", value="03")
+        session.add(id)
+        session.add(version)
 
 
 def cli_populate_all(session: Session, args: Namespace) -> None:
     cli_populate_date(session, args)
     cli_populate_time(session, args)
+    cli_populate_config(session, args)
 
 
 def add_args(parser: ArgumentParser) -> None:
