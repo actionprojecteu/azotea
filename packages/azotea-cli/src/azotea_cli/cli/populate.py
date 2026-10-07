@@ -17,6 +17,7 @@ from argparse import ArgumentParser, Namespace
 # Third party imports
 # -------------------
 
+from sqlalchemy.orm import Session
 
 from lica.sqlalchemy import sqa_logging
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
@@ -48,7 +49,7 @@ DESCRIPTION = "AZOTEA Database initial populate tool"
 log = logging.getLogger(__name__.split(".")[-1])
 
 # get the database engine and session factory object
-engine, Session = create_engine_sessionclass(env_var="DATABASE_URL")
+engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
@@ -187,7 +188,7 @@ def add_args(parser: ArgumentParser) -> None:
 
 def cli_main(args: Namespace) -> None:
     sqa_logging(args)
-    with Session() as session:
+    with SessionFactory() as session:
         args.func(session, args)
     engine.dispose()
 

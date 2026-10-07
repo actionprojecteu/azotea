@@ -43,7 +43,7 @@ DESCRIPTION = "AZOTEA Database initial schema generation tool"
 log = logging.getLogger(__name__.split(".")[-1])
 
 # get the database engine and session factory object
-engine, Session = create_engine_sessionclass(env_var="DATABASE_URL")
+engine, _ = create_engine_sessionclass(env_var="DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
