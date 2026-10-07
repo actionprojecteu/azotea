@@ -28,8 +28,8 @@ from lica.validators import vdate
 # -------------
 
 from azotea_cli import __version__
-from azotea_cli.dao.enums import BayerPattern, HeaderType
-
+from azotea_cli.core.enums import BayerPattern, HeaderType
+from azotea_cli.provisioning import consent
 
 # ----------------
 # Module constants
@@ -82,6 +82,7 @@ def add_args(parser: ArgumentParser) -> None:
 
        conform = subparser.add_parser('view',  help="View consent form")
        conform.add_argument('--agree', action='store_true', help='Auto-agree conset form')
+       conform.set_defaults(func=cli_consent)
 
        # ------------------------------------------
        # Create second level parsers for 'observer'
@@ -209,14 +210,12 @@ def add_args(parser: ArgumentParser) -> None:
        imgview = subparser.add_parser('summary',  help="View image summary data")
 
 
+def cli_consent(args: Namespace) -> None:
+    consent.view(args.agree)
 
 
 def cli_main(args: Namespace) -> None:
-    sqa_logging(args)
-    with Session() as session:
-        #args.func(session, args)
-        log.info("Hello world")
-    engine.dispose()
+   args.func(args)
 
 
 def main():

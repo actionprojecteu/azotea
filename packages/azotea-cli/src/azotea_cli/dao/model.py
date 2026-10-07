@@ -26,7 +26,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .enums import BayerPattern, HeaderType, ImageType, ValidState
+from ..core.enums import BayerPattern, HeaderType, ImageType, ValidState
 
 # --------------
 # Database Enums

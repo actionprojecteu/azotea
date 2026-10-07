@@ -70,7 +70,12 @@ setup:
 
 # =======================================================================
 
+# --------------------------------
+# Indiviual provisonoing use cases
+# --------------------------------
 
+consent agree="":
+    uv run azotool --console consent view {{agree}}
 
 [private]
 check_mnt mnt:
