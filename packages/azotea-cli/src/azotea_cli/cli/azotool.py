@@ -18,8 +18,6 @@ from argparse import ArgumentParser, Namespace
 # Third party imports
 # -------------------
 
-from lica.sqlalchemy import sqa_logging
-from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from lica.cli import execute
 from lica.validators import vdate
 
@@ -43,10 +41,6 @@ DESCRIPTION = "AZOTEA provisioning tool"
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
-
-
-# get the database engine and session factory object
-engine, Session = create_engine_sessionclass(env_var="DATABASE_URL")
 
 # -------------------
 # Auxiliary functions

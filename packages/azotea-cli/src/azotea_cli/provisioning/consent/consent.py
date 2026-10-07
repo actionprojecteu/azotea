@@ -57,14 +57,15 @@ def text() -> str:
 
 def view(agree: bool) -> None:
     with SessionFactory() as session:
-        if is_signed(session):
-            log.info("Consent already signed")
-            return
-        print(text())
-        if agree:
-            with session.begin():
+        with session.begin():
+            if is_signed(session):
+                log.info("Consent already signed")
+                return
+            print(text())
+            if agree:
                 tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
-                cfg1 = Config(section="gdpr", property="consent", value="Yes")
+                cfg1 = Config(section="gdpr", property="agree", value="Yes")
                 cfg2 = Config(section="gdpr", property="tstamp", value=tstamp)
-                session.add([cfg1, cfg2])
+                session.add(cfg1)
+                session.add(cfg2)
     engine.dispose()

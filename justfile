@@ -75,7 +75,7 @@ setup:
 # --------------------------------
 
 consent agree="":
-    uv run azotool --console consent view {{agree}}
+    uv run azotool --console --verbose consent view {{agree}}
 
 [private]
 check_mnt mnt:
