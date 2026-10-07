@@ -77,6 +77,14 @@ setup:
 consent agree="":
     uv run azotool --console --verbose consent view {{agree}}
 
+location1:
+    uv run azotool --console --verbose location create \
+        --site-name "Prado de la burra" --location Alcafran
+location2:
+    uv run azotool --console --verbose location create \
+        --site-name "Prado de la burra" --location Alcafran --longitude -3.5 --latitude 40.5
+
+
 [private]
 check_mnt mnt:
     #!/usr/bin/env bash

@@ -27,7 +27,8 @@ from lica.validators import vdate
 
 from azotea_cli import __version__
 from azotea_cli.core.enums import BayerPattern, HeaderType
-from azotea_cli.provisioning import consent
+from azotea_cli.provisioning import consent, location
+from azotea_cli.provisioning.location import LocationForm
 
 # ----------------
 # Module constants
@@ -104,8 +105,9 @@ def add_args(parser: ArgumentParser) -> None:
        loccre.add_argument('--location',   type=str,  required=True, help="City/Town where the site belongs to")
        loccre.add_argument('--longitude',  type=float, default=None, help='Site longitude in decimal degrees, negative West')
        loccre.add_argument('--latitude',   type=float, default=None, help='Site latitude in decimal degrees, negative South')
-       loccre.add_argument('--utc-offset', type=int,   default=0, help='**CAMERA UTC offset!** (if not set in UTC) GMT+1 = +1 ')
+       loccre.add_argument('--utc-offset', type=int,   default=None, help='**CAMERA UTC offset!** (if not set in UTC) GMT+1 = +1 ')
        loccre.add_argument('--randomize',  action='store_true', default=False, help='randomize a bit the geographical coordinates')
+       loccre.set_defaults(func=cli_location)
 
        # ----------------------------------------
        # Create second level parsers for 'camera'
@@ -206,6 +208,10 @@ def add_args(parser: ArgumentParser) -> None:
 
 def cli_consent(args: Namespace) -> None:
     consent.view(args.agree)
+
+def cli_location(args: Namespace) -> None:
+    form = LocationForm(site_name=args.site_name, location=args.location, longitude=args.longitude, latitude=args.latitude, utc_offset=args.utc_offset)
+    location.crupdate(form, args.randomize)
 
 
 def cli_main(args: Namespace) -> None:

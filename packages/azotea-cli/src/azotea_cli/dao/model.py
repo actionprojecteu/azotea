@@ -13,12 +13,11 @@ from datetime import datetime
 # ---------------------
 # Third party libraries
 # ---------------------
-from lica.sqlalchemy.metadata import metadata
+
 from lica.sqlalchemy.noasync.model import Model
 from sqlalchemy import (
     BigInteger,
     DateTime,
-    Enum,
     ForeignKey,
     LargeBinary,
     String,
@@ -27,46 +26,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..core.enums import BayerPattern, HeaderType, ImageType, ValidState
+from .enums import DbBayerPattern, DbHeaderType, DbImageType, DbValidState
 
-# --------------
-# Database Enums
-# --------------
-#
-DbValidState: Enum = Enum(
-    ValidState,
-    name="db_valid_state",
-    create_constraint=False,
-    metadata=metadata,
-    validate_strings=True,
-    values_callable=lambda x: [e.name for e in x],
-)
-
-DbBayerPattern: Enum = Enum(
-    BayerPattern,
-    name="db_bayer_pattern",
-    create_constraint=False,
-    metadata=metadata,
-    validate_strings=True,
-    values_callable=lambda x: [e.name for e in x],
-)
-
-DbHeaderType: Enum = Enum(
-    HeaderType,
-    name="db_header_type",
-    create_constraint=False,
-    metadata=metadata,
-    validate_strings=True,
-    values_callable=lambda x: [e.name for e in x],
-)
-
-DbImageType: Enum = Enum(
-    ImageType,
-    name="db_image_type",
-    create_constraint=False,
-    metadata=metadata,
-    validate_strings=True,
-    values_callable=lambda x: [e.name for e in x],
-)
 
 # ------
 # Models
@@ -236,7 +197,7 @@ class Image(Model):
     # Either from image metadata or config default
     f_number: Mapped[float | None]
     # Either BIAS, DARK, FLAT or LIGHT
-    imagetype: Mapped[ImageType]
+    imagetype: Mapped[ImageType] = mapped_column(DbImageType)
     # false = image is ok, true = flagged as corrupt image
     flagged: Mapped[bool]
     # session identifier YYYYMMDDHHMMSS
