@@ -46,5 +46,21 @@ class LocationForm:
     latitude: float | None
     utc_offset: int | None
 
+# -------------------------------
+# Create/Update location use case
+# -------------------------------
 def crupdate(form: LocationForm, randomize: bool) -> None:
-    log.info("crupdate")
+    sql = select(Location).where(Location.site_name == form.site_name, Location.location==form.location)
+    with SessionFactory() as session:
+        with session.begin():
+            prev_loc = session.scalars(sql).one_or_none()
+            if prev_loc is None:
+                log.info("adding new location '%s', '%s'", form.site_name, form.location)
+                loc = Location(site_name=form.site_name, location=form.location, longitude=form.longitude, latitude=form.latitude, utc_offset=form.utc_offset, randomized=False)
+                session.add(loc)
+            else:
+                log.info("modifying prev. location '%s', '%s'", prev_loc.site_name, prev_loc.location)
+                prev_loc.longitude=form.longitude
+                prev_loc.latitude=form.latitude
+                prev_loc.utc_offset=form.utc_offset
+                session.add(prev_loc)
