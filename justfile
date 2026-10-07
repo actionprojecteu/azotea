@@ -50,6 +50,24 @@ anew verbose="":
     uv run azopopulate --console --trace --log-file azotea.log {{ verbose }} all --batch-size 25000
 
 
+setup:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    AZOTEA_HOME=${HOME}/azotea
+    IMAGES=${AZOTEA_HOME}/images
+
+    uv run azotool --console consent view --agree
+    uv run azotool --console observer create --default --name Juan --surname "Gómez Pérez" \
+            --affiliation "Agrupación Astronómica de Alcafrán" --acronym AA-ACFN
+    uv run azotool --console location create --default --randomize --site-name Alcafrán --location Alcafrán \
+            --longitude -2.7335649 --latitude 40.4966031 --utc-offset 1
+    uv run azotool --console camera create --default \
+            --from-image ${IMAGES}/2021-11-22/IMG_0164.CR2
+    uv run azotool --console roi create --default --width 500 --height 400 \
+            --from-image ${IMAGES}/2021-11-22/IMG_0164.CR2
+    uv run azotool --console configure optics --focal-length 50 --f-number 3.5
+    uv run azotool --console configure publishing --username foo --password bar --url http://localhost:8080
+
 # =======================================================================
 
 
