@@ -13,3 +13,9 @@ class BayerPattern(StrEnum):
     BGGR = "BGGR"
     GRBG = "GRBG"
     GBGR = "GBGR"
+
+class ImageType(StrEnum):
+    BIAS = "BIAS"
+    DARK = "DARK"
+    FLAT = "FLAT"
+    LIGHT = "LIGHT"

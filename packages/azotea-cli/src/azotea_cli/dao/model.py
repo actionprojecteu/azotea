@@ -8,27 +8,30 @@
 # System wide imports
 # -------------------
 
-from collections import OrderedDict
-from datetime import datetime, timezone
-from typing import List, Optional, Type
+from datetime import datetime
 
 # ---------------------
 # Third party libraries
 # ---------------------
-import pytz
 from lica.sqlalchemy.metadata import metadata
 from lica.sqlalchemy.noasync.model import Model
 from sqlalchemy import (
+    BigInteger,
     DateTime,
     Enum,
     ForeignKey,
+    LargeBinary,
     String,
     UniqueConstraint,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
-from .enums import ValidState, BayerPattern, HeaderType
+from .enums import BayerPattern, HeaderType, ImageType, ValidState
 
+# --------------
+# Database Enums
+# --------------
+#
 DbValidState: Enum = Enum(
     ValidState,
     name="db_valid_state",
@@ -56,7 +59,19 @@ DbHeaderType: Enum = Enum(
     values_callable=lambda x: [e.name for e in x],
 )
 
+DbImageType: Enum = Enum(
+    ImageType,
+    name="db_image_type",
+    create_constraint=False,
+    metadata=metadata,
+    validate_strings=True,
+    values_callable=lambda x: [e.name for e in x],
+)
 
+# ------
+# Models
+# ------
+#
 class Config(Model):
     __tablename__ = "config_t"
 
@@ -115,17 +130,17 @@ class Location(Model):
 
     location_id: Mapped[int] = mapped_column(primary_key=True)
     # Geographical longitude in decimal degrees
-    longitude: Mapped[Optional[float]]
+    longitude: Mapped[float | None]
     # Geographical in decimal degrees
-    latitude: Mapped[Optional[float]]
+    latitude: Mapped[float | None]
     # Descriptive name of this unitque location
     site_name: Mapped[str]
     # village, town, city, etc name
     location: Mapped[str]
     # randomized coordinates flag
-    randomized: Mapped[Optional[bool]]
+    randomized: Mapped[bool | None]
     # UTC offset, time zone as offset from UTC. i.e. GMT+1 = +1
-    utc_offset: Mapped[Optional[float]]
+    utc_offset: Mapped[float | None]
     __table_args__ = (UniqueConstraint("site_name", "location"),)
 
 
@@ -135,10 +150,10 @@ class Observer(Model):
     observer_id: Mapped[int] = mapped_column(primary_key=True)
     family_name: Mapped[str]
     surname: Mapped[str]
-    affiliation: Mapped[Optional[str]]
-    acronym: Mapped[Optional[str]]
-    valid_since: Mapped[datetime]
-    valid_until: Mapped[datetime]
+    affiliation: Mapped[str | None]
+    acronym: Mapped[str | None]
+    valid_since: Mapped[datetime] = mapped_column(DateTime)
+    valid_until: Mapped[datetime]= mapped_column(DateTime)
     valid_state: Mapped[ValidState] = mapped_column(DbValidState)
 
     __table_args__ = (
@@ -161,12 +176,93 @@ class Camera(Model):
     # Either 'EXIF' or 'FITS'
     header_type: Mapped[HeaderType] = mapped_column(DbHeaderType)
     # Either "RGGB", "BGGR", "GRBG" , "GBGR"
-    bayer_pattern: Mapped[BayerPattern] =  mapped_column(DbBayerPattern)
+    bayer_pattern: Mapped[BayerPattern] = mapped_column(DbBayerPattern)
     # Number of raw columns, without debayering
     width: Mapped[int]
     # Number of raw rows, without debayering
     height: Mapped[int]
     # pixel size in microns (width)
-    x_pixsize: Mapped[Optional[float]]
+    x_pixsize: Mapped[float | None]
     # pixel size in microns (height)
-    y_pixsize: Mapped[Optional[float]]
+    y_pixsize: Mapped[float | None]
+
+
+class Roi(Model):
+    __tablename__ = "roi_t"
+
+    roi_id: Mapped[int] = mapped_column(primary_key=True)
+    # x1 should be x1 <= x2
+    x1: Mapped[int]
+    # y1 should be y1 <= y2
+    y1: Mapped[int]
+    x2: Mapped[int]
+    y2: Mapped[int]
+    # as NumPy region text, ie. [y1:y2,x1:x2]
+    display_name: Mapped[str]
+    # Descriptive comment
+    comment: Mapped[str | None]
+
+    __table_args__ = (
+        UniqueConstraint(
+            "x1",
+            "y1",
+            "x2",
+            "y2",
+        ),
+        UniqueConstraint(
+            "display_name",
+        ),
+    )
+
+
+class Image(Model):
+    __tablename__ = "image_t"
+
+    image_id: Mapped[int] = mapped_column(primary_key=True)
+    # Image name without the parent path
+    name: Mapped[str]
+    # Original directory path
+    directory: Mapped[str]
+    # Image hash (alternative key in fact)
+    hash: Mapped[bytes] = mapped_column(LargeBinary(256), unique=True)
+    # DSLR ISO sensivity from EXIF
+    iso: Mapped[int | None]
+    # For imagers that do not have ISO (i.e CMOS astrocameras saving in FITS)
+    gain: Mapped[float | None]
+    # exposure time in seconds
+    exptime: Mapped[float]
+    # Either from image metadata or config default
+    focal_length: Mapped[float | None]
+    # Either from image metadata or config default
+    f_number: Mapped[float | None]
+    # Either BIAS, DARK, FLAT or LIGHT
+    imagetype: Mapped[ImageType]
+    # false = image is ok, true = flagged as corrupt image
+    flagged: Mapped[bool]
+    # session identifier YYYYMMDDHHMMSS
+    session: Mapped[int] = mapped_column(BigInteger)
+    # Set of foreign keys
+    date_id: Mapped[int] = mapped_column(ForeignKey("date_t.date_id"))
+    time_id: Mapped[int] = mapped_column(ForeignKey("time_t.time_id"))
+    camera_id: Mapped[int] = mapped_column(ForeignKey("camera_t.camera_id"))
+    location_id: Mapped[int] = mapped_column(ForeignKey("location_t.location_id"))
+    observer_id: Mapped[int] = mapped_column(ForeignKey("observer_t.observer_id"))
+
+
+class SkyBrightness(Model):
+    __tablename__ = "sky_brightness_t"
+
+    image_id: Mapped[int] =  mapped_column(ForeignKey("image_t.image_id"), primary_key=True)
+    roi_id: Mapped[int] =  mapped_column(ForeignKey("roi_t.roi_id"), primary_key=True)
+
+    # Sky Brightness measurements
+    aver_signal_R: Mapped[float]
+    vari_signal_R: Mapped[float]
+    aver_signal_G1: Mapped[float]
+    vari_signal_G1: Mapped[float]
+    aver_signal_G2: Mapped[float]
+    vari_signal_G2: Mapped[float]
+    aver_signal_B: Mapped[float]
+    vari_signal_B: Mapped[float]
+    # published to server
+    published: Mapped[bool]
