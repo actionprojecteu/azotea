@@ -45,8 +45,9 @@ env-rst drive=def_drive: (check_mnt drive) (env-restore join(drive, "env", proje
 anew verbose="":
     #!/usr/bin/env bash
     set -exuo pipefail
-    uv run azoschema --console --log-file nixnox.log {{ verbose }}
-    uv run azopopulate --console --trace --log-file nixnox.log {{ verbose }} all --batch-size 25000
+    rm -fr azotea.db
+    uv run azoschema --console --log-file azotea.log {{ verbose }}
+    uv run azopopulate --console --trace --log-file azotea.log {{ verbose }} all --batch-size 25000
 
 
 # =======================================================================

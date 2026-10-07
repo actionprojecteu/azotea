@@ -26,17 +26,17 @@ from lica.cli import execute
 # local imports
 # -------------
 
-from nixnox_dao import __version__
-from nixnox_dao.nixnox.noasync import Date, Time, Organization, Location
-from nixnox_dao.nixnox.constants import Coordinates
+from azotea_cli import __version__
+from azotea_cli.dao import Date, Time
 from .util import parser as prs
+
 
 
 # ----------------
 # Module constants
 # ----------------
 
-DESCRIPTION = "NIXNOX Database initial populate tool"
+DESCRIPTION = "AZOTEA Database initial populate tool"
 
 # -----------------------
 # Module global variables
@@ -48,7 +48,7 @@ DESCRIPTION = "NIXNOX Database initial populate tool"
 log = logging.getLogger(__name__.split(".")[-1])
 
 # get the database engine and session factory object
-engine, Session = create_engine_sessionclass(env_var="NIXNOX_DB_URL")
+engine, Session = create_engine_sessionclass(env_var="DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
@@ -153,36 +153,10 @@ def cli_populate_time(session: Session, args: Namespace) -> None:
                 session.add(obj)
 
 
-def cli_populate_location(session: Session, args: Namespace) -> None:
-    log.info("Generating Default Unknown Location value")
-    location = Location(
-        location_id=-1,
-        longitude=None,
-        latitude=None,
-        masl=None,
-        coords_meas=Coordinates.UNKNOWN,
-        place="Unknown",
-        population_centre="Unknown",
-        population_centre_type=None,
-        sub_region="Unknown",
-        region="Unknown",
-        country="Unknown",
-        timezone="Etc/UTC",
-    )
-    with session.begin():
-        session.add(location)
 
-
-def cli_populate_observer(session: Session, args: Namespace) -> None:
-    log.info("Generating Default Observer Location value")
-    observer = Organization(observer_id=-1, name="Unknown")
-    with session.begin():
-        session.add(observer)
 
 
 def cli_populate_all(session: Session, args: Namespace) -> None:
-    # cli_populate_observer(session, args)
-    # cli_populate_location(session, args)
     cli_populate_date(session, args)
     cli_populate_time(session, args)
 
@@ -197,10 +171,6 @@ def add_args(parser: ArgumentParser) -> None:
         "time", parents=[prs.seconds(), prs.batch()], help="Load initial Time values"
     )
     p.set_defaults(func=cli_populate_time)
-    p = subparser.add_parser("location", parents=[], help="Load initial Location values")
-    p.set_defaults(func=cli_populate_location)
-    p = subparser.add_parser("observer", parents=[], help="Load initial Observer values")
-    p.set_defaults(func=cli_populate_observer)
     p = subparser.add_parser(
         "all",
         parents=[prs.since(), prs.until(), prs.seconds(), prs.batch()],
