@@ -5,14 +5,14 @@ class ValidState(StrEnum):
     EXPIRED = "Expired"
 
 class HeaderType(StrEnum):
-    FITS = "Fits"
-    EXIF = "Exif"
+    FITS = "FITS"
+    EXIF = "EXIF"
 
 class BayerPattern(StrEnum):
     RGGB = "RGGB"
     BGGR = "BGGR"
     GRBG = "GRBG"
-    GBGR = "GBGR"
+    GBRG = "GBRG"
 
 class ImageType(StrEnum):
     BIAS = "BIAS"

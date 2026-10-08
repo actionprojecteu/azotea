@@ -175,7 +175,7 @@ def add_args(parser: ArgumentParser) -> None:
         "--extension",
         type=str,
         default=None,
-        help="File extension procuced by a camera (i.e. .NEF)",
+        help="File extension produced by a camera (i.e. .NEF)",
     )
     camcre.add_argument(
         "--header-type", choices=HeaderType, default=None, help="Either 'EXIF' or 'FITS'"
@@ -184,10 +184,10 @@ def add_args(parser: ArgumentParser) -> None:
         "--bayer-pattern", choices=BayerPattern, default=None, help="Bayer pattern grid"
     )
     camcre.add_argument(
-        "--width", type=int, default=0, help="Number of raw columns, with no debayering"
+        "--width", type=int, default=None, help="Number of raw columns, with no debayering"
     )
     camcre.add_argument(
-        "--length", type=int, default=0, help="Number of raw rows, with no debayering"
+        "--height", type=int, default=None, help="Number of raw rows, with no debayering"
     )
     camcre.add_argument("--x-pixsize", type=float, default=None, help="Pixel width in um.")
     camcre.add_argument("--y-pixsize", type=float, default=None, help="Pixel height in um.")

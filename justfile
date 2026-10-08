@@ -98,7 +98,17 @@ observer3:
         uv run azotool --console --verbose observer create \
             --name Vieja --surname "del Visillo"  --acronym AAAFN --affiliation "Agrupacion Astronómica de Alcafran" --fix
 
+camera1:
+   uv run azotool --console --verbose  camera create --default --as-given \
+       --model "Canon EOS 400D DIGITAL" --extension .CR2 --header-type EXIF \
+       --bayer-pattern GBRG --width 5344 --height 3516 --bias 2048
 
+camera2 :
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    IMAGES=images/Carpeta1
+    uv run azotool --console --verbose  camera create --default \
+        --from-image ${IMAGES}/2020_12_1200_02_329999.CR2
 
 
 [private]
