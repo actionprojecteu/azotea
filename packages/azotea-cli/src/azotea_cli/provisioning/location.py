@@ -3,9 +3,7 @@
 # ------------------
 
 import logging
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-import importlib.resources as resources
+from dataclasses import dataclass
 
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 
@@ -13,12 +11,10 @@ from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 # Third party libraries
 # ---------------------
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.core.errors import AzoteaError
 from azotea_cli.dao import Location
 
 from . import consent

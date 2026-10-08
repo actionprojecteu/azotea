@@ -84,6 +84,18 @@ location2:
     uv run azotool --console --verbose location create \
         --site-name "Prado de la burra" --location Alcafran --longitude -3.5 --latitude 40.5
 
+observer1:
+        uv run azotool --console --verbose observer create \
+            --name Vieja --surname "del Visillo"  --acronym AAAFN --affiliation "Agrupacion Astronómica de Alcafran"
+observer2:
+        uv run azotool --console --verbose observer create \
+            --name Vieja --surname "del Visillo"  --acronym AAACFN --affiliation "Agrupacion Astronómica de Alcafran"
+observer3:
+        uv run azotool --console --verbose observer create \
+            --name Vieja --surname "del Visillo"  --acronym AAAFN --affiliation "Agrupacion Astronómica de Alcafran" --fix
+
+
+
 
 [private]
 check_mnt mnt:
