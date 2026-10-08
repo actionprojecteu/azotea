@@ -46,8 +46,8 @@ anew verbose="":
     #!/usr/bin/env bash
     set -exuo pipefail
     rm -fr azotea.db
-    uv run azoschema --console --log-file azotea.log {{ verbose }}
-    uv run azopopulate --console --trace --log-file azotea.log {{ verbose }} all --batch-size 25000
+    uv run azoschema --console --log-file azotea.log {{ verbose }} all --batch-size 25000
+    #uv run azopopulate --console --trace --log-file azotea.log {{ verbose }} all --batch-size 25000
 
 
 setup:

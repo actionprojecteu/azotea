@@ -60,7 +60,10 @@ def crupdate(form: LocationForm, randomize: bool) -> None:
                 session.add(loc)
             else:
                 log.info("modifying prev. location '%s', '%s'", prev_loc.site_name, prev_loc.location)
-                prev_loc.longitude=form.longitude
-                prev_loc.latitude=form.latitude
-                prev_loc.utc_offset=form.utc_offset
+                if form.longitude is not None:
+                    prev_loc.longitude=form.longitude
+                if form.latitude is not None:
+                    prev_loc.latitude=form.latitude
+                if form.utc_offset is not None:
+                    prev_loc.utc_offset=form.utc_offset
                 session.add(prev_loc)

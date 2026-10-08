@@ -29,10 +29,8 @@ dependencies = [
 ]
 
 [project.scripts]
-# Create DB schema
+# Create DB schema and populate with initial values
 azoschema = "azotea_cli.cli.schema:main"
-# Populate schema with initial values
-azopopulate = "azotea_cli.cli.populate:main"
 # Register images and calculate sky bg statistics
 azotea = "azotea_cli.cli.azotea:main"
 # Provisioning and reporting utility

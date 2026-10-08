@@ -10,11 +10,16 @@
 
 import logging
 from argparse import ArgumentParser, Namespace
+import uuid
+from datetime import datetime, timedelta
+from itertools import batched
+
 
 # ------------------
 # SQLAlchemy imports
 # -------------------
 
+from sqlalchemy.orm import Session
 from lica.sqlalchemy import sqa_logging
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from lica.sqlalchemy.noasync.model import Model
@@ -25,9 +30,8 @@ from lica.cli import execute
 # -------------
 
 from azotea_cli import __version__
-
-# We must pull one model to make it work
-from azotea_cli.dao import Date  # noqa: F401
+from azotea_cli.dao import Date, Time, Config
+from .util import parser as prs
 
 # ----------------
 # Module constants
@@ -43,27 +47,149 @@ DESCRIPTION = "AZOTEA Database initial schema generation tool"
 log = logging.getLogger(__name__.split(".")[-1])
 
 # get the database engine and session factory object
-engine, _ = create_engine_sessionclass(env_var="DATABASE_URL")
+engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
 # -------------------
 
+def julian_day(date: datetime) -> float:
+    """Returns the Julian day number of a date at 0h UTC."""
+    a = (14 - date.month) // 12
+    y = date.year + 4800 - a
+    m = date.month + 12 * a - 3
+    return (date.day + ((153 * m + 2) // 5) + 365 * y + y // 4 - y // 100 + y // 400 - 32045) - 0.5
 
-def schema() -> None:
-    with engine.begin():
-        Model.metadata.drop_all(bind=engine)
-        Model.metadata.create_all(bind=engine)
-    engine.dispose()
+
+class TimeIterator:
+    def __init__(self, step_seconds=1):
+        self.step = timedelta(seconds=step_seconds)
+        self.current = datetime(
+            year=2000, month=1, day=1, hour=0, minute=0, second=0, microsecond=0
+        )
+        self.limit = datetime(year=2000, month=1, day=2, hour=0, minute=0, second=0, microsecond=0)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> datetime:
+        x = self.current
+        if x == self.limit:
+            raise StopIteration
+        self.current += self.step
+        return x
+
+
+class DateIterator:
+    def __init__(self, from_date: datetime, to_date: datetime):
+        self.step = timedelta(days=1)
+        self.current = from_date
+        self.limit = to_date
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> datetime:
+        x = self.current
+        if x > self.limit:
+            raise StopIteration
+        self.current += self.step
+        return x
+
+# -------------
+# CLI Functions
+# -------------
+
+def cli_populate_date(session: Session, args: Namespace) -> None:
+    log.info("Generating Date values")
+    date_iterator = DateIterator(from_date=args.since, to_date=args.until)
+    date_objs = (
+        Date(
+            date_id=d.year * 10000 + d.month * 100 + d.day,
+            sql_date=d.strftime("%Y-%m-%d"),
+            day=int(d.strftime("%d")),
+            date=d.strftime("%d/%m/%Y"),
+            day_year=int(d.strftime("%j")),
+            julian_day=julian_day(d),
+            weekday=d.strftime("%A"),
+            weekday_abbr=d.strftime("%a"),
+            weekday_num=int(d.strftime("%w")),  # 0 = Sunday
+            month=d.strftime("%B"),
+            month_num=int(d.strftime("%m")),
+            month_abbr=d.strftime("%b"),
+            year=int(d.strftime("%Y")),
+        )
+        for d in date_iterator
+    )
+    for i, batch in enumerate(batched(date_objs, args.batch_size), start=1):
+        log.info("Writing Date batch #%d (%d records)", i, len(batch))
+        with session.begin():
+            for obj in batch:
+                session.add(obj)
+
+
+def cli_populate_time(session: Session, args: Namespace) -> None:
+    log.info("Generating Time values")
+    time_iterator = TimeIterator(step_seconds=args.seconds)
+    time_objs = (
+        Time(
+            time_id=t.hour * 10000 + t.minute * 100 + t.second,
+            time=t.strftime("%H:%M:%S"),
+            hour=t.hour,
+            minute=t.minute,
+            second=t.second,
+            day_fraction=(t.hour * 3600 + t.minute * 60 + t.second) / (24 * 60 * 60),
+        )
+        for t in time_iterator
+    )
+    for i, batch in enumerate(batched(time_objs, args.batch_size), start=1):
+        log.info("Writing Time batch #%d (%d records)", i, len(batch))
+        with session.begin():
+            for obj in batch:
+                session.add(obj)
+
+
+def cli_populate_config(session: Session, args: Namespace) -> None:
+    with session.begin():
+        id = Config(section="database", property="uuid", value=str(uuid.uuid4()))
+        version = Config(section="database", property="version", value="03")
+        session.add(id)
+        session.add(version)
+
+
+def cli_populate_all(session: Session, args: Namespace) -> None:
+    cli_populate_date(session, args)
+    cli_populate_time(session, args)
+    cli_populate_config(session, args)
+
+
+def add_args(parser: ArgumentParser) -> None:
+    subparser = parser.add_subparsers(dest="command", required=True)
+    p = subparser.add_parser(
+        "date", parents=[prs.since(), prs.until(), prs.batch()], help="Load initial Date values"
+    )
+    p.set_defaults(func=cli_populate_date)
+    p = subparser.add_parser(
+        "time", parents=[prs.seconds(), prs.batch()], help="Load initial Time values"
+    )
+    p.set_defaults(func=cli_populate_time)
+    p = subparser.add_parser(
+        "all",
+        parents=[prs.since(), prs.until(), prs.seconds(), prs.batch()],
+        help="Load all initial values",
+    )
+    p.set_defaults(func=cli_populate_all)
 
 
 def cli_main(args: Namespace) -> None:
     sqa_logging(args)
-    schema()
+    with engine.begin():
+        Model.metadata.drop_all(bind=engine)
+        Model.metadata.create_all(bind=engine)
+        with SessionFactory() as session:
+            args.func(session, args)
+    engine.dispose()
 
-
-def add_args(parser: ArgumentParser) -> None:
-    pass
 
 
 def main():
