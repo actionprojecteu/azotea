@@ -6,7 +6,6 @@ import importlib.resources as resources
 import logging
 from datetime import datetime, timezone
 
-from lica.sqlalchemy import sqa_logging
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 
 # ---------------------
@@ -33,6 +32,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 class ConsentNotAgreed(AzoteaError):
     """Consent form was not signed or was declined"""
+    ...
 
 
 def is_signed(session: Session) -> bool:
