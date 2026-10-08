@@ -68,6 +68,10 @@ setup:
     uv run azotool --console configure optics --focal-length 50 --f-number 3.5
     uv run azotool --console configure publishing --username foo --password bar --url http://localhost:8080
 
+azotea:
+    uv run azotea --console batch --images-dir images --depth 8 --only-load
+
+
 # =======================================================================
 
 # --------------------------------
