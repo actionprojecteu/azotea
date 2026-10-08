@@ -2,26 +2,24 @@
 # standard libraries
 # ------------------
 #
-import logging
 import importlib.resources as resources
+import logging
+from datetime import datetime, timezone
+
+from lica.sqlalchemy import sqa_logging
+from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 
 # ---------------------
 # Third party libraries
 # ---------------------
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from datetime import datetime, timezone
-from lica.sqlalchemy import sqa_logging
-from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 
 # ---------------
 # Own dependecies
 # ---------------
-
 from azotea_cli.core.errors import AzoteaError
 from azotea_cli.dao import Config
-
 
 # -----------------------
 # Module global variables
@@ -31,6 +29,7 @@ from azotea_cli.dao import Config
 log = logging.getLogger(__name__.split(".")[-1])
 
 engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
+
 
 class ConsentNotAgreed(AzoteaError):
     """Consent form was not signed or was declined"""
@@ -42,7 +41,9 @@ def is_signed(session: Session) -> bool:
     answer = session.scalars(sql).one_or_none()
     return False if answer is None or answer.lower() != "yes" else True
 
-
+# --------------------------------------
+# used by other use cases as precondition
+# ---------------------------------------
 def check_signed(session: Session) -> None:
     if not is_signed(session):
         raise ConsentNotAgreed
@@ -50,10 +51,13 @@ def check_signed(session: Session) -> None:
 
 
 def text() -> str:
-    pkg = ".".join(__name__.split(".")[:-1]) # get the absolute parent package path
+    pkg = ".".join(__name__.split(".")[:-1])  # get the absolute parent package path
     return resources.read_text(pkg, "consent.txt", encoding="utf-8")
 
+
+# -------------------------------------
 # Main use case: View and agree consent
+# -------------------------------------
 
 def view(agree: bool) -> None:
     with SessionFactory() as session:
@@ -69,3 +73,6 @@ def view(agree: bool) -> None:
                 session.add(cfg1)
                 session.add(cfg2)
     engine.dispose()
+
+
+__all__ = ["view", "check_signed", "ConsentNotAgreed"]
