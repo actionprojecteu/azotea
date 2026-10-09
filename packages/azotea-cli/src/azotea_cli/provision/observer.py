@@ -53,6 +53,7 @@ def crupdate(form: ObserverForm, fix: bool) -> None:
     sql = select(Observer).where(
         Observer.family_name == form.family_name,
         Observer.surname == form.surname,
+        Observer.valid_state == ValidState.CURRENT
     )
     with SessionFactory() as session:
         with session.begin():

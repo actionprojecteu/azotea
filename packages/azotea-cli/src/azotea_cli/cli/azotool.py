@@ -23,15 +23,15 @@ from lica.validators import vdate
 # local imports
 # -------------
 from azotea_cli import __version__
-from azotea_cli import provisioning as prov
+from azotea_cli import provision as prov
 from azotea_cli.core.enums import BayerPattern, HeaderType
-from azotea_cli.provisioning import LocationForm, ObserverForm
+from azotea_cli.provision import LocationForm, ObserverForm
 
 # ----------------
 # Module constants
 # ----------------
 
-DESCRIPTION = "AZOTEA provisioning tool"
+DESCRIPTION = "AZOTEA provision tool"
 
 # -----------------------
 # Module global variables

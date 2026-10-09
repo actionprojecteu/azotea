@@ -33,7 +33,7 @@ dependencies = [
 azoschema = "azotea_cli.cli.schema:main"
 # Register images and calculate sky bg statistics
 azotea = "azotea_cli.cli.azotea:main"
-# Provisioning and reporting utility
+# provision and reporting utility
 azotool = "azotea_cli.cli.azotool:main"
 # Preprocess FITS images to be prcessed by azotea
 azofits = "azotea_cli.cli.azofits:main"
