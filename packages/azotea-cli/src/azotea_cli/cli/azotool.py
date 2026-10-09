@@ -22,7 +22,7 @@ from lica.validators import vdate
 # -------------
 from azotea_cli import __version__
 from azotea_cli.common.enums import BayerPattern, HeaderType
-from azotea_cli.provision import Provision, LocationForm, ObserverForm
+from azotea_cli.provision import Provision, LocationForm, ObserverForm, CameraForm
 
 # ----------------
 # Module constants
@@ -139,9 +139,8 @@ def add_args(parser: ArgumentParser) -> None:
     subparser = parser_camera.add_subparsers(dest="subcommand")
 
     camcre = subparser.add_parser("create", help="Create a new camera in the database")
-    camswi = subparser.add_parser(
-        "switch", help="Switch default camera to an existing model in the database"
-    )
+    camcre.set_defaults(func=cli_camera)
+
 
     camcre.add_argument(
         "--default", action="store_true", help="Set this camera as the default camera"
@@ -189,6 +188,10 @@ def add_args(parser: ArgumentParser) -> None:
     camcre.add_argument("--x-pixsize", type=float, default=None, help="Pixel width in um.")
     camcre.add_argument("--y-pixsize", type=float, default=None, help="Pixel height in um.")
 
+    camswi = subparser.add_parser(
+        "switch", help="Switch default camera to an existing model in the database"
+    )
+    # This si none bty default becaiuse of the exclusev group (--as-given | --from-image)
     camswi.add_argument(
         "--model", type=str, default=None, help="Camera Model (taken from EXIF data)"
     )
@@ -312,7 +315,25 @@ def cli_location(args: Namespace) -> None:
         latitude=args.latitude,
         utc_offset=args.utc_offset,
     )
-    prov.create_location(form)
+    prov.create_location(form, args.default)
+
+def cli_camera(args: Namespace) -> None:
+    # El resto de valores deberia ser tambien requerido
+    if args.model is None:
+        raise ValueError("Camera model is requuired in --as-given")
+    prov = Provision()
+    form =CameraForm(
+        model=args.model,
+        bayer_pattern=args.bayer_pattern,
+        header_type=args.header_type,
+        extension=args.extension,
+        width=args.width,
+        height=args.height,
+        bias=args.bias,
+        x_pixsize=args.x_pixsize,
+        y_pixsize=args.y_pixsize,
+    )
+    prov.create_camera(form, args.default)
 
 
 def cli_observer(args: Namespace) -> None:
@@ -326,7 +347,7 @@ def cli_observer(args: Namespace) -> None:
     if args.fix:
         prov.update_observer(form)
     else:
-        prov.create_observer_vers(form)
+        prov.create_observer_vers(form, args.default)
 
 
 def cli_main(args: Namespace) -> None:

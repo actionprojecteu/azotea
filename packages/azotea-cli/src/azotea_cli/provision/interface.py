@@ -82,7 +82,7 @@ class CameraForm:
     bias: int
     extension: str
     header_type: HeaderType
-    bayer: BayerPattern
+    bayer_pattern: BayerPattern
     x_pixsize: float
     y_pixsize: float
 
