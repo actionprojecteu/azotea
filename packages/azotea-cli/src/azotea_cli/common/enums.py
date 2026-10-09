@@ -1,4 +1,4 @@
-from enum import StrEnum
+from enum import StrEnum, IntEnum
 
 class ValidState(StrEnum):
     CURRENT = "Current"
@@ -19,3 +19,11 @@ class ImageType(StrEnum):
     DARK = "DARK"
     FLAT = "FLAT"
     LIGHT = "LIGHT"
+
+class BayerIndex(IntEnum):
+    """Indexes to bidimensional 2x2 RGB Bayer pattern, black_level_per_channel and white_levels_per_channel"""
+
+    R = 0
+    Gr = 1
+    B = 2
+    Gb = 3

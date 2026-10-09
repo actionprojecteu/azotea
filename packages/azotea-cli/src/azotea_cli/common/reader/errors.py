@@ -1,8 +1,13 @@
 from azotea_cli.common.errors import AzoteaError
 
+class MissingCameraModelError(AzoteaError):
+    """missing camera moedel from metadata"""
+
+    pass
+
 
 class UnsupportedCFAError(AzoteaError):
-    """Unsupported Color Filter Array type"""
+    """unsupported Color Filter Array type"""
 
     pass
 
@@ -20,6 +25,6 @@ class MissingDateObsError(AzoteaError):
 
 
 class UnknownDateTimeFormatError(AzoteaError):
-    """Unknown date-obs format string"""
+    """unknown observation date format string"""
 
     pass

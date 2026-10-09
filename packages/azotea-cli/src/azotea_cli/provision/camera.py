@@ -26,6 +26,9 @@ from .errors import (
     CameraExistsError,
     CameraMissingError,
     ConsentNotAgreedError,
+    FocalLenMissingError,
+    FNumberMissingError,
+
 )
 from .models import CameraForm
 
@@ -76,10 +79,18 @@ def create_from_image(path: str, as_default: bool) -> None:
         try:
             with session.begin():
                 consent.check_signed(session)
+                def_focal_len = config.load(session, "optics", "focal_len")
+                if def_focal_len is None:
+                    raise FocalLenMissingError
+                def_focal_len = float(def_focal_len)
+                def_f_number = config.load(session, "optics", "f_number")
+                if def_f_number is None:
+                    raise FNumberMissingError
+                def_f_number = float(def_f_number)
                 log.info("adding new camera from image '%s'", path)
                 reader = get_reader(path)
                 _, extension = os.path.splitext(path)
-                metadata = reader.read_metadata(path)
+                metadata = reader.read_metadata(path, def_focal_len, def_f_number)
                 header_type = reader.header_type()
                 model = f"{metadata.make} {metadata.model}"
                 cam = Camera(
@@ -93,7 +104,6 @@ def create_from_image(path: str, as_default: bool) -> None:
                 )
                 session.add(cam)
         except ConsentNotAgreedError:
-            raise
             raise
         except IntegrityError:
             raise CameraExistsError(model)

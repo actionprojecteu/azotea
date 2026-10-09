@@ -20,9 +20,7 @@ class RawPixels(Protocol):
 class ImageReader(Protocol):
     def header_type(self) -> HeaderType: ...
 
-    def image_type(self) ->ImageType: ...
-
-    def read_metadata(self, path: str) -> ImageMetadata:
+    def read_metadata(self, path: str, def_focal_len: float, def_f_number: float) -> ImageMetadata:
         """returns an instance of ImageMetadata dataclass"""
         ...
 
