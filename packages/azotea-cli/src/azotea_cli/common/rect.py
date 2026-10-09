@@ -17,6 +17,10 @@ class Point:
     def __floordiv__(self, rhs: int) -> "Point":
         return Point(self.x // rhs, self.y // rhs)
 
+    @classmethod
+    def zero(cls) -> "Point":
+        return cls(0,0)
+
 
 class Rect:
     PATTERN: re.Pattern[str] = re.compile(r"\[(\d+):(\d+),(\d+):(\d+)\]")

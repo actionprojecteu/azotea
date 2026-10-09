@@ -7,6 +7,7 @@ from .errors import (
     LocationMissingError,
     ObserverExistsError,
     ObserverMissingError,
+    RoiExistsError,
     FocalLenMissingError,
     FNumberMissingError
 )
@@ -14,12 +15,14 @@ from .interfaces import (
     CameraProv,
     LocationProv,
     ObserverProv,
+    RoiProv,
     OpticsProv,
 )
 from .models import (
     CameraForm,
     LocationForm,
     ObserverForm,
+    RoiForm,
     DefaultOpticsForm,
     DefaultOptics,
 )
@@ -29,10 +32,12 @@ __all__ = [
     "CameraProv",
     "LocationProv",
     "ObserverProv",
+    "RoiProv",
     "OpticsProv",
     "LocationForm",
     "ObserverForm",
     "CameraForm",
+    "RoiForm",
     "DefaultOpticsForm",
     "DefaultOptics",
     "ConsentNotAgreedError",
@@ -43,5 +48,6 @@ __all__ = [
     "CameraExistsError",
     "CameraMissingError",
     "FocalLenMissingError",
-    "FNumberMissingError"
+    "FNumberMissingError",
+    "RoiExistsError",
 ]

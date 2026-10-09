@@ -45,6 +45,11 @@ class CameraMissingError(AzoteaError):
 
     pass
 
+class RoiExistsError(AzoteaError):
+    """Roi already exists"""
+
+    pass
+
 class FocalLenMissingError(AzoteaError):
     """default focal length not set"""
 
@@ -54,6 +59,7 @@ class FNumberMissingError(AzoteaError):
     """default f-number not set"""
 
     pass
+
 
 
 __all__ = [

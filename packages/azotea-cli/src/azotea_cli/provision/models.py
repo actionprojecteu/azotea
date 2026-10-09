@@ -42,9 +42,27 @@ class CameraForm:
     x_pixsize: float
     y_pixsize: float
 
+@dataclass(frozen=True)
+class RoiForm:
+    x1: int
+    y1: int
+    x2: int
+    y2: int
+    comment: str | None
+
+    def __str__(self) -> str:
+        return f"[{self.y1}:{self.y2},{self.x1}:{self.x2}]"
+
+@dataclass(frozen=True)
+class RectForm2:
+    width: int
+    height: int
+
 
 __all__ = [
     "LocationForm",
     "ObserverForm",
     "CameraForm",
+    "DefaultOptics",
+    "RoiForm",
 ]

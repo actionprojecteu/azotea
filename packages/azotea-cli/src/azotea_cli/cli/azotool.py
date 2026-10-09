@@ -23,7 +23,7 @@ from lica.validators import vdate, vfile
 from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.enums import BayerPattern, HeaderType
-from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, DefaultOpticsForm, Provision
+from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, RoiForm, DefaultOpticsForm, Provision
 
 # ----------------
 # Module constants
@@ -203,6 +203,7 @@ def add_args(parser: ArgumentParser) -> None:
     subparser = parser_roi.add_subparsers(dest="subcommand")
 
     roicre = subparser.add_parser("create", help="Create a new region of interest in the database")
+    roicre.set_defaults(func=cli_roi)
     roiswi = subparser.add_parser(
         "switch",
         help="Switch default ROI to the auto centered ROI for the given camera and width and height",
@@ -230,7 +231,7 @@ def add_args(parser: ArgumentParser) -> None:
     roicre.add_argument("--x2", type=int, default=None, help="Ending pixel column")
     roicre.add_argument("--y2", type=int, default=None, help="Ending pixel row")
     roicre.add_argument(
-        "--comment", type=str, nargs="+", default=None, help="Additional region comment"
+        "--comment", type=str, default=None, help="Additional region comment"
     )
 
     roiswi.add_argument(
@@ -361,6 +362,30 @@ def cli_camera(args: Namespace) -> None:
         except AzoteaError as e:
             log.error(e)
 
+
+def cli_roi(args: Namespace) -> None:
+    prov = Provision()
+    if args.as_given:
+        # El resto de valores deberia ser tambien requerido
+        if args.x1 is None:
+            raise AzoteaError("Camera model is required in --as-given")
+        form = RoiForm(
+            x1=args.x1,
+            y1=args.y1,
+            x2=args.x2,
+            y2=args.y2,
+            comment = args.comment
+        )
+        try:
+            prov.create_roi(form, args.default)
+        except AzoteaError as e:
+            log.error(e)
+
+    else:
+        try:
+            prov.create_roi_from_image(args.from_image, args.width, args.height, args.default)
+        except AzoteaError as e:
+            log.error(e)
 
 
 def cli_observer(args: Namespace) -> None:

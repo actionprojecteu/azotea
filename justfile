@@ -97,6 +97,8 @@ observer2:
 observer3:
         uv run azotool --console --verbose observer create \
             --name Vieja --surname "del Visillo"  --acronym AAAFN --affiliation "Agrupacion Astronómica de Alcafran" --fix
+optics:
+    uv run azotool --console configure optics --focal-length 50 --f-number 3.5
 
 camera1:
    uv run azotool --console --verbose  camera create --default --as-given \
@@ -110,8 +112,18 @@ camera2 :
     uv run azotool --console   camera create --default \
         --from-image ${IMAGES}/2020_12_1200_02_329999.CR2
 
-optics:
-    uv run azotool --console configure optics --focal-length 50 --f-number 3.5
+
+roi1:
+     uv run azotool --console roi create --default --as-given \
+        --x1 100 --x2 600 --y1 300 --y2 700
+
+roi2:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    IMAGES=images/Carpeta1
+     uv run azotool --console  roi create --default --width 500 --height 400 \
+        --from-image ${IMAGES}/2020_12_1200_02_329999.CR2
+
 
 [private]
 check_mnt mnt:
