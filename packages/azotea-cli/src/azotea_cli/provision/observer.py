@@ -54,6 +54,7 @@ def create_versioned(form: ObserverForm, as_default: bool) -> None:
                 consent.check_signed(session)
                 now = datetime.now(timezone.utc)
                 prev_obs = session.scalars(sql).one_or_none()
+                obs = None
                 if prev_obs is None:
                     obs = Observer(
                         family_name=form.family_name,

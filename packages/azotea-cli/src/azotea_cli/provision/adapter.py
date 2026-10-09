@@ -1,5 +1,5 @@
-from .interface import IProvision, ObserverForm, LocationForm
-from . import consent, location, observer
+from .interface import IProvision, ObserverForm, LocationForm, CameraForm
+from . import consent, location, observer, camera
 
 class Provision(IProvision):
     def consent_view(self, agree: bool) -> None:
@@ -12,3 +12,7 @@ class Provision(IProvision):
         observer.create_versioned(form, as_default)
     def update_observer(self, form: ObserverForm) -> None:
         observer.update(form)
+    def create_camera(self, form: CameraForm,  as_default: bool) -> None:
+        camera.create(form,as_default)
+    def create_camera_from_image(self, path: str,  as_default: bool) -> None:
+        camera.create_from_image(path, as_default)

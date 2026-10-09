@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Protocol
 
+from azotea_cli.common.enums import BayerPattern, HeaderType
 from azotea_cli.common.errors import AzoteaError
-from azotea_cli.common.enums import HeaderType, BayerPattern
 
 # ------------------
 # Package exceptions
@@ -39,6 +39,18 @@ class ObserverMissingError(AzoteaError):
     pass
 
 
+class CameraExistsError(AzoteaError):
+    """Camera already exists"""
+
+    pass
+
+
+class CameraMissingError(AzoteaError):
+    """Camera does not exists"""
+
+    pass
+
+
 # -----------
 # Dataclasses
 # -----------
@@ -61,6 +73,7 @@ class ObserverForm:
     affiliation: str | None
     acronym: str | None
 
+
 @dataclass(frozen=True)
 class CameraForm:
     model: str
@@ -73,6 +86,7 @@ class CameraForm:
     x_pixsize: float
     y_pixsize: float
 
+
 # ----------
 # Interfaces
 # ----------
@@ -82,18 +96,21 @@ class IProvision(Protocol):
     def consent_view(self, agree: bool) -> None: ...
     def create_location(self, form: LocationForm, as_default: bool) -> None: ...
     def update_location(self, form: LocationForm) -> None: ...
-    def create_observer_vers(self, form: ObserverForm,  as_default: bool) -> None: ...
+    def create_observer_vers(self, form: ObserverForm, as_default: bool) -> None: ...
     def update_observer(self, form: ObserverForm) -> None: ...
-    def create_camera(self, form: CameraForm) -> None: ...
-    def create_camera_from_image(self, path: str) -> None: ...
+    def create_camera(self, form: CameraForm, as_default: bool) -> None: ...
+    def create_camera_from_image(self, path: str, as_default: bool) -> None: ...
 
 
 __all__ = [
     "LocationForm",
     "ObserverForm",
+    "CameraForm",
     "ConsentNotAgreedError",
     "LocationExistsError",
     "LocationMissingError",
     "ObserverExistsError",
     "ObserverMissingError",
+    "CameraExistsError",
+    "CameraMissingError",
 ]
