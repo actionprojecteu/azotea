@@ -21,6 +21,7 @@ from lica.validators import vdate, vfile
 # local imports
 # -------------
 from azotea_cli import __version__
+from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.enums import BayerPattern, HeaderType
 from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, DefaultOpticsForm, Provision
 
@@ -315,7 +316,10 @@ def cli_location(args: Namespace) -> None:
         latitude=args.latitude,
         utc_offset=args.utc_offset,
     )
-    prov.create_location(form, args.default)
+    try:
+        prov.create_location(form, args.default)
+    except AzoteaError as e:
+        log.error(e)
 
 def cli_optics(args: Namespace) -> None:
     prov = Provision()
@@ -323,14 +327,17 @@ def cli_optics(args: Namespace) -> None:
         focal_len=args.focal_length,
         f_number=args.f_number,
     )
-    prov.save_default_optics(form)
+    try:
+        prov.save_default_optics(form)
+    except AzoteaError as e:
+        log.error(e)
 
 def cli_camera(args: Namespace) -> None:
     prov = Provision()
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
         if args.model is None:
-            raise ValueError("Camera model is required in --as-given")
+            raise AzoteaError("Camera model is required in --as-given")
 
         form = CameraForm(
             model=args.model,
@@ -343,9 +350,17 @@ def cli_camera(args: Namespace) -> None:
             x_pixsize=args.x_pixsize,
             y_pixsize=args.y_pixsize,
         )
-        prov.create_camera(form, args.default)
+        try:
+            prov.create_camera(form, args.default)
+        except AzoteaError as e:
+            log.error(e)
+
     else:
-        prov.create_camera_from_image(args.from_image, args.default)
+        try:
+            prov.create_camera_from_image(args.from_image, args.default)
+        except AzoteaError as e:
+            log.error(e)
+
 
 
 def cli_observer(args: Namespace) -> None:
@@ -356,10 +371,13 @@ def cli_observer(args: Namespace) -> None:
         affiliation=args.affiliation,
         acronym=args.acronym,
     )
-    if args.fix:
-        prov.update_observer(form)
-    else:
-        prov.create_observer_vers(form, args.default)
+    try:
+        if args.fix:
+            prov.update_observer(form)
+        else:
+            prov.create_observer_vers(form, args.default)
+    except AzoteaError as e:
+        log.error(e)
 
 
 def cli_main(args: Namespace) -> None:

@@ -11,7 +11,7 @@ from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 # ---------------------
 # Third party libraries
 # ---------------------
-from sqlalchemy import select
+
 from sqlalchemy.orm import Session
 
 # ---------------
