@@ -8,9 +8,7 @@
 # System wide imports
 # -------------------
 
-import glob
 import logging
-import os
 from argparse import ArgumentParser, Namespace
 
 # -------------------
@@ -24,7 +22,7 @@ from lica.validators import vdate
 # -------------
 from azotea_cli import __version__
 from azotea_cli import provision as prov
-from azotea_cli.core.enums import BayerPattern, HeaderType
+from azotea_cli.common.enums import BayerPattern, HeaderType
 from azotea_cli.provision import LocationForm, ObserverForm
 
 # ----------------

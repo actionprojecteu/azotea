@@ -5,8 +5,8 @@ from typing import Protocol
 
 import numpy as np
 
-from azotea_cli.core.enums import BayerPattern, ImageType
-from azotea_cli.core.rect import Rect
+from azotea_cli.common.enums import BayerPattern, ImageType
+from azotea_cli.common.rect import Rect
 
 # type alias
 type Array2Du16 = np.ndarray[tuple[int, int], np.dtype[np.uint16]]

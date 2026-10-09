@@ -17,8 +17,8 @@ from sqlalchemy import select
 # Own dependecies
 # ---------------
 
-from azotea_cli.core.constants import FOREVER
-from azotea_cli.core.enums import ValidState
+from azotea_cli.common.constants import FOREVER
+from azotea_cli.common.enums import ValidState
 from azotea_cli.dao import Observer
 
 from . import consent

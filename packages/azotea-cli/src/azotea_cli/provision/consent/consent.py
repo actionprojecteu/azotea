@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.core.errors import AzoteaError
+from azotea_cli.common.errors import AzoteaError
 from azotea_cli.dao import Config
 
 # -----------------------

@@ -1,7 +1,7 @@
 
 from sqlalchemy import Enum
 from lica.sqlalchemy.metadata import metadata
-from ..core.enums import BayerPattern, HeaderType, ImageType, ValidState
+from ..common.enums import BayerPattern, HeaderType, ImageType, ValidState
 
 # --------------
 # Database Enums
