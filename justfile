@@ -107,7 +107,7 @@ camera2 :
     #!/usr/bin/env bash
     set -exuo pipefail
     IMAGES=images/Carpeta1
-    uv run azotool --console --verbose  camera create --default \
+    uv run azotool --console --verbose --trace camera create --default \
         --from-image ${IMAGES}/2020_12_1200_02_329999.CR2
 
 

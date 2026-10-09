@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from .models import CameraForm, LocationForm, ObserverForm
+from .models import CameraForm, LocationForm, ObserverForm, DefaultOpticsForm, DefaultOptics
 
 # ----------
 # Interfaces
@@ -25,6 +25,9 @@ class CameraProv(Protocol):
     def create_camera(self, form: CameraForm, as_default: bool) -> None: ...
     def create_camera_from_image(self, path: str, as_default: bool) -> None: ...
 
+class OpticsProv(Protocol):
+    def save_default_optics(self, form: DefaultOpticsForm) -> None: ...
+    def load_default_optics(self) -> DefaultOptics: ...
 
 __all__ = [
     "ConsentProv",

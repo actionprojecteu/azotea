@@ -1,6 +1,6 @@
 from .interfaces import LocationProv, ObserverProv, CameraProv
-from .models import  ObserverForm, LocationForm, CameraForm
-from . import consent, location, observer, camera
+from .models import  ObserverForm, LocationForm, CameraForm, DefaultOpticsForm, DefaultOptics
+from . import consent, location, observer, camera, optics
 
 class Provision(LocationProv, ObserverProv, CameraProv):
     def consent_view(self, agree: bool) -> None:
@@ -17,3 +17,7 @@ class Provision(LocationProv, ObserverProv, CameraProv):
         camera.create(form,as_default)
     def create_camera_from_image(self, path: str,  as_default: bool) -> None:
         camera.create_from_image(path, as_default)
+    def save_default_optics(self, form: DefaultOpticsForm) -> None:
+         optics.save_default(form)
+    def load_default_optics(self) -> DefaultOptics:
+        return optics.load_default()

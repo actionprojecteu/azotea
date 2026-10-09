@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from azotea_cli.common.enums import HeaderType
+from azotea_cli.common.enums import HeaderType, ImageType
 from azotea_cli.common.rect import Rect
 
 from .models import Array2Du16, ImageMetadata
@@ -19,6 +19,8 @@ class RawPixels(Protocol):
 
 class ImageReader(Protocol):
     def header_type(self) -> HeaderType: ...
+
+    def image_type(self) ->ImageType: ...
 
     def read_metadata(self, path: str) -> ImageMetadata:
         """returns an instance of ImageMetadata dataclass"""

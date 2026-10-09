@@ -22,6 +22,6 @@ class ImageMetadata:
     imagetyp: ImageType
     timestamp: datetime | None
     focal_len: float | None
-    f_numer: float | None
+    f_number: float | None
 
 __all__ = ["ImageMetadata", "Array2Du16"]

@@ -3,6 +3,16 @@ from dataclasses import dataclass
 from azotea_cli.common.enums import BayerPattern, HeaderType
 
 @dataclass(frozen=True)
+class DefaultOpticsForm:
+    focal_len: float | None
+    f_number: float | None
+
+@dataclass(frozen=True)
+class DefaultOptics:
+    focal_len: float
+    f_number: float
+
+@dataclass(frozen=True)
 class LocationForm:
     site_name: str
     location: str

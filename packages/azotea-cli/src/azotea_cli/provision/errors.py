@@ -45,6 +45,16 @@ class CameraMissingError(AzoteaError):
 
     pass
 
+class FocalLenMissingError(AzoteaError):
+    """default focal length not set"""
+
+    pass
+
+class FNumberMissingError(AzoteaError):
+    """default f-number not set"""
+
+    pass
+
 
 __all__ = [
     "ConsentNotAgreedError",
