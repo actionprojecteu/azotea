@@ -110,6 +110,8 @@ camera2 :
     uv run azotool --console --verbose --trace camera create --default \
         --from-image ${IMAGES}/2020_12_1200_02_329999.CR2
 
+optics:
+    uv run azotool --console configure optics --focal-length 50 --f-number 3.5
 
 [private]
 check_mnt mnt:

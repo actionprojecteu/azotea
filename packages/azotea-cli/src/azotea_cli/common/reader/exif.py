@@ -12,7 +12,7 @@ from azotea_cli.common.enums import HeaderType, ImageType, BayerPattern
 from .interfaces import ImageReader, RawPixels
 from .models import ImageMetadata
 from .errors import ReadMetadataError, MissingDateObsError, UnknownDateTimeFormatError
-from ...provision import Provision, DefaultOptics
+####from ...provision import Provision, DefaultOptics
 
 
 # get the root logger

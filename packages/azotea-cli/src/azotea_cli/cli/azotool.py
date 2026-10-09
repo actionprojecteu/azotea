@@ -22,7 +22,7 @@ from lica.validators import vdate, vfile
 # -------------
 from azotea_cli import __version__
 from azotea_cli.common.enums import BayerPattern, HeaderType
-from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, Provision
+from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, DefaultOpticsForm, Provision
 
 # ----------------
 # Module constants
@@ -280,6 +280,7 @@ def add_args(parser: ArgumentParser) -> None:
     miscopt = subparser.add_parser(
         "optics", help="Create the 'optics' section in the configuration"
     )
+    miscopt.set_defaults(func=cli_optics)
     miscopt.add_argument(
         "--focal-length", type=float, required=True, help="Camera focal length in mm."
     )
@@ -316,6 +317,13 @@ def cli_location(args: Namespace) -> None:
     )
     prov.create_location(form, args.default)
 
+def cli_optics(args: Namespace) -> None:
+    prov = Provision()
+    form = DefaultOpticsForm(
+        focal_len=args.focal_length,
+        f_number=args.f_number,
+    )
+    prov.save_default_optics(form)
 
 def cli_camera(args: Namespace) -> None:
     prov = Provision()
