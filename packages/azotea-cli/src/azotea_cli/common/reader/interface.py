@@ -43,7 +43,7 @@ class RawPixels(Protocol):
 
 class ImageReader(Protocol):
     def read_metadata(self, path: Path | str) -> ImageMetadata:
-        """returns ans insabxce of ImageMetadata dataclass"""
+        """returns an instance of ImageMetadata dataclass"""
         ...
 
     def read_pixels(self, path: Path | str) -> RawPixels:
