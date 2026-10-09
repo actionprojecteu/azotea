@@ -12,11 +12,11 @@ from .errors import (
     FNumberMissingError
 )
 from .interfaces import (
-    CameraProv,
-    LocationProv,
-    ObserverProv,
-    RoiProv,
-    OpticsProv,
+    ICameraProv,
+    ILocationProv,
+    IObserverProv,
+    IRoiProv,
+    IOpticsProv,
 )
 from .models import (
     CameraForm,
@@ -29,11 +29,11 @@ from .models import (
 
 __all__ = [
     "Provision",
-    "CameraProv",
-    "LocationProv",
-    "ObserverProv",
-    "RoiProv",
-    "OpticsProv",
+    "ICameraProv",
+    "ILocationProv",
+    "IObserverProv",
+    "IRoiProv",
+    "IOpticsProv",
     "LocationForm",
     "ObserverForm",
     "CameraForm",

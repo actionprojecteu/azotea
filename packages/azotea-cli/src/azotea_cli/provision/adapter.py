@@ -1,9 +1,9 @@
 from . import camera, consent, location, observer, optics, roi
-from .interfaces import CameraProv, LocationProv, ObserverProv, RoiProv
+from .interfaces import ICameraProv, ILocationProv, IObserverProv, IRoiProv
 from .models import CameraForm, DefaultOptics, DefaultOpticsForm, LocationForm, ObserverForm, RoiForm
 
 
-class Provision(LocationProv, ObserverProv, CameraProv, RoiProv):
+class Provision(ILocationProv, IObserverProv, ICameraProv, IRoiProv):
     def consent_view(self, agree: bool) -> None:
         consent.view(agree)
 

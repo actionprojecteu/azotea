@@ -14,38 +14,38 @@ from .models import (
 # ----------
 
 
-class ConsentProv(Protocol):
+class IConsentProv(Protocol):
     def consent_view(self, agree: bool) -> None: ...
 
 
-class ObserverProv(Protocol):
+class IObserverProv(Protocol):
     def create_observer_vers(self, form: ObserverForm, as_default: bool) -> None: ...
     def update_observer(self, form: ObserverForm) -> None: ...
 
 
-class LocationProv(Protocol):
+class ILocationProv(Protocol):
     def create_location(self, form: LocationForm, as_default: bool) -> None: ...
     def update_location(self, form: LocationForm) -> None: ...
 
 
-class CameraProv(Protocol):
+class ICameraProv(Protocol):
     def create_camera(self, form: CameraForm, as_default: bool) -> None: ...
     def create_camera_from_image(self, path: str, as_default: bool) -> None: ...
 
 
-class OpticsProv(Protocol):
+class IOpticsProv(Protocol):
     def save_default_optics(self, form: DefaultOpticsForm) -> None: ...
     def load_default_optics(self) -> DefaultOptics: ...
 
 
-class RoiProv(Protocol):
+class IRoiProv(Protocol):
     def create_roi(self, form: RoiForm, as_default: bool) -> None: ...
     def create_roi_from_image(self, path: str,  width: int, height: int, as_default: bool) -> None: ...
 
 
 __all__ = [
-    "ConsentProv",
-    "LocationProv",
-    "ObserverProv",
-    "CameraProv",
+    "IConsentProv",
+    "ILocationProv",
+    "IObserverProv",
+    "ICameraProv",
 ]
