@@ -17,8 +17,9 @@ from sqlalchemy.orm import Session
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.common.errors import AzoteaError
+
 from azotea_cli.dao import Config
+from ..interface import  ConsentNotAgreedError
 
 # -----------------------
 # Module global variables
@@ -28,11 +29,6 @@ from azotea_cli.dao import Config
 log = logging.getLogger(__name__.split(".")[-1])
 
 engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
-
-
-class ConsentNotAgreed(AzoteaError):
-    """Consent form was not signed or was declined"""
-    ...
 
 
 def is_signed(session: Session) -> bool:
@@ -46,7 +42,7 @@ def is_signed(session: Session) -> bool:
 # ---------------------------------------
 def check_signed(session: Session) -> None:
     if not is_signed(session):
-        raise ConsentNotAgreed
+        raise ConsentNotAgreedError
     log.info("Consent already signed")
 
 

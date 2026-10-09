@@ -21,9 +21,8 @@ from lica.validators import vdate
 # local imports
 # -------------
 from azotea_cli import __version__
-from azotea_cli import provision as prov
 from azotea_cli.common.enums import BayerPattern, HeaderType
-from azotea_cli.provision import LocationForm, ObserverForm
+from azotea_cli.provision import Provision, LocationForm, ObserverForm
 
 # ----------------
 # Module constants
@@ -300,10 +299,12 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_consent(args: Namespace) -> None:
+    prov = Provision()
     prov.consent_view(args.agree)
 
 
 def cli_location(args: Namespace) -> None:
+    prov = Provision()
     form = LocationForm(
         site_name=args.site_name,
         location=args.location,
@@ -315,6 +316,7 @@ def cli_location(args: Namespace) -> None:
 
 
 def cli_observer(args: Namespace) -> None:
+    prov = Provision()
     form = ObserverForm(
         family_name=args.name,
         surname=args.surname,
@@ -324,7 +326,7 @@ def cli_observer(args: Namespace) -> None:
     if args.fix:
         prov.update_observer(form)
     else:
-        prov.create_vers_observer(form)
+        prov.create_observer_vers(form)
 
 
 def cli_main(args: Namespace) -> None:
