@@ -3,14 +3,18 @@
 # ------------------
 
 import logging
+import os
 
 # ---------------------
 # Third party libraries
 # ---------------------
+#
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+
+from azotea_cli.common.reader import get_reader
 
 # ---------------
 # Own dependecies
@@ -18,12 +22,12 @@ from sqlalchemy.orm import Session
 from azotea_cli.dao import Camera
 
 from . import config, consent
-from .interface import (
+from .errors import (
     CameraExistsError,
-    CameraForm,
     CameraMissingError,
     ConsentNotAgreedError,
 )
+from .models import CameraForm
 
 # -----------------------
 # Module global variables
@@ -68,12 +72,28 @@ def create(form: CameraForm, as_default: bool) -> None:
 
 def create_from_image(path: str, as_default: bool) -> None:
     with SessionFactory() as session:
+        model = None
         try:
             with session.begin():
                 consent.check_signed(session)
                 log.info("adding new camera from image '%s'", path)
+                reader = get_reader(path)
+                _, extension = os.path.splitext(path)
+                metadata = reader.read_metadata(path)
+                header_type = reader.header_type()
+                model = f"{metadata.make} {metadata.model}"
+                cam = Camera(
+                    model=model,
+                    bias=metadata.black_level,
+                    extension=extension,
+                    header_type=header_type,
+                    bayer_pattern=metadata.bayer,
+                    width=metadata.width,
+                    height=metadata.height,
+                )
+                session.add(cam)
         except ConsentNotAgreedError:
             raise
             raise
         except IntegrityError:
-            raise CameraExistsError(cam.model)
+            raise CameraExistsError(model)

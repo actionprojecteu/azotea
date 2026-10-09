@@ -21,12 +21,12 @@ from azotea_cli.common.enums import ValidState
 from azotea_cli.dao import Observer
 
 from . import config, consent
-from .interface import (
+from .errors import (
     ConsentNotAgreedError,
     ObserverExistsError,
-    ObserverForm,
     ObserverMissingError,
 )
+from .models import ObserverForm
 
 # -----------------------
 # Module global variables

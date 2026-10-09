@@ -2,16 +2,12 @@
 # standard libraries
 # ------------------
 
-import logging
-
 # ---------------------
 # Third party libraries
 # ---------------------
 
-from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 
 # ---------------
 # Own dependecies

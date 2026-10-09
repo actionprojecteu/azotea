@@ -5,7 +5,7 @@ from typing import Protocol
 
 import numpy as np
 
-from azotea_cli.common.enums import BayerPattern, ImageType
+from azotea_cli.common.enums import BayerPattern, ImageType, HeaderType
 from azotea_cli.common.rect import Rect
 
 # type alias
@@ -42,6 +42,8 @@ class RawPixels(Protocol):
 
 
 class ImageReader(Protocol):
+    def header_type(self) -> HeaderType: ...
+
     def read_metadata(self, path: Path | str) -> ImageMetadata:
         """returns an instance of ImageMetadata dataclass"""
         ...

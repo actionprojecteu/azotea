@@ -18,8 +18,7 @@ from sqlalchemy.orm import Session
 # Own dependecies
 # ---------------
 
-from azotea_cli.dao import Config
-from ..interface import  ConsentNotAgreedError
+from ..errors import  ConsentNotAgreedError
 from .. import config
 
 # -----------------------

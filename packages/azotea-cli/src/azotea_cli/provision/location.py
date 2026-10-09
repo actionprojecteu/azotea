@@ -7,10 +7,8 @@ import logging
 # ---------------------
 # Third party libraries
 # ---------------------
-
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 # ---------------
@@ -18,14 +16,13 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 from azotea_cli.dao import Location
 
-from . import consent
-from . import config
-from .interface import (
+from . import config, consent
+from .errors import (
     ConsentNotAgreedError,
     LocationExistsError,
-    LocationForm,
     LocationMissingError,
 )
+from .models import LocationForm
 
 # -----------------------
 # Module global variables
@@ -40,7 +37,8 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # Create/Update location use case
 # -------------------------------
 
-def create(form: LocationForm,  as_default: bool) -> None:
+
+def create(form: LocationForm, as_default: bool) -> None:
     with SessionFactory() as session:
         try:
             with session.begin():

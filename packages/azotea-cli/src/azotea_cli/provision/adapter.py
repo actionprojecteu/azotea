@@ -1,7 +1,8 @@
-from .interface import IProvision, ObserverForm, LocationForm, CameraForm
+from .interfaces import LocationProv, ObserverProv, CameraProv
+from .models import  ObserverForm, LocationForm, CameraForm
 from . import consent, location, observer, camera
 
-class Provision(IProvision):
+class Provision(LocationProv, ObserverProv, CameraProv):
     def consent_view(self, agree: bool) -> None:
         consent.view(agree)
     def create_location(self, form: LocationForm,  as_default: bool) -> None:

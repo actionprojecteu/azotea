@@ -15,14 +15,14 @@ from argparse import ArgumentParser, Namespace
 # Third party imports
 # -------------------
 from lica.cli import execute
-from lica.validators import vdate
+from lica.validators import vdate, vfile
 
 # --------------
 # local imports
 # -------------
 from azotea_cli import __version__
 from azotea_cli.common.enums import BayerPattern, HeaderType
-from azotea_cli.provision import Provision, LocationForm, ObserverForm, CameraForm
+from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, Provision
 
 # ----------------
 # Module constants
@@ -141,14 +141,13 @@ def add_args(parser: ArgumentParser) -> None:
     camcre = subparser.add_parser("create", help="Create a new camera in the database")
     camcre.set_defaults(func=cli_camera)
 
-
     camcre.add_argument(
         "--default", action="store_true", help="Set this camera as the default camera"
     )
     group = camcre.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "--from-image",
-        type=str,
+        type=vfile,
         default=None,
         action="store",
         metavar="<image file path>",
@@ -317,23 +316,28 @@ def cli_location(args: Namespace) -> None:
     )
     prov.create_location(form, args.default)
 
+
 def cli_camera(args: Namespace) -> None:
-    # El resto de valores deberia ser tambien requerido
-    if args.model is None:
-        raise ValueError("Camera model is requuired in --as-given")
     prov = Provision()
-    form =CameraForm(
-        model=args.model,
-        bayer_pattern=args.bayer_pattern,
-        header_type=args.header_type,
-        extension=args.extension,
-        width=args.width,
-        height=args.height,
-        bias=args.bias,
-        x_pixsize=args.x_pixsize,
-        y_pixsize=args.y_pixsize,
-    )
-    prov.create_camera(form, args.default)
+    if args.as_given:
+        # El resto de valores deberia ser tambien requerido
+        if args.model is None:
+            raise ValueError("Camera model is required in --as-given")
+
+        form = CameraForm(
+            model=args.model,
+            bayer_pattern=args.bayer_pattern,
+            header_type=args.header_type,
+            extension=args.extension,
+            width=args.width,
+            height=args.height,
+            bias=args.bias,
+            x_pixsize=args.x_pixsize,
+            y_pixsize=args.y_pixsize,
+        )
+        prov.create_camera(form, args.default)
+    else:
+        prov.create_camera_from_image(args.from_image, args.default)
 
 
 def cli_observer(args: Namespace) -> None:
