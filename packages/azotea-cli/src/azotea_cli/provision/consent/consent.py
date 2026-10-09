@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 
 from azotea_cli.dao import Config
 from ..interface import  ConsentNotAgreedError
+from .. import config
 
 # -----------------------
 # Module global variables
@@ -32,9 +33,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 
 def is_signed(session: Session) -> bool:
-    sql = select(Config.value).where(Config.section == "gdpr", Config.property == "agree")
-    log.debug(sql)
-    answer = session.scalars(sql).one_or_none()
+    answer = config.load(session, "gdpr", "agree" )
     return False if answer is None or answer.lower() != "yes" else True
 
 # --------------------------------------
@@ -63,11 +62,9 @@ def view(agree: bool) -> None:
                 return
             print(text())
             if agree:
+                config.save(session, "gdpr", "agree", "Yes")
                 tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
-                cfg1 = Config(section="gdpr", property="agree", value="Yes")
-                cfg2 = Config(section="gdpr", property="tstamp", value=tstamp)
-                session.add(cfg1)
-                session.add(cfg2)
+                config.save(session, "gdpr", "tstamp",tstamp)
     engine.dispose()
 
 

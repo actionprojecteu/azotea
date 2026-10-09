@@ -10,6 +10,7 @@ import logging
 
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 # ---------------
@@ -18,6 +19,7 @@ from sqlalchemy.exc import IntegrityError
 from azotea_cli.dao import Location
 
 from . import consent
+from . import config
 from .interface import (
     ConsentNotAgreedError,
     LocationExistsError,
@@ -38,8 +40,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # Create/Update location use case
 # -------------------------------
 
-
-def create(form: LocationForm) -> None:
+def create(form: LocationForm,  as_default: bool) -> None:
     with SessionFactory() as session:
         try:
             with session.begin():
@@ -54,10 +55,14 @@ def create(form: LocationForm) -> None:
                     randomized=form.randomized,
                 )
                 session.add(loc)
+                if as_default:
+                    session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
+                    config.save(session, "location", "location_id", str(loc.location_id))
         except ConsentNotAgreedError:
             raise
         except IntegrityError as e:
             raise LocationExistsError(f"({form.site_name}, {form.location})")
+    engine.dispose()
 
 
 def update(form: LocationForm) -> None:
@@ -80,6 +85,7 @@ def update(form: LocationForm) -> None:
             if form.randomized is not None:
                 prev_loc.randomized = form.randomized
             session.add(prev_loc)
+    engine.dispose()
 
 
 __all__ = ["create, update"]

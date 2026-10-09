@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from azotea_cli.common.errors import AzoteaError
+from azotea_cli.common.enums import HeaderType, BayerPattern
 
 # ------------------
 # Package exceptions
@@ -60,6 +61,17 @@ class ObserverForm:
     affiliation: str | None
     acronym: str | None
 
+@dataclass(frozen=True)
+class CameraForm:
+    model: str
+    width: int
+    height: int
+    bias: int
+    extension: str
+    header_type: HeaderType
+    bayer: BayerPattern
+    x_pixsize: float
+    y_pixsize: float
 
 # ----------
 # Interfaces
@@ -68,10 +80,12 @@ class ObserverForm:
 
 class IProvision(Protocol):
     def consent_view(self, agree: bool) -> None: ...
-    def create_location(self, form: LocationForm) -> None: ...
+    def create_location(self, form: LocationForm, as_default: bool) -> None: ...
     def update_location(self, form: LocationForm) -> None: ...
-    def create_observer_vers(self, form: ObserverForm) -> None: ...
+    def create_observer_vers(self, form: ObserverForm,  as_default: bool) -> None: ...
     def update_observer(self, form: ObserverForm) -> None: ...
+    def create_camera(self, form: CameraForm) -> None: ...
+    def create_camera_from_image(self, path: str) -> None: ...
 
 
 __all__ = [

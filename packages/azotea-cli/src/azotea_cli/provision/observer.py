@@ -20,7 +20,7 @@ from azotea_cli.common.constants import FOREVER
 from azotea_cli.common.enums import ValidState
 from azotea_cli.dao import Observer
 
-from . import consent
+from . import config, consent
 from .interface import (
     ConsentNotAgreedError,
     ObserverExistsError,
@@ -42,7 +42,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # -------------------------------
 
 
-def create_versioned(form: ObserverForm) -> None:
+def create_versioned(form: ObserverForm, as_default: bool) -> None:
     sql = select(Observer).where(
         Observer.family_name == form.family_name,
         Observer.surname == form.surname,
@@ -81,6 +81,9 @@ def create_versioned(form: ObserverForm) -> None:
                     )
                     session.add(prev_obs)
                     session.add(obs)
+                if as_default:
+                    session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
+                    config.save(session, "observer", "observer_id", str(obs.observer_id))
         except ConsentNotAgreedError:
             raise
         except IntegrityError:
