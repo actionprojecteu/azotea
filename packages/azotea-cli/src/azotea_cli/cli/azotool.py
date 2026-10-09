@@ -318,7 +318,7 @@ def cli_location(args: Namespace) -> None:
 
 def cli_observer(args: Namespace) -> None:
     form = ObserverForm(
-        family_name=args.family_name,
+        family_name=args.name,
         surname=args.surname,
         affiliation=args.affiliation,
         acronym=args.acronym,
