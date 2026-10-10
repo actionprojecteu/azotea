@@ -13,13 +13,13 @@ from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 # ---------------------
 from sqlalchemy.orm import Session
 
-from ...errors import ConsentNotAgreedError
+from ..errors import ConsentNotAgreedError
 
 # ---------------
 # Own dependecies
 # ---------------
-from ...interfaces import IConsentProv
-from .. import config
+from ..interfaces import IConsentProv
+from . import config
 
 # -----------------------
 # Module global variables
