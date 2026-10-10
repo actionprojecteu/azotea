@@ -30,7 +30,7 @@ from lica.cli import execute
 # -------------
 
 from azotea_cli import __version__
-from azotea_cli.dao import Date, Time, Config
+from azotea_cli.infra.sqlalchemy import Date, Time, Config
 from .util import parser as prs
 
 # ----------------

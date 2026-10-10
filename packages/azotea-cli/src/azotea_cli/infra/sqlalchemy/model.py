@@ -25,7 +25,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ..common.enums import BayerPattern, HeaderType, ImageType, ValidState
+from azotea_cli.common.enums import BayerPattern, HeaderType, ImageType, ValidState
 from .enums import DbBayerPattern, DbHeaderType, DbImageType, DbValidState
 
 

@@ -1,7 +1,7 @@
 
 from sqlalchemy import Enum
 from lica.sqlalchemy.metadata import metadata
-from ..common.enums import BayerPattern, HeaderType, ImageType, ValidState
+from azotea_cli.common.enums import BayerPattern, HeaderType, ImageType, ValidState
 
 # --------------
 # Database Enums

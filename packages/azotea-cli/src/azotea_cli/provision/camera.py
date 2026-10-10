@@ -19,7 +19,7 @@ from azotea_cli.common.reader import get_reader
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.dao import Camera
+from azotea_cli.infra.sqlalchemy import Camera
 
 from . import config, consent
 from .errors import (

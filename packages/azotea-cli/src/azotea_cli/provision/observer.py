@@ -18,7 +18,7 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 from azotea_cli.common.constants import FOREVER
 from azotea_cli.common.enums import ValidState
-from azotea_cli.dao import Observer
+from azotea_cli.infra.sqlalchemy import Observer
 
 from . import config, consent
 from .errors import (

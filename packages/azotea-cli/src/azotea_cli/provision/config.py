@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 # Own dependecies
 # ---------------
 #
-from azotea_cli.dao import Config
+from azotea_cli.infra.sqlalchemy import Config
 
 def load(session: Session, section: str, property: str) -> str | None:
     sql = select(Config.value).where(Config.section == section, Config.property == property)

@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.dao import Location
+from azotea_cli.infra.sqlalchemy import Location
 
 from . import config, consent
 from .errors import (

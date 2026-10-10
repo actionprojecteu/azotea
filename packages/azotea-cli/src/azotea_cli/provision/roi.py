@@ -19,7 +19,7 @@ from azotea_cli.common.reader import get_reader
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.dao import Roi
+from azotea_cli.infra.sqlalchemy import Roi
 from azotea_cli.common.rect import Rect, Point
 
 from . import config, consent
