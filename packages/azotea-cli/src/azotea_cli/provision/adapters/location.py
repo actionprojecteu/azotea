@@ -16,13 +16,16 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 from azotea_cli.infra.sqlalchemy import Location
 
-from . import config, consent
-from .errors import (
+from . import config
+from ..errors import (
     ConsentNotAgreedError,
     LocationExistsError,
     LocationMissingError,
+    MissingDefaultLocationError,
 )
-from .models import LocationForm
+
+from ..models import LocationForm
+from ..interfaces import ILocationProv
 
 # -----------------------
 # Module global variables
@@ -37,53 +40,66 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # Create/Update location use case
 # -------------------------------
 
+class LocationProvImpl(ILocationProv):
+    def create(self, form: LocationForm, as_default: bool) -> int:
+        with SessionFactory() as session:
+            try:
+                with session.begin():
+                    log.info("adding new location '%s', '%s'", form.site_name, form.location)
+                    loc = Location(
+                        site_name=form.site_name,
+                        location=form.location,
+                        longitude=form.longitude,
+                        latitude=form.latitude,
+                        utc_offset=form.utc_offset,
+                        randomized=form.randomized,
+                    )
+                    session.add(loc)
+                    if as_default:
+                        session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
+                        config.save(session, "location", "location_id", str(loc.location_id))
+            except ConsentNotAgreedError:
+                raise
+            except IntegrityError as e:
+                raise LocationExistsError(f"({form.site_name}, {form.location})")
+        engine.dispose()
+        return loc.location_id
 
-def create(form: LocationForm, as_default: bool) -> None:
-    with SessionFactory() as session:
-        try:
+
+
+    def update(self, form: LocationForm) -> None:
+        sql = select(Location).where(
+            Location.site_name == form.site_name, Location.location == form.location
+        )
+        with SessionFactory() as session:
             with session.begin():
-                consent.check_signed(session)
-                log.info("adding new location '%s', '%s'", form.site_name, form.location)
-                loc = Location(
-                    site_name=form.site_name,
-                    location=form.location,
-                    longitude=form.longitude,
-                    latitude=form.latitude,
-                    utc_offset=form.utc_offset,
-                    randomized=form.randomized,
-                )
-                session.add(loc)
-                if as_default:
-                    session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
-                    config.save(session, "location", "location_id", str(loc.location_id))
-        except ConsentNotAgreedError:
-            raise
-        except IntegrityError as e:
-            raise LocationExistsError(f"({form.site_name}, {form.location})")
-    engine.dispose()
+                prev_loc = session.scalars(sql).one_or_none()
+                if prev_loc is None:
+                    raise LocationMissingError(f"({form.site_name}, {form.location})")
+                log.info("modifying prev. location '%s', '%s'", prev_loc.site_name, prev_loc.location)
+                if form.longitude is not None:
+                    prev_loc.longitude = form.longitude
+                if form.latitude is not None:
+                    prev_loc.latitude = form.latitude
+                if form.utc_offset is not None:
+                    prev_loc.utc_offset = form.utc_offset
+                if form.randomized is not None:
+                    prev_loc.randomized = form.randomized
+                session.add(prev_loc)
+        engine.dispose()
+
+    def set_default_id(self, location_id: int):
+        with SessionFactory() as session:
+            config.save(session, "location", "location_id", str(location_id))
+
+    def get_default_id(self) -> int:
+        with SessionFactory() as session:
+            location_id = config.load(session, "location", "location_id")
+            if location_id is None:
+                raise MissingDefaultLocationError
+            return int(location_id)
 
 
-def update(form: LocationForm) -> None:
-    sql = select(Location).where(
-        Location.site_name == form.site_name, Location.location == form.location
-    )
-    with SessionFactory() as session:
-        with session.begin():
-            consent.check_signed(session)
-            prev_loc = session.scalars(sql).one_or_none()
-            if prev_loc is None:
-                raise LocationMissingError(f"({form.site_name}, {form.location})")
-            log.info("modifying prev. location '%s', '%s'", prev_loc.site_name, prev_loc.location)
-            if form.longitude is not None:
-                prev_loc.longitude = form.longitude
-            if form.latitude is not None:
-                prev_loc.latitude = form.latitude
-            if form.utc_offset is not None:
-                prev_loc.utc_offset = form.utc_offset
-            if form.randomized is not None:
-                prev_loc.randomized = form.randomized
-            session.add(prev_loc)
-    engine.dispose()
 
 
-__all__ = ["create, update"]
+__all__ = ["LocationProvImpl"]

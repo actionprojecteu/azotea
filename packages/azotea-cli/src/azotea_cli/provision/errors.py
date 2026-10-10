@@ -21,6 +21,11 @@ class LocationMissingError(AzoteaError):
 
     pass
 
+class MissingDefaultLocationError(AzoteaError):
+    """Default location is not set"""
+
+    pass
+
 
 class ObserverExistsError(AzoteaError):
     """Observer already exists"""

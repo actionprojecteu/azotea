@@ -39,8 +39,9 @@ class ConsentProvImpl(IConsentProv):
         with SessionFactory() as session:
             if agreed:
                 tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
-                config.save(session, "gdpr", "agree", "Yes")
-                config.save(session, "gdpr", "tstamp", tstamp)
+                with session.begin():
+                    config.save(session, "gdpr", "agree", "Yes")
+                    config.save(session, "gdpr", "tstamp", tstamp)
 
     def agreed(self) -> bool:
         with SessionFactory() as session:

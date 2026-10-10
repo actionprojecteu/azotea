@@ -24,8 +24,8 @@ from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.enums import BayerPattern, HeaderType
 from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, RoiForm, DefaultOpticsForm
-from azotea_cli.provision.use_cases import consent_view_and_agree
-from azotea_cli.provision.adapters import ConsentProvImpl
+from azotea_cli.provision.use_cases import consent_view_and_agree, create_location
+from azotea_cli.provision.adapters import ConsentProvImpl, LocationProvImpl
 from azotea_cli.infra.cli.display import StdoutDisplay
 
 # ----------------
@@ -313,7 +313,8 @@ def cli_consent(args: Namespace) -> None:
 
 
 def cli_location(args: Namespace) -> None:
-    prov = Provision()
+    location = LocationProvImpl()
+    consent = ConsentProvImpl()
     form = LocationForm(
         site_name=args.site_name,
         location=args.location,
@@ -322,7 +323,7 @@ def cli_location(args: Namespace) -> None:
         utc_offset=args.utc_offset,
     )
     try:
-        prov.create_location(form, args.default)
+        create_location(consent, location, form, args.default)
     except AzoteaError as e:
         log.error(e)
 

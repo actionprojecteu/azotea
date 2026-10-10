@@ -1,2 +1,3 @@
 from .consent import ConsentProvImpl
-__all__ = ["ConsentProvImpl"]
+from .location import  LocationProvImpl
+__all__ = ["ConsentProvImpl", "LocationProvImpl"]
