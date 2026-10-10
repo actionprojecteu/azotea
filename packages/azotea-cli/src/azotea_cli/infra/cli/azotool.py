@@ -339,7 +339,7 @@ def cli_location(args: Namespace) -> None:
         utc_offset=args.utc_offset,
     )
     try:
-        create_location(consent, location, form, args.default)
+        create_location(location, consent, form, args.default)
     except AzoteaError as e:
         log.error(e)
 
@@ -352,7 +352,7 @@ def cli_optics(args: Namespace) -> None:
         f_number=args.f_number,
     )
     try:
-        save_default_optics(consent, optics, form)
+        save_default_optics(optics, consent, form)
     except AzoteaError as e:
         log.error(e)
 
@@ -378,13 +378,13 @@ def cli_camera(args: Namespace) -> None:
             y_pixsize=args.y_pixsize,
         )
         try:
-            create_camera(consent, camera, form, args.default)
+            create_camera(camera, consent, form, args.default)
         except AzoteaError as e:
             log.error(e)
 
     else:
         try:
-            create_camera_from_image(consent, optics, camera, args.from_image, args.default)
+            create_camera_from_image(camera, consent, optics,args.from_image, args.default)
         except AzoteaError as e:
             log.error(e)
 
@@ -400,14 +400,14 @@ def cli_roi(args: Namespace) -> None:
             raise AzoteaError("Camera model is required in --as-given")
         form = RoiForm(x1=args.x1, y1=args.y1, x2=args.x2, y2=args.y2, comment=args.comment)
         try:
-            create_roi(consent, roi, form, args.default)
+            create_roi(roi, consent, form, args.default)
         except AzoteaError as e:
             log.error(e)
 
     else:
         form = RoiCenteredForm(width=args.width, height=args.height)
         try:
-            create_roi_from_image(consent, optics, roi, args.from_image,form, args.default)
+            create_roi_from_image(roi, consent, optics, args.from_image,form, args.default)
         except AzoteaError as e:
             log.error(e)
 
@@ -423,9 +423,9 @@ def cli_observer(args: Namespace) -> None:
     )
     try:
         if args.fix:
-            update_observer(consent, observer, form)
+            update_observer(observer,consent,  form)
         else:
-            create_versioned_observer(consent, observer, form, args.default)
+            create_versioned_observer(observer, consent, form, args.default)
     except AzoteaError as e:
         log.error(e)
 

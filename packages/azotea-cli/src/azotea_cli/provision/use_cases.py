@@ -34,59 +34,59 @@ def consent_check(consent: IConsentProv) -> None:
 
 
 def create_location(
-    consent: IConsentProv, location: ILocationProv, form: LocationForm, as_default: bool
+    location: ILocationProv, consent: IConsentProv, form: LocationForm, as_default: bool
 ) -> None:
     consent.check_raises()
     location.create(form, as_default)
 
 
 def save_default_optics(
-    consent: IConsentProv, optics: IOpticsProv, form: DefaultOpticsForm
+    optics: IOpticsProv, consent: IConsentProv, form: DefaultOpticsForm
 ) -> None:
     consent.check_raises()
     optics.save(form)
 
 
-def load_default_optics(consent: IConsentProv, optics: IOpticsProv) -> DefaultOptics:
+def load_default_optics(optics: IOpticsProv, consent: IConsentProv ) -> DefaultOptics:
     consent.check_raises()
     data = optics.load()
     return data
 
 
 def create_versioned_observer(
-    consent: IConsentProv, observer: IObserverProv, form: ObserverForm, as_default: bool
+    observer: IObserverProv, consent: IConsentProv, form: ObserverForm, as_default: bool
 ) -> None:
     consent.check_raises()
     observer.create_versioned(form, as_default)
 
 
-def update_observer(consent: IConsentProv, observer: IObserverProv, form: ObserverForm) -> None:
+def update_observer(observer: IObserverProv, consent: IConsentProv, form: ObserverForm) -> None:
     consent.check_raises()
     observer.update(form)
 
 
 def create_camera(
-    consent: IConsentProv, camera: ICameraProv, form: CameraForm, as_default: bool
+   camera: ICameraProv,  consent: IConsentProv, form: CameraForm, as_default: bool
 ) -> None:
     consent.check_raises()
     camera.create(form, as_default)
 
 
 def create_camera_from_image(
-    consent: IConsentProv, optics: IOpticsProv, camera: ICameraProv, path: str, as_default: bool
+    camera: ICameraProv, consent: IConsentProv, optics: IOpticsProv, path: str, as_default: bool
 ) -> None:
     consent.check_raises()
     default_optics = optics.load()
     camera.create_from_image(path, default_optics, as_default)
 
 
-def create_roi(consent: IConsentProv, roi: IRoiProv, form: RoiForm, as_default: bool) -> None:
+def create_roi(roi: IRoiProv, consent: IConsentProv, form: RoiForm, as_default: bool) -> None:
     consent.check_raises()
     roi.create(form, as_default)
 
 
 def create_roi_from_image(
-    consent: IConsentProv, optics: IOpticsProv, roi: IRoiProv, path: str, form: RoiCenteredForm,  as_default: bool
+    roi: IRoiProv, consent: IConsentProv, optics: IOpticsProv, path: str, form: RoiCenteredForm,  as_default: bool
 ) -> None:
     consent.check_raises()
     default_optics = optics.load()
