@@ -31,13 +31,13 @@ dependencies = [
 
 [project.scripts]
 # Create DB schema and populate with initial values
-azoschema = "azotea_cli.cli.schema:main"
+azoschema = "azotea_cli.infra.cli.schema:main"
 # Register images and calculate sky bg statistics
-azotea = "azotea_cli.cli.azotea:main"
+azotea = "azotea_cli.infra.cli.azotea:main"
 # provision and reporting utility
-azotool = "azotea_cli.cli.azotool:main"
+azotool = "azotea_cli.infra.cli.azotool:main"
 # Preprocess FITS images to be prcessed by azotea
-azofits = "azotea_cli.cli.azofits:main"
+azofits = "azotea_cli.infra.cli.azofits:main"
 
 # ------------------------
 # DYNAMIC VERSIONING STUFF
