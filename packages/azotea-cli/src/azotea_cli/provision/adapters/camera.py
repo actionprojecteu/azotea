@@ -30,7 +30,7 @@ from ..errors import (
 
 )
 from ..models import CameraForm, DefaultOptics
-from ..interfaces import ICameraProv
+from ..interfaces import CameraProv
 
 # -----------------------
 # Module global variables
@@ -45,7 +45,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # Create/Update location use case
 # -------------------------------
 
-class CameraProvImpl(ICameraProv):
+class CameraProvImpl(CameraProv):
 
     def create(self, form: CameraForm, as_default: bool) -> int:
         with SessionFactory() as session:

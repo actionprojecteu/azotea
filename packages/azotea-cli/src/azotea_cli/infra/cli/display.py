@@ -1,6 +1,6 @@
-from azotea_cli.provision.interfaces import IDisplay
+from azotea_cli.provision.interfaces import Display
 
-class StdoutDisplay(IDisplay):
+class StdoutDisplay(Display):
     def display(self, text: str) -> None:
         print(text)
 

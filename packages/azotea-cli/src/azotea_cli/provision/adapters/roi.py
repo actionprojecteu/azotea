@@ -26,7 +26,7 @@ from ..errors import (
     RoiExistsError,
     MissingDefaultRoiError
 )
-from ..interfaces import IRoiProv
+from ..interfaces import RoiProv
 from ..models import RoiCenteredForm, RoiForm, DefaultOptics
 from . import config
 # -----------------------
@@ -43,7 +43,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # -------------------------------
 
 
-class RoiProvImpl(IRoiProv):
+class RoiProvImpl(RoiProv):
 
     def set_default(self, roi_id: int) -> None:
         with SessionFactory() as session:

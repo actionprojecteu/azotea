@@ -18,7 +18,7 @@ from ..errors import ConsentNotAgreedError
 # ---------------
 # Own dependecies
 # ---------------
-from ..interfaces import IConsentProv
+from ..interfaces import ConsentProv
 from . import config
 
 # -----------------------
@@ -31,7 +31,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 
-class ConsentProvImpl(IConsentProv):
+class ConsentProvImpl(ConsentProv):
     def review(self) -> str:
         return text()
 

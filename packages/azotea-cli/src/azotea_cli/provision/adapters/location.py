@@ -24,7 +24,7 @@ from ..errors import (
 )
 
 from ..models import LocationForm
-from ..interfaces import ILocationProv
+from ..interfaces import LocationProv
 
 # -----------------------
 # Module global variables
@@ -39,7 +39,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # Create/Update location use case
 # -------------------------------
 
-class LocationProvImpl(ILocationProv):
+class LocationProvImpl(LocationProv):
     def create(self, form: LocationForm, as_default: bool) -> int:
         with SessionFactory() as session:
             try:

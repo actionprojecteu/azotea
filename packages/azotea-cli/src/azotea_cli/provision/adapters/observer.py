@@ -27,7 +27,7 @@ from ..errors import (
     MissingDefaultObserverError,
 )
 from ..models import ObserverForm
-from ..interfaces import IObserverProv
+from ..interfaces import ObserverProv
 
 # -----------------------
 # Module global variables
@@ -42,7 +42,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # Create/Update location use case
 # -------------------------------
 
-class ObserverProvImpl(IObserverProv):
+class ObserverProvImpl(ObserverProv):
 
     def set_default(self, observer_id) -> None:
         with SessionFactory() as session:
