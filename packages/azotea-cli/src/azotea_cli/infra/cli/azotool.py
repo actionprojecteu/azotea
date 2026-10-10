@@ -24,8 +24,8 @@ from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.enums import BayerPattern, HeaderType
 from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, RoiForm, DefaultOpticsForm
-from azotea_cli.provision.use_cases import consent_view_and_agree, create_location
-from azotea_cli.provision.adapters import ConsentProvImpl, LocationProvImpl
+from azotea_cli.provision.use_cases import consent_view_and_agree, create_location, save_default_optics
+from azotea_cli.provision.adapters import ConsentProvImpl, LocationProvImpl, OpticsProvImpl
 from azotea_cli.infra.cli.display import StdoutDisplay
 
 # ----------------
@@ -328,13 +328,14 @@ def cli_location(args: Namespace) -> None:
         log.error(e)
 
 def cli_optics(args: Namespace) -> None:
-    prov = Provision()
+    optics = OpticsProvImpl()
+    consent = ConsentProvImpl()
     form = DefaultOpticsForm(
         focal_len=args.focal_length,
         f_number=args.f_number,
     )
     try:
-        prov.save_default_optics(form)
+        save_default_optics(consent, optics, form)
     except AzoteaError as e:
         log.error(e)
 

@@ -51,7 +51,6 @@ class ConsentProvImpl(IConsentProv):
         with SessionFactory() as session:
             if not self._is_signed(session):
                 raise ConsentNotAgreedError
-            log.info("Consent already signed")
 
     def _is_signed(self, session: Session) -> bool:
         answer = config.load(session, "gdpr", "agree")
