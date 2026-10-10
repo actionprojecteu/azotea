@@ -56,8 +56,18 @@ class CameraMissingError(AzoteaError):
 
     pass
 
+class MissingDefaultCameraError(AzoteaError):
+    """Default camera is not set"""
+
+    pass
+
 class RoiExistsError(AzoteaError):
     """Roi already exists"""
+
+    pass
+
+class MissingDefaultRoiError(AzoteaError):
+    """Default roi is not set"""
 
     pass
 
@@ -70,15 +80,3 @@ class FNumberMissingError(AzoteaError):
     """default f-number not set"""
 
     pass
-
-
-
-__all__ = [
-    "ConsentNotAgreedError",
-    "LocationExistsError",
-    "LocationMissingError",
-    "ObserverExistsError",
-    "ObserverMissingError",
-    "CameraExistsError",
-    "CameraMissingError",
-]

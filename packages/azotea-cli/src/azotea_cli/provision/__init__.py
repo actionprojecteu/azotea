@@ -22,6 +22,7 @@ from .models import (
     LocationForm,
     ObserverForm,
     RoiForm,
+    RoiCenteredForm,
     DefaultOpticsForm,
     DefaultOptics,
 )

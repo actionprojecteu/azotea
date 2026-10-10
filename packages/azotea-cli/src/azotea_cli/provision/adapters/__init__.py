@@ -3,6 +3,7 @@ from .consent import ConsentProvImpl
 from .location import LocationProvImpl
 from .observer import ObserverProvImpl
 from .optics import OpticsProvImpl
+from .roi import RoiProvImpl
 
 __all__ = [
     "ConsentProvImpl",
@@ -10,4 +11,5 @@ __all__ = [
     "OpticsProvImpl",
     "ObserverProvImpl",
     "CameraProvImpl",
+    "RoiProvImpl",
 ]

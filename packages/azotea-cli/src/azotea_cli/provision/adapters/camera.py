@@ -20,15 +20,16 @@ from azotea_cli.common.reader import get_reader
 # ---------------
 from azotea_cli.infra.sqlalchemy import Camera
 
-from . import config, consent
+from . import config
 from ..errors import (
     CameraExistsError,
     CameraMissingError,
     FocalLenMissingError,
     FNumberMissingError,
+    MissingDefaultCameraError,
 
 )
-from ..models import CameraForm
+from ..models import CameraForm, DefaultOptics
 from ..interfaces import ICameraProv
 
 # -----------------------
@@ -73,23 +74,15 @@ class CameraProvImpl(ICameraProv):
         return camera_id
 
 
-    def create_from_image(self, path: str, as_default: bool) -> int:
+    def create_from_image(self, path: str, optics: DefaultOptics, as_default: bool) -> int:
         with SessionFactory() as session:
             model = None
             try:
                 with session.begin():
-                    def_focal_len = config.load(session, "optics", "focal_len")
-                    if def_focal_len is None:
-                        raise FocalLenMissingError
-                    def_focal_len = float(def_focal_len)
-                    def_f_number = config.load(session, "optics", "f_number")
-                    if def_f_number is None:
-                        raise FNumberMissingError
-                    def_f_number = float(def_f_number)
                     log.info("adding new camera from image: %s", path)
                     reader = get_reader(path)
                     _, extension = os.path.splitext(path)
-                    metadata = reader.read_metadata(path, def_focal_len, def_f_number)
+                    metadata = reader.read_metadata(path, optics.focal_len, optics.f_number)
                     header_type = reader.header_type()
                     model = metadata.model if metadata.model.startswith(metadata.make) else  f"{metadata.make} {metadata.model}"
                     cam = Camera(
@@ -107,3 +100,14 @@ class CameraProvImpl(ICameraProv):
             except IntegrityError:
                 raise CameraExistsError(model)
         return camera_id
+
+    def set_default(self, camera_id: int) -> None:
+        with SessionFactory() as session:
+            config.save(session, "camera", "camera_id", str(camera_id))
+
+    def get_default(self) -> int:
+        with SessionFactory() as session:
+            camera_id = config.load(session, "camera", "camera_id")
+            if camera_id is None:
+                raise MissingDefaultCameraError
+            return int(camera_id)

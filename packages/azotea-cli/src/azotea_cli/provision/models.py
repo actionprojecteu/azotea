@@ -74,9 +74,12 @@ class RoiForm:
 
 
 @dataclass(frozen=True)
-class RectForm2:
+class RoiCenteredForm:
     width: int
     height: int
+
+    def __str__(self) -> str:
+        return f"width: {self.width}, height: {self.height}"
 
 
 __all__ = [

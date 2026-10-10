@@ -7,8 +7,17 @@ from .interfaces import (
     ILocationProv,
     IObserverProv,
     IOpticsProv,
+    IRoiProv,
 )
-from .models import CameraForm, DefaultOptics, DefaultOpticsForm, LocationForm, ObserverForm
+from .models import (
+    CameraForm,
+    RoiCenteredForm,
+    DefaultOptics,
+    DefaultOpticsForm,
+    LocationForm,
+    ObserverForm,
+    RoiForm,
+)
 
 log = logging.getLogger(__name__.split(".")[-2])
 
@@ -62,8 +71,23 @@ def create_camera(
     consent.check_raises()
     camera.create(form, as_default)
 
+
 def create_camera_from_image(
-    consent: IConsentProv, camera: ICameraProv, path: str, as_default: bool
+    consent: IConsentProv, optics: IOpticsProv, camera: ICameraProv, path: str, as_default: bool
 ) -> None:
     consent.check_raises()
-    camera.create_from_image(path, as_default)
+    default_optics = optics.load()
+    camera.create_from_image(path, default_optics, as_default)
+
+
+def create_roi(consent: IConsentProv, roi: IRoiProv, form: RoiForm, as_default: bool) -> None:
+    consent.check_raises()
+    roi.create(form, as_default)
+
+
+def create_roi_from_image(
+    consent: IConsentProv, optics: IOpticsProv, roi: IRoiProv, path: str, form: RoiCenteredForm,  as_default: bool
+) -> None:
+    consent.check_raises()
+    default_optics = optics.load()
+    roi.create_from_image(path, form, default_optics, as_default)

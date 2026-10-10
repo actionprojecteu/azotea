@@ -25,13 +25,14 @@ from azotea_cli import __version__
 from azotea_cli.common.enums import BayerPattern, HeaderType
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.infra.cli.display import StdoutDisplay
-from azotea_cli.provision import CameraForm, DefaultOpticsForm, LocationForm, ObserverForm, RoiForm
+from azotea_cli.provision import CameraForm, DefaultOpticsForm, LocationForm, ObserverForm, RoiForm, RoiCenteredForm
 from azotea_cli.provision.adapters import (
     CameraProvImpl,
     ConsentProvImpl,
     LocationProvImpl,
     ObserverProvImpl,
     OpticsProvImpl,
+    RoiProvImpl,
 )
 from azotea_cli.provision.use_cases import (
     consent_view_and_agree,
@@ -41,6 +42,8 @@ from azotea_cli.provision.use_cases import (
     create_versioned_observer,
     save_default_optics,
     update_observer,
+    create_roi,
+    create_roi_from_image,
 )
 
 # ----------------
@@ -357,6 +360,7 @@ def cli_optics(args: Namespace) -> None:
 def cli_camera(args: Namespace) -> None:
     camera = CameraProvImpl()
     consent = ConsentProvImpl()
+    optics = OpticsProvImpl()
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
         if args.model is None:
@@ -380,26 +384,30 @@ def cli_camera(args: Namespace) -> None:
 
     else:
         try:
-            create_camera_from_image(consent, camera, args.from_image, args.default)
+            create_camera_from_image(consent, optics, camera, args.from_image, args.default)
         except AzoteaError as e:
             log.error(e)
 
 
 def cli_roi(args: Namespace) -> None:
-    prov = Provision()
+    roi = RoiProvImpl()
+    consent = ConsentProvImpl()
+    optics = OpticsProvImpl()
+
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
         if args.x1 is None:
             raise AzoteaError("Camera model is required in --as-given")
         form = RoiForm(x1=args.x1, y1=args.y1, x2=args.x2, y2=args.y2, comment=args.comment)
         try:
-            prov.create_roi(form, args.default)
+            create_roi(consent, roi, form, args.default)
         except AzoteaError as e:
             log.error(e)
 
     else:
+        form = RoiCenteredForm(width=args.width, height=args.height)
         try:
-            prov.create_roi_from_image(args.from_image, args.width, args.height, args.default)
+            create_roi_from_image(consent, optics, roi, args.from_image,form, args.default)
         except AzoteaError as e:
             log.error(e)
 
