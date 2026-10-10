@@ -11,14 +11,14 @@ from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 # ---------------------
 # Third party libraries
 # ---------------------
-
 from sqlalchemy.orm import Session
+
+from ...errors import ConsentNotAgreedError
 
 # ---------------
 # Own dependecies
 # ---------------
-
-from ..errors import  ConsentNotAgreedError
+from ...interfaces import IConsentProv
 from .. import config
 
 # -----------------------
@@ -31,13 +31,37 @@ log = logging.getLogger(__name__.split(".")[-1])
 engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 
-def is_signed(session: Session) -> bool:
-    answer = config.load(session, "gdpr", "agree" )
-    return False if answer is None or answer.lower() != "yes" else True
+class ConsentProvImpl(IConsentProv):
+    def view(self) -> None:
+        with SessionFactory() as session:
+            with session.begin():
+                if self.is_signed(session):
+                    log.info("Consent already signed")
+                    return
+                print(text())
 
-# --------------------------------------
+    def agree(self, agreed: bool) -> None:
+        with SessionFactory() as session:
+            if agreed:
+                tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
+                config.save(session, "gdpr", "agree", "Yes")
+                config.save(session, "gdpr", "tstamp", tstamp)
+
+    def check(self) -> None:
+        with SessionFactory() as session:
+            if not self.is_signed(session):
+                raise ConsentNotAgreedError
+            log.info("Consent already signed")
+
+    def is_signed(self, session: Session) -> bool:
+        answer = config.load(session, "gdpr", "agree")
+        return False if answer is None or answer.lower() != "yes" else True
+
+
+# ---------------------------------------
 # used by other use cases as precondition
 # ---------------------------------------
+#
 def check_signed(session: Session) -> None:
     if not is_signed(session):
         raise ConsentNotAgreedError
@@ -53,6 +77,7 @@ def text() -> str:
 # Main use case: View and agree consent
 # -------------------------------------
 
+
 def view(agree: bool) -> None:
     with SessionFactory() as session:
         with session.begin():
@@ -63,7 +88,7 @@ def view(agree: bool) -> None:
             if agree:
                 config.save(session, "gdpr", "agree", "Yes")
                 tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
-                config.save(session, "gdpr", "tstamp",tstamp)
+                config.save(session, "gdpr", "tstamp", tstamp)
     engine.dispose()
 
 

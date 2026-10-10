@@ -1,4 +1,3 @@
-from .adapter import Provision
 from .errors import (
     CameraExistsError,
     CameraMissingError,
@@ -28,7 +27,6 @@ from .models import (
 )
 
 __all__ = [
-    "Provision",
     "ICameraProv",
     "ILocationProv",
     "IObserverProv",

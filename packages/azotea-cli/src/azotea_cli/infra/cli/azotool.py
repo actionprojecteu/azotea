@@ -23,7 +23,9 @@ from lica.validators import vdate, vfile
 from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.enums import BayerPattern, HeaderType
-from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, RoiForm, DefaultOpticsForm, Provision
+from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, RoiForm, DefaultOpticsForm
+from azotea_cli.provision.use_cases import consent_view_and_agree
+from azotea_cli.provision.adapters import ConsentProvImpl
 
 # ----------------
 # Module constants
@@ -304,8 +306,8 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_consent(args: Namespace) -> None:
-    prov = Provision()
-    prov.consent_view(args.agree)
+    prov = ConsentProvImpl()
+    consent_view_and_agree(prov, args.agree)
 
 
 def cli_location(args: Namespace) -> None:
