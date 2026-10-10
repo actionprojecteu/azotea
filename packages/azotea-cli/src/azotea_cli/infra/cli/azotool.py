@@ -24,8 +24,8 @@ from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.enums import BayerPattern, HeaderType
 from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, RoiForm, DefaultOpticsForm
-from azotea_cli.provision.use_cases import consent_view_and_agree, create_location, save_default_optics
-from azotea_cli.provision.adapters import ConsentProvImpl, LocationProvImpl, OpticsProvImpl
+from azotea_cli.provision.use_cases import consent_view_and_agree, create_location, save_default_optics, create_versioned_observer, update_observer
+from azotea_cli.provision.adapters import ConsentProvImpl, LocationProvImpl, OpticsProvImpl, ObserverProvImpl
 from azotea_cli.infra.cli.display import StdoutDisplay
 
 # ----------------
@@ -395,7 +395,8 @@ def cli_roi(args: Namespace) -> None:
 
 
 def cli_observer(args: Namespace) -> None:
-    prov = Provision()
+    observer = ObserverProvImpl()
+    consent = ConsentProvImpl()
     form = ObserverForm(
         family_name=args.name,
         surname=args.surname,
@@ -404,9 +405,9 @@ def cli_observer(args: Namespace) -> None:
     )
     try:
         if args.fix:
-            prov.update_observer(form)
+            update_observer(consent, observer, form)
         else:
-            prov.create_observer_vers(form, args.default)
+            create_versioned_observer(consent, observer, form, args.default)
     except AzoteaError as e:
         log.error(e)
 

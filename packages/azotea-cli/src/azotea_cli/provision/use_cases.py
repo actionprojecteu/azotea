@@ -1,7 +1,7 @@
 import logging
 
-from .interfaces import IConsentProv, IDisplay, ILocationProv, IOpticsProv
-from .models import DefaultOptics, DefaultOpticsForm, LocationForm
+from .interfaces import IConsentProv, IDisplay, ILocationProv, IObserverProv, IOpticsProv
+from .models import DefaultOptics, DefaultOpticsForm, LocationForm, ObserverForm
 
 log = logging.getLogger(__name__.split(".")[-2])
 
@@ -29,14 +29,24 @@ def save_default_optics(
 ) -> None:
     consent.check_raises()
     optics.save(form)
-    log.info("default optics saved")
 
 
 def load_default_optics(consent: IConsentProv, optics: IOpticsProv) -> DefaultOptics:
     consent.check_raises()
     data = optics.load()
-    log.info("default optics loaded")
     return data
+
+
+def create_versioned_observer(
+    consent: IConsentProv, observer: IObserverProv, form: ObserverForm, as_default: bool
+) -> None:
+    consent.check_raises()
+    observer.create_versioned(form, as_default)
+
+
+def update_observer(consent: IConsentProv, observer: IObserverProv, form: ObserverForm) -> None:
+    consent.check_raises()
+    observer.update(form)
 
 
 __all__ = [

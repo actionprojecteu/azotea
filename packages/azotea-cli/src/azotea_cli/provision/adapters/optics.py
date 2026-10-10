@@ -47,7 +47,7 @@ class OpticsProvImpl(IOpticsProv):
                     config.save(session, "optics", "focal_len", str(form.focal_len))
                 if form.f_number is not None:
                     config.save(session, "optics", "f_number", str(form.f_number))
-        engine.dispose()
+        log.info("saved default optics %s", form)
 
     def load(self) -> DefaultOptics:
         with SessionFactory() as session:
@@ -58,8 +58,9 @@ class OpticsProvImpl(IOpticsProv):
                 f_number = config.load(session, "optics", "f_number")
                 if f_number is None:
                     raise FNumberMissingError()
-        engine.dispose()
-        return DefaultOptics(focal_len = float(focal_len), f_number=float(f_number))
+        data = DefaultOptics(focal_len = float(focal_len), f_number=float(f_number))
+        log.info("loaded default optics %s", data)
+        return data
 
 
 

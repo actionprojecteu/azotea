@@ -18,7 +18,6 @@ from azotea_cli.infra.sqlalchemy import Location
 
 from . import config
 from ..errors import (
-    ConsentNotAgreedError,
     LocationExistsError,
     LocationMissingError,
     MissingDefaultLocationError,
@@ -45,7 +44,7 @@ class LocationProvImpl(ILocationProv):
         with SessionFactory() as session:
             try:
                 with session.begin():
-                    log.info("adding new location '%s', '%s'", form.site_name, form.location)
+                    log.info("adding new location: %s", form)
                     loc = Location(
                         site_name=form.site_name,
                         location=form.location,
@@ -55,15 +54,14 @@ class LocationProvImpl(ILocationProv):
                         randomized=form.randomized,
                     )
                     session.add(loc)
+                    session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
+                    location_id = loc.location_id
                     if as_default:
-                        session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
+                        log.info("saving default location_id: %d", form, location_id)
                         config.save(session, "location", "location_id", str(loc.location_id))
-            except ConsentNotAgreedError:
-                raise
             except IntegrityError as e:
                 raise LocationExistsError(f"({form.site_name}, {form.location})")
-        engine.dispose()
-        return loc.location_id
+        return location_id
 
 
 
@@ -86,13 +84,12 @@ class LocationProvImpl(ILocationProv):
                 if form.randomized is not None:
                     prev_loc.randomized = form.randomized
                 session.add(prev_loc)
-        engine.dispose()
 
-    def set_default_id(self, location_id: int):
+    def set_default(self, location_id: int):
         with SessionFactory() as session:
             config.save(session, "location", "location_id", str(location_id))
 
-    def get_default_id(self) -> int:
+    def get_default(self) -> int:
         with SessionFactory() as session:
             location_id = config.load(session, "location", "location_id")
             if location_id is None:

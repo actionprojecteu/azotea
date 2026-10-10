@@ -38,6 +38,12 @@ class ObserverMissingError(AzoteaError):
 
     pass
 
+class MissingDefaultObserverError(AzoteaError):
+    """Default observer is not set"""
+
+    pass
+
+
 
 class CameraExistsError(AzoteaError):
     """Camera already exists"""
