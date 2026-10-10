@@ -1,7 +1,14 @@
 import logging
 
-from .interfaces import IConsentProv, IDisplay, ILocationProv, IObserverProv, IOpticsProv
-from .models import DefaultOptics, DefaultOpticsForm, LocationForm, ObserverForm
+from .interfaces import (
+    ICameraProv,
+    IConsentProv,
+    IDisplay,
+    ILocationProv,
+    IObserverProv,
+    IOpticsProv,
+)
+from .models import CameraForm, DefaultOptics, DefaultOpticsForm, LocationForm, ObserverForm
 
 log = logging.getLogger(__name__.split(".")[-2])
 
@@ -49,10 +56,14 @@ def update_observer(consent: IConsentProv, observer: IObserverProv, form: Observ
     observer.update(form)
 
 
-__all__ = [
-    "consent_check",
-    "consent_view_and_agree",
-    "save_default_optics",
-    "load_default_optics",
-    "create_location",
-]
+def create_camera(
+    consent: IConsentProv, camera: ICameraProv, form: CameraForm, as_default: bool
+) -> None:
+    consent.check_raises()
+    camera.create(form, as_default)
+
+def create_camera_from_image(
+    consent: IConsentProv, camera: ICameraProv, path: str, as_default: bool
+) -> None:
+    consent.check_raises()
+    camera.create_from_image(path, as_default)

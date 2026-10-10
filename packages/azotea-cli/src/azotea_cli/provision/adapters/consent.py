@@ -40,8 +40,10 @@ class ConsentProvImpl(IConsentProv):
             if agreed:
                 tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
                 with session.begin():
-                    config.save(session, "gdpr", "agree", "Yes")
-                    config.save(session, "gdpr", "tstamp", tstamp)
+                    if not self._is_signed(session):
+                        config.save(session, "gdpr", "agree", "Yes")
+                        config.save(session, "gdpr", "tstamp", tstamp)
+                        log.info("consent form signed")
 
     def agreed(self) -> bool:
         with SessionFactory() as session:

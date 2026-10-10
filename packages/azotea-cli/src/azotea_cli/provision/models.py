@@ -57,6 +57,9 @@ class CameraForm:
     x_pixsize: float
     y_pixsize: float
 
+    def __str__(self) -> str:
+         return f"{self.model}"
+
 
 @dataclass(frozen=True)
 class RoiForm:

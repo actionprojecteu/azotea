@@ -20,13 +20,28 @@ from lica.validators import vdate, vfile
 # --------------
 # local imports
 # -------------
+#
 from azotea_cli import __version__
-from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.enums import BayerPattern, HeaderType
-from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, RoiForm, DefaultOpticsForm
-from azotea_cli.provision.use_cases import consent_view_and_agree, create_location, save_default_optics, create_versioned_observer, update_observer
-from azotea_cli.provision.adapters import ConsentProvImpl, LocationProvImpl, OpticsProvImpl, ObserverProvImpl
+from azotea_cli.common.errors import AzoteaError
 from azotea_cli.infra.cli.display import StdoutDisplay
+from azotea_cli.provision import CameraForm, DefaultOpticsForm, LocationForm, ObserverForm, RoiForm
+from azotea_cli.provision.adapters import (
+    CameraProvImpl,
+    ConsentProvImpl,
+    LocationProvImpl,
+    ObserverProvImpl,
+    OpticsProvImpl,
+)
+from azotea_cli.provision.use_cases import (
+    consent_view_and_agree,
+    create_camera,
+    create_camera_from_image,
+    create_location,
+    create_versioned_observer,
+    save_default_optics,
+    update_observer,
+)
 
 # ----------------
 # Module constants
@@ -233,9 +248,7 @@ def add_args(parser: ArgumentParser) -> None:
     roicre.add_argument("--y1", type=int, default=None, help="Starting pixel row")
     roicre.add_argument("--x2", type=int, default=None, help="Ending pixel column")
     roicre.add_argument("--y2", type=int, default=None, help="Ending pixel row")
-    roicre.add_argument(
-        "--comment", type=str, default=None, help="Additional region comment"
-    )
+    roicre.add_argument("--comment", type=str, default=None, help="Additional region comment")
 
     roiswi.add_argument(
         "--model", type=str, default=None, help="Camera Model (taken from EXIF data)"
@@ -327,6 +340,7 @@ def cli_location(args: Namespace) -> None:
     except AzoteaError as e:
         log.error(e)
 
+
 def cli_optics(args: Namespace) -> None:
     optics = OpticsProvImpl()
     consent = ConsentProvImpl()
@@ -339,8 +353,10 @@ def cli_optics(args: Namespace) -> None:
     except AzoteaError as e:
         log.error(e)
 
+
 def cli_camera(args: Namespace) -> None:
-    prov = Provision()
+    camera = CameraProvImpl()
+    consent = ConsentProvImpl()
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
         if args.model is None:
@@ -358,13 +374,13 @@ def cli_camera(args: Namespace) -> None:
             y_pixsize=args.y_pixsize,
         )
         try:
-            prov.create_camera(form, args.default)
+            create_camera(consent, camera, form, args.default)
         except AzoteaError as e:
             log.error(e)
 
     else:
         try:
-            prov.create_camera_from_image(args.from_image, args.default)
+            create_camera_from_image(consent, camera, args.from_image, args.default)
         except AzoteaError as e:
             log.error(e)
 
@@ -375,13 +391,7 @@ def cli_roi(args: Namespace) -> None:
         # El resto de valores deberia ser tambien requerido
         if args.x1 is None:
             raise AzoteaError("Camera model is required in --as-given")
-        form = RoiForm(
-            x1=args.x1,
-            y1=args.y1,
-            x2=args.x2,
-            y2=args.y2,
-            comment = args.comment
-        )
+        form = RoiForm(x1=args.x1, y1=args.y1, x2=args.x2, y2=args.y2, comment=args.comment)
         try:
             prov.create_roi(form, args.default)
         except AzoteaError as e:
