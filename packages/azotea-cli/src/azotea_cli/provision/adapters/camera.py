@@ -3,31 +3,28 @@
 # ------------------
 
 import logging
-import os
 
 # ---------------------
 # Third party libraries
 # ---------------------
-#
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from sqlalchemy.exc import IntegrityError
-
 
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import Camera
 
-from . import config
+from azotea_cli.infra.sqlalchemy import Camera
+from azotea_cli.common.reader.models import ImageMetadata
+
 from ..errors import (
     CameraExistsError,
     MissingDefaultCameraError,
-
 )
-from ..models import CameraForm
-from ...common.reader.models import ImageMetadata
-
 from ..interfaces import CameraProv
+from ..models import CameraForm
+from . import config
+
 # -----------------------
 # Module global variables
 # -----------------------
@@ -41,19 +38,18 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # Create/Update location use case
 # -------------------------------
 
-class CameraProvImpl(CameraProv):
 
+class CameraProvImpl(CameraProv):
     def set_default(self, camera_id: int) -> None:
-         with SessionFactory() as session:
-             config.save(session, "camera", "camera_id", str(camera_id))
+        with SessionFactory() as session:
+            config.save(session, "camera", "camera_id", str(camera_id))
 
     def get_default(self) -> int:
-         with SessionFactory() as session:
-             camera_id = config.load(session, "camera", "camera_id")
-             if camera_id is None:
-                 raise MissingDefaultCameraError
-             return int(camera_id)
-
+        with SessionFactory() as session:
+            camera_id = config.load(session, "camera", "camera_id")
+            if camera_id is None:
+                raise MissingDefaultCameraError
+            return int(camera_id)
 
     def create(self, form: CameraForm, as_default: bool) -> int:
         with SessionFactory() as session:
@@ -81,14 +77,17 @@ class CameraProvImpl(CameraProv):
                 raise CameraExistsError(form.model)
         return camera_id
 
-
     def create_from_image(self, metadata: ImageMetadata, as_default: bool) -> int:
         with SessionFactory() as session:
             model = None
             try:
                 with session.begin():
                     log.info("adding new camera from metadata: %s", metadata)
-                    model = metadata.model if metadata.model.startswith(metadata.make) else  f"{metadata.make} {metadata.model}"
+                    model = (
+                        metadata.model
+                        if metadata.model.startswith(metadata.make)
+                        else f"{metadata.make} {metadata.model}"
+                    )
                     cam = Camera(
                         model=model,
                         bias=metadata.black_level,

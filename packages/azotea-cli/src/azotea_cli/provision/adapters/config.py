@@ -28,5 +28,3 @@ def save(session: Session, section: str, property: str, value: str) -> None:
     else:
         new = Config(section=section, property=property, value=value)
         session.add(new)
-
-__all__ = ["load", "save"]

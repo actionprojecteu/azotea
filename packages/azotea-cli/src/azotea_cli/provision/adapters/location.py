@@ -16,15 +16,14 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 from azotea_cli.infra.sqlalchemy import Location
 
-from . import config
 from ..errors import (
     LocationExistsError,
     LocationMissingError,
     MissingDefaultLocationError,
 )
-
-from ..models import LocationForm
 from ..interfaces import LocationProv
+from ..models import LocationForm
+from . import config
 
 # -----------------------
 # Module global variables
@@ -39,7 +38,19 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # Create/Update location use case
 # -------------------------------
 
+
 class LocationProvImpl(LocationProv):
+    def set_default(self, location_id: int):
+        with SessionFactory() as session:
+            config.save(session, "location", "location_id", str(location_id))
+
+    def get_default(self) -> int:
+        with SessionFactory() as session:
+            location_id = config.load(session, "location", "location_id")
+            if location_id is None:
+                raise MissingDefaultLocationError
+            return int(location_id)
+
     def create(self, form: LocationForm, as_default: bool) -> int:
         with SessionFactory() as session:
             try:
@@ -59,11 +70,9 @@ class LocationProvImpl(LocationProv):
                     if as_default:
                         log.info("saving default location_id: %d", form, location_id)
                         config.save(session, "location", "location_id", str(loc.location_id))
-            except IntegrityError as e:
+            except IntegrityError:
                 raise LocationExistsError(f"({form.site_name}, {form.location})")
         return location_id
-
-
 
     def update(self, form: LocationForm) -> None:
         sql = select(Location).where(
@@ -74,7 +83,9 @@ class LocationProvImpl(LocationProv):
                 prev_loc = session.scalars(sql).one_or_none()
                 if prev_loc is None:
                     raise LocationMissingError(f"({form.site_name}, {form.location})")
-                log.info("modifying prev. location '%s', '%s'", prev_loc.site_name, prev_loc.location)
+                log.info(
+                    "modifying prev. location '%s', '%s'", prev_loc.site_name, prev_loc.location
+                )
                 if form.longitude is not None:
                     prev_loc.longitude = form.longitude
                 if form.latitude is not None:
@@ -84,19 +95,3 @@ class LocationProvImpl(LocationProv):
                 if form.randomized is not None:
                     prev_loc.randomized = form.randomized
                 session.add(prev_loc)
-
-    def set_default(self, location_id: int):
-        with SessionFactory() as session:
-            config.save(session, "location", "location_id", str(location_id))
-
-    def get_default(self) -> int:
-        with SessionFactory() as session:
-            location_id = config.load(session, "location", "location_id")
-            if location_id is None:
-                raise MissingDefaultLocationError
-            return int(location_id)
-
-
-
-
-__all__ = ["LocationProvImpl"]

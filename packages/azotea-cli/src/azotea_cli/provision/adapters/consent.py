@@ -62,11 +62,3 @@ class ConsentProvImpl(ConsentProv):
 def text() -> str:
     pkg = ".".join(__name__.split(".")[:-1])  # get the absolute parent package path
     return resources.read_text(pkg, "consent.txt", encoding="utf-8")
-
-
-# -------------------------------------
-# Main use case: View and agree consent
-# -------------------------------------
-
-
-__all__ = ["ConsentProvImpl", "ConsentNotAgreed"]

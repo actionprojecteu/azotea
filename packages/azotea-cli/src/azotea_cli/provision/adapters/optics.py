@@ -2,17 +2,13 @@
 # standard libraries
 # ------------------
 #
-import importlib.resources as resources
 import logging
-from datetime import datetime, timezone
 
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 
 # ---------------------
 # Third party libraries
 # ---------------------
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 # ---------------
 # Own dependecies
@@ -21,7 +17,7 @@ from sqlalchemy.orm import Session
 from ..interfaces import OpticsProv
 from ..errors import  FocalLenMissingError, FNumberMissingError
 from ..models import DefaultOptics, DefaultOpticsForm
-from . import config, consent
+from . import config
 
 # -----------------------
 # Module global variables

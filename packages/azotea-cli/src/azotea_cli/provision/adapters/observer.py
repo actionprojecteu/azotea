@@ -44,7 +44,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 class ObserverProvImpl(ObserverProv):
 
-    def set_default(self, observer_id) -> None:
+    def set_default(self, observer_id: int) -> None:
         with SessionFactory() as session:
             with session.begin():
                 config.save(session, "observer", "observer", str(observer_id))

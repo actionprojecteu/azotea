@@ -3,7 +3,6 @@
 # ------------------
 
 import logging
-import os
 
 # ---------------------
 # Third party libraries
@@ -25,7 +24,7 @@ from ..errors import (
     MissingDefaultRoiError
 )
 from ..interfaces import RoiProv
-from ..models import RoiCenteredForm, RoiForm
+from ..models import RoiForm
 from . import config
 
 # -----------------------
