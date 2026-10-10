@@ -9,16 +9,16 @@ import rawpy
 
 from azotea_cli.common.enums import BayerPattern, HeaderType, BayerIndex
 
-from .errors import (
+from ..errors import (
     MissingCameraModelError,
     MissingDateObsError,
     ReadMetadataError,
     UnknownDateTimeFormatError,
     UnsupportedCFAError,
 )
-from .interfaces import ImageReader, RawPixels
-from .models import ImageMetadata
-from .utils import image_type_by_path
+from ..interfaces import ImageReader, RawPixels
+from ..models import ImageMetadata
+from ..utils import image_type_by_path
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
@@ -95,6 +95,8 @@ class ExifReader(ImageReader):
                 raise UnsupportedCFAError(color_desc)
             cfa = "".join(map(lambda c: {"Gr": "G", "Gb": "G"}.get(c, c), [BayerIndex(i).name for i in img.raw_pattern.ravel()]))
             bayer = BayerPattern(cfa)
+            header_type=self.header_type()
+            _, extension = os.path.splitext(path)
 
         metadata = ImageMetadata(
             width=width,
@@ -110,6 +112,8 @@ class ExifReader(ImageReader):
             timestamp=timestamp,
             focal_len=focal_len,
             f_number=f_number,
+            header_type=header_type,
+            extension=extension,
         )
         return metadata
 

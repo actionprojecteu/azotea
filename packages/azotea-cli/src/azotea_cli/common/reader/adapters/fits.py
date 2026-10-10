@@ -1,7 +1,7 @@
 
 from azotea_cli.common.enums import HeaderType
 
-from .interfaces import ImageReader
+from ..interfaces import ImageReader
 
 class FitsReader(ImageReader):
 

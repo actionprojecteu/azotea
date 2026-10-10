@@ -24,8 +24,16 @@ from lica.validators import vdate, vfile
 from azotea_cli import __version__
 from azotea_cli.common.enums import BayerPattern, HeaderType
 from azotea_cli.common.errors import AzoteaError
+from azotea_cli.common.reader.adapters import ReaderFactoryImpl
 from azotea_cli.infra.cli.display import StdoutDisplay
-from azotea_cli.provision import CameraForm, DefaultOpticsForm, LocationForm, ObserverForm, RoiForm, RoiCenteredForm
+from azotea_cli.provision import (
+    CameraForm,
+    DefaultOpticsForm,
+    LocationForm,
+    ObserverForm,
+    RoiCenteredForm,
+    RoiForm,
+)
 from azotea_cli.provision.adapters import (
     CameraProvImpl,
     ConsentProvImpl,
@@ -39,11 +47,11 @@ from azotea_cli.provision.use_cases import (
     create_camera,
     create_camera_from_image,
     create_location,
+    create_roi,
+    create_roi_from_image,
     create_versioned_observer,
     save_default_optics,
     update_observer,
-    create_roi,
-    create_roi_from_image,
 )
 
 # ----------------
@@ -361,6 +369,7 @@ def cli_camera(args: Namespace) -> None:
     camera = CameraProvImpl()
     consent = ConsentProvImpl()
     optics = OpticsProvImpl()
+    factory = ReaderFactoryImpl()
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
         if args.model is None:
@@ -384,13 +393,16 @@ def cli_camera(args: Namespace) -> None:
 
     else:
         try:
-            create_camera_from_image(camera, consent, optics,args.from_image, args.default)
+            create_camera_from_image(
+                camera, consent, optics, factory, args.from_image, args.default
+            )
         except AzoteaError as e:
             log.error(e)
 
 
 def cli_roi(args: Namespace) -> None:
     roi = RoiProvImpl()
+    factory = ReaderFactoryImpl()
     consent = ConsentProvImpl()
     optics = OpticsProvImpl()
 
@@ -407,7 +419,9 @@ def cli_roi(args: Namespace) -> None:
     else:
         form = RoiCenteredForm(width=args.width, height=args.height)
         try:
-            create_roi_from_image(roi, consent, optics, args.from_image,form, args.default)
+            create_roi_from_image(
+                roi, consent, optics, factory, args.from_image, form, args.default
+            )
         except AzoteaError as e:
             log.error(e)
 
@@ -423,7 +437,7 @@ def cli_observer(args: Namespace) -> None:
     )
     try:
         if args.fix:
-            update_observer(observer,consent,  form)
+            update_observer(observer, consent, form)
         else:
             create_versioned_observer(observer, consent, form, args.default)
     except AzoteaError as e:

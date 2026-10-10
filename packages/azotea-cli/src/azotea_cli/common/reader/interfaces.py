@@ -28,4 +28,7 @@ class ImageReader(Protocol):
         """returns an object that implements the RawPixels interface"""
         ...
 
-__all__ = ["RawPixels", "ImageReader"]
+class ReaderFactory(Protocol):
+    def get_reader(self, path:  str) -> ImageReader:
+        """returns an object that implements the ImageReader interface"""
+        ...

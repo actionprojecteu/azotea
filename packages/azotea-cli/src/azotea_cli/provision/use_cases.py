@@ -6,7 +6,7 @@ from .interfaces import (
     Display,
     LocationProv,
     ObserverProv,
-    IOpticsProv,
+    OpticsProv,
     RoiProv,
 )
 from .models import (
@@ -18,6 +18,10 @@ from .models import (
     ObserverForm,
     RoiForm,
 )
+
+
+from azotea_cli.common.rect import Point, Rect
+from azotea_cli.common.reader.interfaces import ReaderFactory
 
 log = logging.getLogger(__name__.split(".")[-2])
 
@@ -41,13 +45,13 @@ def create_location(
 
 
 def save_default_optics(
-    optics: IOpticsProv, consent: ConsentProv, form: DefaultOpticsForm
+    optics: OpticsProv, consent: ConsentProv, form: DefaultOpticsForm
 ) -> None:
     consent.check_raises()
     optics.save(form)
 
 
-def load_default_optics(optics: IOpticsProv, consent: ConsentProv ) -> DefaultOptics:
+def load_default_optics(optics: OpticsProv, consent: ConsentProv ) -> DefaultOptics:
     consent.check_raises()
     data = optics.load()
     return data
@@ -73,11 +77,13 @@ def create_camera(
 
 
 def create_camera_from_image(
-    camera: CameraProv, consent: ConsentProv, optics: IOpticsProv, path: str, as_default: bool
+    camera: CameraProv, consent: ConsentProv, optics: OpticsProv, factory: ReaderFactory, path: str, as_default: bool
 ) -> None:
     consent.check_raises()
     default_optics = optics.load()
-    camera.create_from_image(path, default_optics, as_default)
+    reader = factory.get_reader(path)
+    metadata = reader.read_metadata(path, default_optics.focal_len, default_optics.f_number)
+    camera.create_from_image(metadata,  as_default)
 
 
 def create_roi(roi: RoiProv, consent: ConsentProv, form: RoiForm, as_default: bool) -> None:
@@ -86,8 +92,15 @@ def create_roi(roi: RoiProv, consent: ConsentProv, form: RoiForm, as_default: bo
 
 
 def create_roi_from_image(
-    roi: RoiProv, consent: ConsentProv, optics: IOpticsProv, path: str, form: RoiCenteredForm,  as_default: bool
+    roi: RoiProv, consent: ConsentProv, optics: OpticsProv, factory: ReaderFactory, path: str, form: RoiCenteredForm,  as_default: bool
 ) -> None:
     consent.check_raises()
     default_optics = optics.load()
-    roi.create_from_image(path, form, default_optics, as_default)
+    reader = factory.get_reader(path)
+    metadata = reader.read_metadata(path, default_optics.focal_len, default_optics.f_number)
+    dim = Point(form.width, form.height) * 2  # to raw coordinates
+    raw_size = Point(metadata.width, metadata.height)
+    raw_screen = Rect.from_points(Point.zero(), raw_size)
+    rect = Rect.from_points(Point.zero(), dim).recenter_on(raw_screen)
+    rect = rect // 2  # to each plane coordinates
+    roi.create_from_image(rect, metadata, as_default)

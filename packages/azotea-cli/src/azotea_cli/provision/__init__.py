@@ -15,7 +15,7 @@ from .interfaces import (
     LocationProv,
     ObserverProv,
     RoiProv,
-    IOpticsProv,
+    OpticsProv,
 )
 from .models import (
     CameraForm,
@@ -32,7 +32,7 @@ __all__ = [
     "LocationProv",
     "ObserverProv",
     "RoiProv",
-    "IOpticsProv",
+    "OpticsProv",
     "LocationForm",
     "ObserverForm",
     "CameraForm",

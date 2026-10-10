@@ -10,16 +10,14 @@ import os
 # ---------------------
 #
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
-
-from azotea_cli.common.reader import get_reader
-from azotea_cli.common.rect import Point, Rect
 
 # ---------------
 # Own dependecies
 # ---------------
+
+from azotea_cli.common.rect import Rect
+from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.infra.sqlalchemy import Roi
 
 from ..errors import (
@@ -27,8 +25,9 @@ from ..errors import (
     MissingDefaultRoiError
 )
 from ..interfaces import RoiProv
-from ..models import RoiCenteredForm, RoiForm, DefaultOptics
+from ..models import RoiCenteredForm, RoiForm
 from . import config
+
 # -----------------------
 # Module global variables
 # -----------------------
@@ -81,20 +80,11 @@ class RoiProvImpl(RoiProv):
                 raise RoiExistsError(str(rect))
         return roi_id
 
-    def create_from_image(self, path: str, form: RoiCenteredForm, optics: DefaultOptics, as_default: bool) -> int:
+    def create_from_image(self, rect: Rect, metadata: ImageMetadata, as_default: bool) -> int:
         with SessionFactory() as session:
-            rect = None
             try:
                 with session.begin():
-                    log.info("adding new roi from image '%s'", path)
-                    reader = get_reader(path)
-                    _, extension = os.path.splitext(path)
-                    metadata = reader.read_metadata(path, optics.focal_len, optics.f_number)
-                    dim = Point(form.width, form.height) * 2  # to raw coordinates
-                    raw_size = Point(metadata.width, metadata.height)
-                    raw_screen = Rect.from_points(Point.zero(), raw_size)
-                    rect = Rect.from_points(Point.zero(), dim).recenter_on(raw_screen)
-                    rect = rect // 2  # to each plane coordinates
+                    log.info("adding new roi from image '%s'", metadata)
                     model = (
                         metadata.model
                         if metadata.model.startswith(metadata.make)
@@ -102,7 +92,7 @@ class RoiProvImpl(RoiProv):
                     )
                     center = rect.central()
                     comment = (
-                        f"ROI for {model}, centered at P={center}, width={form.width}, height={form.height}"
+                        f"ROI for {model}, centered at P={center}, width={rect.width()}, height={rect.height()}"
                     )
                     roi = Roi(
                         x1=rect.x1,

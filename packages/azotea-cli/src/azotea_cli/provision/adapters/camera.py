@@ -10,10 +10,8 @@ import os
 # ---------------------
 #
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from azotea_cli.common.reader import get_reader
 
 # ---------------
 # Own dependecies
@@ -23,15 +21,13 @@ from azotea_cli.infra.sqlalchemy import Camera
 from . import config
 from ..errors import (
     CameraExistsError,
-    CameraMissingError,
-    FocalLenMissingError,
-    FNumberMissingError,
     MissingDefaultCameraError,
 
 )
-from ..models import CameraForm, DefaultOptics
-from ..interfaces import CameraProv
+from ..models import CameraForm
+from ...common.reader.models import ImageMetadata
 
+from ..interfaces import CameraProv
 # -----------------------
 # Module global variables
 # -----------------------
@@ -46,6 +42,18 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # -------------------------------
 
 class CameraProvImpl(CameraProv):
+
+    def set_default(self, camera_id: int) -> None:
+         with SessionFactory() as session:
+             config.save(session, "camera", "camera_id", str(camera_id))
+
+    def get_default(self) -> int:
+         with SessionFactory() as session:
+             camera_id = config.load(session, "camera", "camera_id")
+             if camera_id is None:
+                 raise MissingDefaultCameraError
+             return int(camera_id)
+
 
     def create(self, form: CameraForm, as_default: bool) -> int:
         with SessionFactory() as session:
@@ -74,22 +82,18 @@ class CameraProvImpl(CameraProv):
         return camera_id
 
 
-    def create_from_image(self, path: str, optics: DefaultOptics, as_default: bool) -> int:
+    def create_from_image(self, metadata: ImageMetadata, as_default: bool) -> int:
         with SessionFactory() as session:
             model = None
             try:
                 with session.begin():
-                    log.info("adding new camera from image: %s", path)
-                    reader = get_reader(path)
-                    _, extension = os.path.splitext(path)
-                    metadata = reader.read_metadata(path, optics.focal_len, optics.f_number)
-                    header_type = reader.header_type()
+                    log.info("adding new camera from metadata: %s", metadata)
                     model = metadata.model if metadata.model.startswith(metadata.make) else  f"{metadata.make} {metadata.model}"
                     cam = Camera(
                         model=model,
                         bias=metadata.black_level,
-                        extension=extension,
-                        header_type=header_type,
+                        extension=metadata.extension,
+                        header_type=metadata.header_type,
                         bayer_pattern=metadata.bayer,
                         width=metadata.width,
                         height=metadata.height,
@@ -97,17 +101,9 @@ class CameraProvImpl(CameraProv):
                     session.add(cam)
                     session.flush()
                     camera_id = cam.camera_id
+                    if as_default:
+                        log.info("saving default camera_id: %d", camera_id)
+                        config.save(session, "camera", "camera_id", str(cam.camera_id))
             except IntegrityError:
                 raise CameraExistsError(model)
         return camera_id
-
-    def set_default(self, camera_id: int) -> None:
-        with SessionFactory() as session:
-            config.save(session, "camera", "camera_id", str(camera_id))
-
-    def get_default(self) -> int:
-        with SessionFactory() as session:
-            camera_id = config.load(session, "camera", "camera_id")
-            if camera_id is None:
-                raise MissingDefaultCameraError
-            return int(camera_id)

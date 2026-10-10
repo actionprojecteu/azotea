@@ -1,5 +1,4 @@
-from .interfaces import ImageReader
+from .interfaces import ImageReader, ReaderFactory
 from .models import ImageMetadata, Array2Du16
-from .factory import get_reader
 
-__all__ = ["ImageReader", "ImageMetadata", "Array2Du16", "get_reader"]
+__all__ = ["ImageReader", "ImageMetadata", "ReaderFactory",  "Array2Du16",]

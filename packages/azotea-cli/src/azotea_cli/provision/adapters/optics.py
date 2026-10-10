@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 # Own dependecies
 # ---------------
 
-from ..interfaces import IOpticsProv
+from ..interfaces import OpticsProv
 from ..errors import  FocalLenMissingError, FNumberMissingError
 from ..models import DefaultOptics, DefaultOpticsForm
 from . import config, consent
@@ -38,7 +38,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 # Main use case: View and agree consent
 # -------------------------------------
 
-class OpticsProvImpl(IOpticsProv):
+class OpticsProvImpl(OpticsProv):
 
     def save(self, form: DefaultOpticsForm) -> None:
         with SessionFactory() as session:
