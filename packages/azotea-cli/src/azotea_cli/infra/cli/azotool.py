@@ -26,6 +26,7 @@ from azotea_cli.common.enums import BayerPattern, HeaderType
 from azotea_cli.provision import CameraForm, LocationForm, ObserverForm, RoiForm, DefaultOpticsForm
 from azotea_cli.provision.use_cases import consent_view_and_agree
 from azotea_cli.provision.adapters import ConsentProvImpl
+from azotea_cli.infra.cli.display import StdoutDisplay
 
 # ----------------
 # Module constants
@@ -306,8 +307,9 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_consent(args: Namespace) -> None:
-    prov = ConsentProvImpl()
-    consent_view_and_agree(prov, args.agree)
+    consent = ConsentProvImpl()
+    display = StdoutDisplay()
+    consent_view_and_agree(consent, display, args.agree)
 
 
 def cli_location(args: Namespace) -> None:

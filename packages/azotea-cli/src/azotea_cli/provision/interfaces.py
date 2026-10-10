@@ -13,11 +13,14 @@ from .models import (
 # Interfaces
 # ----------
 
+class IDisplay(Protocol):
+    def display(self, text: str) -> None: ...
 
 class IConsentProv(Protocol):
-    def view(self) -> None: ...
+    def review(self) -> str: ...
     def agree(self, agreed: bool) -> None: ...
-    def check(self) -> None: ...
+    def agreed(self) -> bool: ...
+    def check_raises(self) -> None: ...
 
 
 class IObserverProv(Protocol):
@@ -46,6 +49,7 @@ class IRoiProv(Protocol):
 
 
 __all__ = [
+    "IDisplay",
     "IConsentProv",
     "ILocationProv",
     "IObserverProv",

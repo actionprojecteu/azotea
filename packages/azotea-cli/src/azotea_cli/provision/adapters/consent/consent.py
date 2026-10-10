@@ -32,13 +32,8 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 
 class ConsentProvImpl(IConsentProv):
-    def view(self) -> None:
-        with SessionFactory() as session:
-            with session.begin():
-                if self.is_signed(session):
-                    log.info("Consent already signed")
-                    return
-                print(text())
+    def review(self) -> str:
+        return text()
 
     def agree(self, agreed: bool) -> None:
         with SessionFactory() as session:
@@ -47,25 +42,19 @@ class ConsentProvImpl(IConsentProv):
                 config.save(session, "gdpr", "agree", "Yes")
                 config.save(session, "gdpr", "tstamp", tstamp)
 
-    def check(self) -> None:
+    def agreed(self) -> bool:
         with SessionFactory() as session:
-            if not self.is_signed(session):
+            return self._is_signed(session)
+
+    def check_raises(self) -> None:
+        with SessionFactory() as session:
+            if not self._is_signed(session):
                 raise ConsentNotAgreedError
             log.info("Consent already signed")
 
-    def is_signed(self, session: Session) -> bool:
+    def _is_signed(self, session: Session) -> bool:
         answer = config.load(session, "gdpr", "agree")
         return False if answer is None or answer.lower() != "yes" else True
-
-
-# ---------------------------------------
-# used by other use cases as precondition
-# ---------------------------------------
-#
-def check_signed(session: Session) -> None:
-    if not is_signed(session):
-        raise ConsentNotAgreedError
-    log.info("Consent already signed")
 
 
 def text() -> str:
@@ -78,18 +67,4 @@ def text() -> str:
 # -------------------------------------
 
 
-def view(agree: bool) -> None:
-    with SessionFactory() as session:
-        with session.begin():
-            if is_signed(session):
-                log.info("Consent already signed")
-                return
-            print(text())
-            if agree:
-                config.save(session, "gdpr", "agree", "Yes")
-                tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
-                config.save(session, "gdpr", "tstamp", tstamp)
-    engine.dispose()
-
-
-__all__ = ["view", "check_signed", "ConsentNotAgreed"]
+__all__ = ["ConsentProvImpl", "ConsentNotAgreed"]
