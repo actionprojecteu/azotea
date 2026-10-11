@@ -25,8 +25,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from lica.sqlalchemy.noasync.model import Model
-from lica.sqlalchemy.metadata import metadata
+from .metadata import Model, metadata
 
 # ----------------
 # Own dependencies

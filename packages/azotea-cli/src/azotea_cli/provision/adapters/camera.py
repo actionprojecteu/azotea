@@ -7,14 +7,14 @@ import logging
 # ---------------------
 # Third party libraries
 # ---------------------
-from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
+
 from sqlalchemy.exc import IntegrityError
 
 # ---------------
 # Own dependecies
 # ---------------
 
-from azotea_cli.infra.sqlalchemy import Camera
+from azotea_cli.infra.sqlalchemy import Camera, get_session
 from azotea_cli.common.models import ObjId
 from azotea_cli.common.reader.models import ImageMetadata
 
@@ -33,8 +33,6 @@ from . import config
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
-
 # -------------------------------
 # Create/Update location use case
 # -------------------------------
@@ -42,12 +40,12 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 class CameraProvImpl(CameraProv):
     def set_default(self, camera_id: ObjId) -> None:
-        with SessionFactory() as session:
+        with get_session() as session:
             log.info("saving default camera_id: %d", camera_id)
             config.save(session, "camera", "camera_id", str(camera_id))
 
     def get_default(self) -> ObjId:
-        with SessionFactory() as session:
+        with get_session() as session:
             camera_id = config.load(session, "camera", "camera_id")
             if camera_id is None:
                 raise MissingDefaultCameraError
@@ -55,7 +53,7 @@ class CameraProvImpl(CameraProv):
             return int(camera_id)
 
     def create(self, form: CameraForm) -> int:
-        with SessionFactory() as session:
+        with get_session() as session:
             try:
                 with session.begin():
                     log.info("adding new camera: %s", form)
@@ -78,7 +76,7 @@ class CameraProvImpl(CameraProv):
         return camera_id
 
     def create_from_image(self, metadata: ImageMetadata) -> int:
-        with SessionFactory() as session:
+        with get_session() as session:
             model = None
             try:
                 with session.begin():

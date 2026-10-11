@@ -10,7 +10,14 @@ from .models import (
     Time,
 )
 
+from .database import engine, sqa_logging, get_session
+from .metadata import Model
+
 __all__ = [
+    "engine",
+    "sqa_logging",
+    "get_session",
+    "Model",
     "Camera",
     "Config",
     "Date",

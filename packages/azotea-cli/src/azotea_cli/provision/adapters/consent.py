@@ -6,8 +6,6 @@ import importlib.resources as resources
 import logging
 from datetime import datetime, timezone
 
-from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
-
 # ---------------------
 # Third party libraries
 # ---------------------
@@ -18,6 +16,8 @@ from ..errors import ConsentNotAgreedError
 # ---------------
 # Own dependecies
 # ---------------
+
+from azotea_cli.infra.sqlalchemy import get_session
 from ..interfaces import ConsentProv
 from . import config
 
@@ -28,15 +28,12 @@ from . import config
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
-
-
 class ConsentProvImpl(ConsentProv):
     def review(self) -> str:
         return text()
 
     def agree(self, agreed: bool) -> None:
-        with SessionFactory() as session:
+        with get_session() as session:
             if agreed:
                 tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
                 with session.begin():
@@ -46,11 +43,11 @@ class ConsentProvImpl(ConsentProv):
                         log.info("consent form signed")
 
     def agreed(self) -> bool:
-        with SessionFactory() as session:
+        with get_session() as session:
             return self._is_signed(session)
 
     def check_raises(self) -> None:
-        with SessionFactory() as session:
+        with get_session() as session:
             if not self._is_signed(session):
                 raise ConsentNotAgreedError
 

@@ -7,7 +7,6 @@ import logging
 # ---------------------
 # Third party libraries
 # ---------------------
-from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
@@ -16,7 +15,7 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 
 from azotea_cli.common.models import ObjId
-from azotea_cli.infra.sqlalchemy import Location
+from azotea_cli.infra.sqlalchemy import Location, get_session
 
 from ..errors import (
     LocationExistsError,
@@ -34,8 +33,6 @@ from . import config
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
-
 # -------------------------------
 # Create/Update location use case
 # -------------------------------
@@ -43,12 +40,12 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 class LocationProvImpl(LocationProv):
     def set_default(self, location_id: ObjId):
-        with SessionFactory() as session:
+        with get_session() as session:
             log.info("saving default location_id: %d", location_id)
             config.save(session, "location", "location_id", str(location_id))
 
     def get_default(self) -> ObjId:
-        with SessionFactory() as session:
+        with get_session() as session:
             location_id = config.load(session, "location", "location_id")
             if location_id is None:
                 raise MissingDefaultLocationError
@@ -56,7 +53,7 @@ class LocationProvImpl(LocationProv):
             return int(location_id)
 
     def create(self, form: LocationForm) -> int:
-        with SessionFactory() as session:
+        with get_session() as session:
             try:
                 with session.begin():
                     log.info("adding new location: %s", form)
@@ -79,7 +76,7 @@ class LocationProvImpl(LocationProv):
         sql = select(Location).where(
             Location.site_name == form.site_name, Location.location == form.location
         )
-        with SessionFactory() as session:
+        with get_session() as session:
             with session.begin():
                 prev_loc = session.scalars(sql).one_or_none()
                 if prev_loc is None:

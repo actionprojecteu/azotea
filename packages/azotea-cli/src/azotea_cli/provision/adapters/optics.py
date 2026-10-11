@@ -4,18 +4,13 @@
 #
 import logging
 
-from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
-
-# ---------------------
-# Third party libraries
-# ---------------------
-
 # ---------------
 # Own dependecies
 # ---------------
+from azotea_cli.infra.sqlalchemy import get_session
 
+from ..errors import FNumberMissingError, FocalLenMissingError
 from ..interfaces import OpticsProv
-from ..errors import  FocalLenMissingError, FNumberMissingError
 from ..models import DefaultOptics, DefaultOpticsForm
 from . import config
 
@@ -26,18 +21,15 @@ from . import config
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
-
-
 
 # -------------------------------------
 # Main use case: View and agree consent
 # -------------------------------------
 
-class OpticsProvImpl(OpticsProv):
 
+class OpticsProvImpl(OpticsProv):
     def save(self, form: DefaultOpticsForm) -> None:
-        with SessionFactory() as session:
+        with get_session() as session:
             with session.begin():
                 if form.focal_len is not None:
                     config.save(session, "optics", "focal_len", str(form.focal_len))
@@ -46,7 +38,7 @@ class OpticsProvImpl(OpticsProv):
         log.info("saved default optics %s", form)
 
     def load(self) -> DefaultOptics:
-        with SessionFactory() as session:
+        with get_session() as session:
             with session.begin():
                 focal_len = config.load(session, "optics", "focal_len")
                 if focal_len is None:
@@ -54,10 +46,9 @@ class OpticsProvImpl(OpticsProv):
                 f_number = config.load(session, "optics", "f_number")
                 if f_number is None:
                     raise FNumberMissingError()
-        data = DefaultOptics(focal_len = float(focal_len), f_number=float(f_number))
+        data = DefaultOptics(focal_len=float(focal_len), f_number=float(f_number))
         log.info("loaded default optics %s", data)
         return data
-
 
 
 __all__ = ["OpticsProvImpl"]

@@ -9,28 +9,24 @@
 # -------------------
 
 import logging
-from argparse import ArgumentParser, Namespace
 import uuid
+from argparse import ArgumentParser, Namespace
 from datetime import datetime, timedelta
 from itertools import batched
 
+from lica.cli import execute
 
 # ------------------
 # SQLAlchemy imports
 # -------------------
-
 from sqlalchemy.orm import Session
-from lica.sqlalchemy import sqa_logging
-from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
-from lica.sqlalchemy.noasync.model import Model
-from lica.cli import execute
 
 # --------------
 # local imports
 # -------------
-
 from azotea_cli import __version__
-from azotea_cli.infra.sqlalchemy import Date, Time, Config
+from azotea_cli.infra.sqlalchemy import Config, Date, Model, Time, engine, get_session, sqa_logging
+
 from .util import parser as prs
 
 # ----------------
@@ -46,12 +42,10 @@ DESCRIPTION = "AZOTEA Database initial schema generation tool"
 # get the module logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-# get the database engine and session factory object
-engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
-
 # -------------------
 # Auxiliary functions
 # -------------------
+
 
 def julian_day(date: datetime) -> float:
     """Returns the Julian day number of a date at 0h UTC."""
@@ -96,9 +90,11 @@ class DateIterator:
         self.current += self.step
         return x
 
+
 # -------------
 # CLI Functions
 # -------------
+
 
 def cli_populate_date(session: Session, args: Namespace) -> None:
     log.info("Generating Date values")
@@ -123,9 +119,8 @@ def cli_populate_date(session: Session, args: Namespace) -> None:
     )
     for i, batch in enumerate(batched(date_objs, args.batch_size), start=1):
         log.info("Writing Date batch #%d (%d records)", i, len(batch))
-        with session.begin():
-            for obj in batch:
-                session.add(obj)
+        for obj in batch:
+            session.add(obj)
 
 
 def cli_populate_time(session: Session, args: Namespace) -> None:
@@ -144,17 +139,15 @@ def cli_populate_time(session: Session, args: Namespace) -> None:
     )
     for i, batch in enumerate(batched(time_objs, args.batch_size), start=1):
         log.info("Writing Time batch #%d (%d records)", i, len(batch))
-        with session.begin():
-            for obj in batch:
-                session.add(obj)
+        for obj in batch:
+            session.add(obj)
 
 
 def cli_populate_config(session: Session, args: Namespace) -> None:
-    with session.begin():
-        id = Config(section="database", property="uuid", value=str(uuid.uuid4()))
-        version = Config(section="database", property="version", value="03")
-        session.add(id)
-        session.add(version)
+    id = Config(section="database", property="uuid", value=str(uuid.uuid4()))
+    version = Config(section="database", property="version", value="03")
+    session.add(id)
+    session.add(version)
 
 
 def cli_populate_all(session: Session, args: Namespace) -> None:
@@ -182,14 +175,13 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_main(args: Namespace) -> None:
-    sqa_logging(args)
+    sqa_logging(args.verbose)
     with engine.begin():
         Model.metadata.drop_all(bind=engine)
         Model.metadata.create_all(bind=engine)
-        with SessionFactory() as session:
+        with get_session() as session:
             args.func(session, args)
     engine.dispose()
-
 
 
 def main():

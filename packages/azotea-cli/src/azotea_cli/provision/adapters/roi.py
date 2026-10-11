@@ -18,7 +18,7 @@ from azotea_cli.common.reader.models import ImageMetadata
 # Own dependecies
 # ---------------
 from azotea_cli.common.rect import Rect
-from azotea_cli.infra.sqlalchemy import Roi
+from azotea_cli.infra.sqlalchemy import get_session, Roi
 
 from ..errors import MissingDefaultRoiError, RoiExistsError
 from ..interfaces import RoiProv
@@ -32,8 +32,6 @@ from . import config
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
-
 # -------------------------------
 # Create/Update location use case
 # -------------------------------
@@ -41,12 +39,12 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 class RoiProvImpl(RoiProv):
     def set_default(self, roi_id: ObjId) -> None:
-        with SessionFactory() as session:
+        with get_session() as session:
             log.info("saving default roi_id: %d", roi_id)
             config.save(session, "roi", "roi_id", str(roi_id))
 
     def get_default(self) -> ObjId:
-        with SessionFactory() as session:
+        with get_session() as session:
             roi_id = config.load(session, "roi", "roi_id")
             if roi_id is None:
                 raise MissingDefaultRoiError
@@ -54,7 +52,7 @@ class RoiProvImpl(RoiProv):
             return int(roi_id)
 
     def create(self, form: RoiForm) -> int:
-        with SessionFactory() as session:
+        with get_session() as session:
             rect = None
             try:
                 with session.begin():
@@ -76,7 +74,7 @@ class RoiProvImpl(RoiProv):
         return roi_id
 
     def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> int:
-        with SessionFactory() as session:
+        with get_session() as session:
             try:
                 with session.begin():
                     log.info("adding new roi from image '%s'", metadata)
