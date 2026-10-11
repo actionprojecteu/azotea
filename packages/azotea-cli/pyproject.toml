@@ -1,6 +1,6 @@
 [project]
 name = "azotea-client"
-dynamic = ["version"]
+version = "0.1.0"
 description = "AZOTEA command line interface"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -39,22 +39,12 @@ azotool = "azotea_cli.infra.cli.azotool:main"
 # Preprocess FITS images to be prcessed by azotea
 azofits = "azotea_cli.infra.cli.azofits:main"
 
-# ------------------------
-# DYNAMIC VERSIONING STUFF
-# ------------------------
-
 [build-system]
-requires = ["hatchling", "uv-dynamic-versioning"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.version]
-source = "uv-dynamic-versioning"
-
 [tool.hatch.build.targets.wheel]
-packages = ["src/azotea_cli",]
-
-[tool.uv-dynamic-versioning]
-fallback-version = "0.1.0"
+packages = ["src/azotea_cli"]
 
 # -----------
 # Other stuff
