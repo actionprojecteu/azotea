@@ -1,5 +1,12 @@
+
 from enum import StrEnum, IntEnum
 
+
+
+# -----------------
+# Enumeration types
+# -----------------
+#
 class ValidState(StrEnum):
     CURRENT = "Current"
     EXPIRED = "Expired"
@@ -27,3 +34,6 @@ class BayerIndex(IntEnum):
     Gr = 1
     B = 2
     Gb = 3
+
+# For the ime being ObjId is an alias
+type ObjId = int

@@ -1,5 +1,5 @@
 
-from azotea_cli.common.enums import HeaderType
+from azotea_cli.common.models import HeaderType
 
 from ..interfaces import ImageReader
 

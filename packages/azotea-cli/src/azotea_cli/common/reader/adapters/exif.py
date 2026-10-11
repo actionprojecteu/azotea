@@ -7,7 +7,7 @@ from typing import Any, Mapping
 import exifread
 import rawpy
 
-from azotea_cli.common.enums import BayerPattern, HeaderType, BayerIndex
+from azotea_cli.common.models import BayerPattern, HeaderType, BayerIndex
 
 from ..errors import (
     MissingCameraModelError,

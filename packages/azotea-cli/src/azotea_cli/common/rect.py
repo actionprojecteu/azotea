@@ -1,9 +1,9 @@
 import re
-from azotea_cli.common.errors import AzoteaError
+from .errors import AzoteaError
 
 class InvalidRectStringError(AzoteaError):
-    """Rectangle string is not well formatted"""
-    ...
+    """Rectangle string incorrectly formatted"""
+    pass
 
 
 class Point:

@@ -14,6 +14,8 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 # Own dependecies
 # ---------------
+
+from azotea_cli.common.models import ObjId
 from azotea_cli.infra.sqlalchemy import Location
 
 from ..errors import (
@@ -40,11 +42,11 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 
 class LocationProvImpl(LocationProv):
-    def set_default(self, location_id: int):
+    def set_default(self, location_id: ObjId):
         with SessionFactory() as session:
             config.save(session, "location", "location_id", str(location_id))
 
-    def get_default(self) -> int:
+    def get_default(self) -> ObjId:
         with SessionFactory() as session:
             location_id = config.load(session, "location", "location_id")
             if location_id is None:

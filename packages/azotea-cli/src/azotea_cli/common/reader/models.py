@@ -3,10 +3,10 @@ from datetime import datetime
 
 import numpy as np
 
-from azotea_cli.common.enums import BayerPattern, ImageType, HeaderType
+from azotea_cli.common.models import BayerPattern, ImageType, HeaderType
 
 # type alias
-type Array2Du16 = np.ndarray[tuple[int, int], np.dtype[np.uint16]]
+type IntArray2D = np.ndarray[tuple[int, int], np.dtype[np.uint16]]
 
 @dataclass(frozen=True)
 class ImageMetadata:
@@ -29,4 +29,4 @@ class ImageMetadata:
     def __str__(self) -> str:
         return f"{self.model} {self.width}x{self.height}"
 
-__all__ = ["ImageMetadata", "Array2Du16"]
+__all__ = ["ImageMetadata", "IntArray2D"]

@@ -16,6 +16,7 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 
 from azotea_cli.common.rect import Rect
+from azotea_cli.common.models import ObjId
 from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.infra.sqlalchemy import Roi
 
@@ -43,11 +44,11 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 class RoiProvImpl(RoiProv):
 
-    def set_default(self, roi_id: int) -> None:
+    def set_default(self, roi_id: ObjId) -> None:
         with SessionFactory() as session:
             config.save(session, "roi", "roi_id", str(roi_id))
 
-    def get_default(self) -> int:
+    def get_default(self) -> ObjId:
         with SessionFactory() as session:
             roi_id = config.load(session, "roi", "roi_id")
             if roi_id is None:

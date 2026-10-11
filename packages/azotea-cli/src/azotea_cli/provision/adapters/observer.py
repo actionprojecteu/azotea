@@ -17,7 +17,7 @@ from sqlalchemy.exc import IntegrityError
 # Own dependecies
 # ---------------
 from azotea_cli.common.constants import FOREVER
-from azotea_cli.common.enums import ValidState
+from azotea_cli.common.models import ValidState, ObjId
 from azotea_cli.infra.sqlalchemy import Observer
 
 from . import config
@@ -44,13 +44,13 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 class ObserverProvImpl(ObserverProv):
 
-    def set_default(self, observer_id: int) -> None:
+    def set_default(self, observer_id: ObjId) -> None:
         with SessionFactory() as session:
             with session.begin():
                 config.save(session, "observer", "observer", str(observer_id))
 
 
-    def get_default(self) -> int:
+    def get_default(self) -> ObjId:
         with SessionFactory() as session:
             observer_id = config.load(session, "observer", "observer")
             if observer_id is None:

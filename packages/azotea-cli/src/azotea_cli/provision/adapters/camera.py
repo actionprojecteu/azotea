@@ -15,6 +15,7 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 
 from azotea_cli.infra.sqlalchemy import Camera
+from azotea_cli.common.models import ObjId
 from azotea_cli.common.reader.models import ImageMetadata
 
 from ..errors import (
@@ -40,11 +41,11 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 
 class CameraProvImpl(CameraProv):
-    def set_default(self, camera_id: int) -> None:
+    def set_default(self, camera_id: ObjId) -> None:
         with SessionFactory() as session:
             config.save(session, "camera", "camera_id", str(camera_id))
 
-    def get_default(self) -> int:
+    def get_default(self) -> ObjId:
         with SessionFactory() as session:
             camera_id = config.load(session, "camera", "camera_id")
             if camera_id is None:

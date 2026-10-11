@@ -14,8 +14,8 @@ from datetime import datetime
 # Third party libraries
 # ---------------------
 
-from lica.sqlalchemy.noasync.model import Model
 from sqlalchemy import (
+    Enum,
     BigInteger,
     DateTime,
     ForeignKey,
@@ -25,14 +25,59 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from azotea_cli.common.enums import BayerPattern, HeaderType, ImageType, ValidState
-from .enums import DbBayerPattern, DbHeaderType, DbImageType, DbValidState
+from lica.sqlalchemy.noasync.model import Model
+from lica.sqlalchemy.metadata import metadata
+
+# ----------------
+# Own dependencies
+# ----------------
+from azotea_cli.common.models import BayerPattern, HeaderType, ImageType, ValidState
+
+# -----------------------
+# Database Enums mappsing
+# -----------------------
+
+DbValidState: Enum = Enum(
+    ValidState,
+    name="db_valid_state",
+    create_constraint=False,
+    metadata=metadata,
+    validate_strings=True,
+    values_callable=lambda x: [e.name for e in x],
+)
+
+DbBayerPattern: Enum = Enum(
+    BayerPattern,
+    name="db_bayer_pattern",
+    create_constraint=False,
+    metadata=metadata,
+    validate_strings=True,
+    values_callable=lambda x: [e.name for e in x],
+)
+
+DbHeaderType: Enum = Enum(
+    HeaderType,
+    name="db_header_type",
+    create_constraint=False,
+    metadata=metadata,
+    validate_strings=True,
+    values_callable=lambda x: [e.name for e in x],
+)
+
+DbImageType: Enum = Enum(
+    ImageType,
+    name="db_image_type",
+    create_constraint=False,
+    metadata=metadata,
+    validate_strings=True,
+    values_callable=lambda x: [e.name for e in x],
+)
 
 
-# ------
-# Models
-# ------
-#
+# ---------------
+# Database Models
+# ---------------
+
 class Config(Model):
     __tablename__ = "config_t"
 
