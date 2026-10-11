@@ -44,6 +44,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 class LocationProvImpl(LocationProv):
     def set_default(self, location_id: ObjId):
         with SessionFactory() as session:
+            log.info("saving default location_id: %d", location_id)
             config.save(session, "location", "location_id", str(location_id))
 
     def get_default(self) -> ObjId:
@@ -51,9 +52,10 @@ class LocationProvImpl(LocationProv):
             location_id = config.load(session, "location", "location_id")
             if location_id is None:
                 raise MissingDefaultLocationError
+            log.info("loading default location_id: %d", location_id)
             return int(location_id)
 
-    def create(self, form: LocationForm, as_default: bool) -> int:
+    def create(self, form: LocationForm) -> int:
         with SessionFactory() as session:
             try:
                 with session.begin():
@@ -69,9 +71,6 @@ class LocationProvImpl(LocationProv):
                     session.add(loc)
                     session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
                     location_id = loc.location_id
-                    if as_default:
-                        log.info("saving default location_id: %d", form, location_id)
-                        config.save(session, "location", "location_id", str(loc.location_id))
             except IntegrityError:
                 raise LocationExistsError(f"({form.site_name}, {form.location})")
         return location_id

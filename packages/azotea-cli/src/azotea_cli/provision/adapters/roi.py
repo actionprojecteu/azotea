@@ -11,19 +11,16 @@ import logging
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from sqlalchemy.exc import IntegrityError
 
+from azotea_cli.common.models import ObjId
+from azotea_cli.common.reader.models import ImageMetadata
+
 # ---------------
 # Own dependecies
 # ---------------
-
 from azotea_cli.common.rect import Rect
-from azotea_cli.common.models import ObjId
-from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.infra.sqlalchemy import Roi
 
-from ..errors import (
-    RoiExistsError,
-    MissingDefaultRoiError
-)
+from ..errors import MissingDefaultRoiError, RoiExistsError
 from ..interfaces import RoiProv
 from ..models import RoiForm
 from . import config
@@ -43,9 +40,9 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 
 
 class RoiProvImpl(RoiProv):
-
     def set_default(self, roi_id: ObjId) -> None:
         with SessionFactory() as session:
+            log.info("saving default roi_id: %d", roi_id)
             config.save(session, "roi", "roi_id", str(roi_id))
 
     def get_default(self) -> ObjId:
@@ -53,9 +50,10 @@ class RoiProvImpl(RoiProv):
             roi_id = config.load(session, "roi", "roi_id")
             if roi_id is None:
                 raise MissingDefaultRoiError
+            log.info("loading default roi_id: %d", roi_id)
             return int(roi_id)
 
-    def create(self, form: RoiForm, as_default: bool) -> int:
+    def create(self, form: RoiForm) -> int:
         with SessionFactory() as session:
             rect = None
             try:
@@ -73,14 +71,11 @@ class RoiProvImpl(RoiProv):
                     session.add(roi)
                     session.flush()
                     roi_id = roi.roi_id
-                    if as_default:
-                        log.info("saving default roi_id: %d", roi_id)
-                        config.save(session, "roi", "roi_id", str(roi.roi_id))
             except IntegrityError:
                 raise RoiExistsError(str(rect))
         return roi_id
 
-    def create_from_image(self, rect: Rect, metadata: ImageMetadata, as_default: bool) -> int:
+    def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> int:
         with SessionFactory() as session:
             try:
                 with session.begin():
@@ -91,9 +86,7 @@ class RoiProvImpl(RoiProv):
                         else f"{metadata.make} {metadata.model}"
                     )
                     center = rect.central()
-                    comment = (
-                        f"ROI for {model}, centered at P={center}, width={rect.width()}, height={rect.height()}"
-                    )
+                    comment = f"ROI for {model}, centered at P={center}, width={rect.width()}, height={rect.height()}"
                     roi = Roi(
                         x1=rect.x1,
                         y1=rect.y1,
@@ -105,10 +98,6 @@ class RoiProvImpl(RoiProv):
                     session.add(roi)
                     session.flush()
                     roi_id = roi.roi_id
-                    if as_default:
-                        log.info("saving default roi_id: %d", roi_id)
-                        config.save(session, "roi", "roi_id", str(roi.roi_id))
-
             except IntegrityError:
                 raise RoiExistsError(str(rect))
         return roi_id

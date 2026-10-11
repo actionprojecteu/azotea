@@ -47,6 +47,7 @@ class ObserverProvImpl(ObserverProv):
     def set_default(self, observer_id: ObjId) -> None:
         with SessionFactory() as session:
             with session.begin():
+                log.info("saving default observer_id: %d", observer_id)
                 config.save(session, "observer", "observer", str(observer_id))
 
 
@@ -55,9 +56,10 @@ class ObserverProvImpl(ObserverProv):
             observer_id = config.load(session, "observer", "observer")
             if observer_id is None:
                 raise MissingDefaultObserverError
+            log.info("loading default observer_id: %d", observer_id)
             return int(observer_id)
 
-    def create_versioned(self, form: ObserverForm, as_default: bool) -> int:
+    def create_versioned(self, form: ObserverForm) -> int:
         sql = select(Observer).where(
             Observer.family_name == form.family_name,
             Observer.surname == form.surname,
@@ -103,9 +105,6 @@ class ObserverProvImpl(ObserverProv):
                         log.info("create a new version with id %d of observer: %s", observer_id, form)
                     else:
                          observer_id = prev_obs.observer_id
-                    if as_default:
-                        log.info("saving default observer_id: %d", form, observer_id)
-                        config.save(session, "observer", "observer_id", str(observer_id))
                     return observer_id
             except IntegrityError:
                 raise ObserverExistsError(f"{form.family_name} {form.surname}")

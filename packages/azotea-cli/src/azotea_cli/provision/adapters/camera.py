@@ -43,6 +43,7 @@ engine, SessionFactory = create_engine_sessionclass(env_var="DATABASE_URL")
 class CameraProvImpl(CameraProv):
     def set_default(self, camera_id: ObjId) -> None:
         with SessionFactory() as session:
+            log.info("saving default camera_id: %d", camera_id)
             config.save(session, "camera", "camera_id", str(camera_id))
 
     def get_default(self) -> ObjId:
@@ -50,9 +51,10 @@ class CameraProvImpl(CameraProv):
             camera_id = config.load(session, "camera", "camera_id")
             if camera_id is None:
                 raise MissingDefaultCameraError
+            log.info("loading default camera_id: %d", camera_id)
             return int(camera_id)
 
-    def create(self, form: CameraForm, as_default: bool) -> int:
+    def create(self, form: CameraForm) -> int:
         with SessionFactory() as session:
             try:
                 with session.begin():
@@ -71,14 +73,11 @@ class CameraProvImpl(CameraProv):
                     session.add(cam)
                     session.flush()
                     camera_id = cam.camera_id
-                    if as_default:
-                        log.info("saving default camera_id: %d", camera_id)
-                        config.save(session, "camera", "camera_id", str(cam.camera_id))
             except IntegrityError:
                 raise CameraExistsError(form.model)
         return camera_id
 
-    def create_from_image(self, metadata: ImageMetadata, as_default: bool) -> int:
+    def create_from_image(self, metadata: ImageMetadata) -> int:
         with SessionFactory() as session:
             model = None
             try:
@@ -101,9 +100,6 @@ class CameraProvImpl(CameraProv):
                     session.add(cam)
                     session.flush()
                     camera_id = cam.camera_id
-                    if as_default:
-                        log.info("saving default camera_id: %d", camera_id)
-                        config.save(session, "camera", "camera_id", str(cam.camera_id))
             except IntegrityError:
                 raise CameraExistsError(model)
         return camera_id
