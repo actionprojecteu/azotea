@@ -1,3 +1,3 @@
-from .factory import ReaderFactoryImpl
+from .factory import ImageReaderFactoryImpl
 
-__all__ = ["ReaderFactoryImpl"]
+__all__ = ["ImageReaderFactoryImpl"]

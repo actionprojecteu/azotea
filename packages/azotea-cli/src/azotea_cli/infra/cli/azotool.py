@@ -24,7 +24,7 @@ from lica.validators import vdate, vfile
 from azotea_cli import __version__
 from azotea_cli.common.models import BayerPattern, HeaderType
 from azotea_cli.common.errors import AzoteaError
-from azotea_cli.common.reader.adapters import ReaderFactoryImpl
+from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 from azotea_cli.infra.cli.display import StdoutDisplay
 from azotea_cli.provision import (
     CameraForm,
@@ -35,12 +35,12 @@ from azotea_cli.provision import (
     RoiForm,
 )
 from azotea_cli.provision.adapters import (
-    CameraProvImpl,
-    ConsentProvImpl,
-    LocationProvImpl,
-    ObserverProvImpl,
-    OpticsProvImpl,
-    RoiProvImpl,
+    CameraRepoImpl,
+    ConsentRepoImpl,
+    LocationRepoImpl,
+    ObserverRepoImpl,
+    OpticsRepoImpl,
+    RoiRepoImpl,
 )
 from azotea_cli.provision.use_cases import (
     consent_view_and_agree,
@@ -331,14 +331,14 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_consent(args: Namespace) -> None:
-    consent = ConsentProvImpl()
+    consent = ConsentRepoImpl()
     display = StdoutDisplay()
     consent_view_and_agree(consent, display, args.agree)
 
 
 def cli_location(args: Namespace) -> None:
-    location = LocationProvImpl()
-    consent = ConsentProvImpl()
+    location = LocationRepoImpl()
+    consent = ConsentRepoImpl()
     form = LocationForm(
         site_name=args.site_name,
         location=args.location,
@@ -353,8 +353,8 @@ def cli_location(args: Namespace) -> None:
 
 
 def cli_optics(args: Namespace) -> None:
-    optics = OpticsProvImpl()
-    consent = ConsentProvImpl()
+    optics = OpticsRepoImpl()
+    consent = ConsentRepoImpl()
     form = DefaultOpticsForm(
         focal_len=args.focal_length,
         f_number=args.f_number,
@@ -366,10 +366,10 @@ def cli_optics(args: Namespace) -> None:
 
 
 def cli_camera(args: Namespace) -> None:
-    camera = CameraProvImpl()
-    consent = ConsentProvImpl()
-    optics = OpticsProvImpl()
-    factory = ReaderFactoryImpl()
+    camera = CameraRepoImpl()
+    consent = ConsentRepoImpl()
+    optics = OpticsRepoImpl()
+    factory = ImageReaderFactoryImpl()
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
         if args.model is None:
@@ -401,10 +401,10 @@ def cli_camera(args: Namespace) -> None:
 
 
 def cli_roi(args: Namespace) -> None:
-    roi = RoiProvImpl()
-    factory = ReaderFactoryImpl()
-    consent = ConsentProvImpl()
-    optics = OpticsProvImpl()
+    roi = RoiRepoImpl()
+    factory = ImageReaderFactoryImpl()
+    consent = ConsentRepoImpl()
+    optics = OpticsRepoImpl()
 
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
@@ -427,8 +427,8 @@ def cli_roi(args: Namespace) -> None:
 
 
 def cli_observer(args: Namespace) -> None:
-    observer = ObserverProvImpl()
-    consent = ConsentProvImpl()
+    observer = ObserverRepoImpl()
+    consent = ConsentRepoImpl()
     form = ObserverForm(
         family_name=args.name,
         surname=args.surname,

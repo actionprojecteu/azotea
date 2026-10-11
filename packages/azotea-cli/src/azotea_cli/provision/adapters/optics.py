@@ -7,10 +7,10 @@ import logging
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import get_session
+from azotea_cli.infra.sqlalchemy import get_db_session
 
 from ..errors import FNumberMissingError, FocalLenMissingError
-from ..interfaces import OpticsProv
+from ..interfaces import OpticsRepo
 from ..models import DefaultOptics, DefaultOpticsForm
 from . import config
 
@@ -27,9 +27,9 @@ log = logging.getLogger(__name__.split(".")[-1])
 # -------------------------------------
 
 
-class OpticsProvImpl(OpticsProv):
+class OpticsRepoImpl(OpticsRepo):
     def save(self, form: DefaultOpticsForm) -> None:
-        with get_session() as session:
+        with get_db_session() as session:
             with session.begin():
                 if form.focal_len is not None:
                     config.save(session, "optics", "focal_len", str(form.focal_len))
@@ -38,7 +38,7 @@ class OpticsProvImpl(OpticsProv):
         log.info("saved default optics %s", form)
 
     def load(self) -> DefaultOptics:
-        with get_session() as session:
+        with get_db_session() as session:
             with session.begin():
                 focal_len = config.load(session, "optics", "focal_len")
                 if focal_len is None:
@@ -51,4 +51,4 @@ class OpticsProvImpl(OpticsProv):
         return data
 
 
-__all__ = ["OpticsProvImpl"]
+__all__ = ["OpticsRepoImpl"]

@@ -28,7 +28,7 @@ engine: Engine = create_engine(url, pool_pre_ping=True, connect_args={"check_sam
 _SessionFactory = sessionmaker(engine, autoflush=False, expire_on_commit=False)
 
 @contextmanager
-def get_session() -> Generator[Session, None, None]:
+def get_db_session() -> Generator[Session, None, None]:
     session = _SessionFactory()
     try:
         yield session
@@ -45,4 +45,4 @@ def sqa_logging(debug: bool) -> None:
         logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 
 
-__all__ = ["engine", "get_session", "sqa_logging"]
+__all__ = ["engine", "get_db_session", "sqa_logging"]

@@ -17,8 +17,8 @@ from ..errors import ConsentNotAgreedError
 # Own dependecies
 # ---------------
 
-from azotea_cli.infra.sqlalchemy import get_session
-from ..interfaces import ConsentProv
+from azotea_cli.infra.sqlalchemy import get_db_session
+from ..interfaces import ConsentRepo
 from . import config
 
 # -----------------------
@@ -28,12 +28,12 @@ from . import config
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-class ConsentProvImpl(ConsentProv):
+class ConsentRepoImpl(ConsentRepo):
     def review(self) -> str:
         return text()
 
     def agree(self, agreed: bool) -> None:
-        with get_session() as session:
+        with get_db_session() as session:
             if agreed:
                 tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
                 with session.begin():
@@ -43,11 +43,11 @@ class ConsentProvImpl(ConsentProv):
                         log.info("consent form signed")
 
     def agreed(self) -> bool:
-        with get_session() as session:
+        with get_db_session() as session:
             return self._is_signed(session)
 
     def check_raises(self) -> None:
-        with get_session() as session:
+        with get_db_session() as session:
             if not self._is_signed(session):
                 raise ConsentNotAgreedError
 

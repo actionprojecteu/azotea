@@ -25,7 +25,7 @@ from sqlalchemy.orm import Session
 # local imports
 # -------------
 from azotea_cli import __version__
-from azotea_cli.infra.sqlalchemy import Config, Date, Model, Time, engine, get_session, sqa_logging
+from azotea_cli.infra.sqlalchemy import Config, Date, Model, Time, engine, get_db_session, sqa_logging
 
 from .util import parser as prs
 
@@ -179,7 +179,7 @@ def cli_main(args: Namespace) -> None:
     with engine.begin():
         Model.metadata.drop_all(bind=engine)
         Model.metadata.create_all(bind=engine)
-        with get_session() as session:
+        with get_db_session() as session:
             args.func(session, args)
     engine.dispose()
 

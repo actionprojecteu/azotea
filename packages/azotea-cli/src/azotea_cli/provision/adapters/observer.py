@@ -17,7 +17,7 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 from azotea_cli.common.constants import FOREVER
 from azotea_cli.common.models import ValidState, ObjId
-from azotea_cli.infra.sqlalchemy import Observer, get_session
+from azotea_cli.infra.sqlalchemy import Observer, get_db_session
 
 from . import config
 from ..errors import (
@@ -26,7 +26,7 @@ from ..errors import (
     MissingDefaultObserverError,
 )
 from ..models import ObserverForm
-from ..interfaces import ObserverProv
+from ..interfaces import ObserverRepo
 
 # -----------------------
 # Module global variables
@@ -39,21 +39,21 @@ log = logging.getLogger(__name__.split(".")[-1])
 # Create/Update location use case
 # -------------------------------
 
-class ObserverProvImpl(ObserverProv):
+class ObserverRepoImpl(ObserverRepo):
 
     def set_default(self, observer_id: ObjId) -> None:
-        with get_session() as session:
+        with get_db_session() as session:
             with session.begin():
                 log.info("saving default observer_id: %d", observer_id)
                 config.save(session, "observer", "observer", str(observer_id))
 
 
     def get_default(self) -> ObjId:
-        with get_session() as session:
+        with get_db_session() as session:
             observer_id = config.load(session, "observer", "observer")
             if observer_id is None:
                 raise MissingDefaultObserverError
-            log.info("loading default observer_id: %d", observer_id)
+            log.info("loading default observer_id: %s", observer_id)
             return int(observer_id)
 
     def create_versioned(self, form: ObserverForm) -> int:
@@ -62,7 +62,7 @@ class ObserverProvImpl(ObserverProv):
             Observer.surname == form.surname,
             Observer.valid_state == ValidState.CURRENT,
         )
-        with get_session() as session:
+        with get_db_session() as session:
             try:
                 with session.begin():
                     now = datetime.now(timezone.utc)
@@ -113,7 +113,7 @@ class ObserverProvImpl(ObserverProv):
             Observer.surname == form.surname,
             Observer.valid_state == ValidState.CURRENT,
         )
-        with get_session() as session:
+        with get_db_session() as session:
             with session.begin():
                 prev_obs = session.scalars(sql).one_or_none()
                 if prev_obs is None:

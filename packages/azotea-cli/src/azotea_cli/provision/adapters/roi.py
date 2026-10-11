@@ -18,10 +18,10 @@ from azotea_cli.common.reader.models import ImageMetadata
 # Own dependecies
 # ---------------
 from azotea_cli.common.rect import Rect
-from azotea_cli.infra.sqlalchemy import get_session, Roi
+from azotea_cli.infra.sqlalchemy import get_db_session, Roi
 
 from ..errors import MissingDefaultRoiError, RoiExistsError
-from ..interfaces import RoiProv
+from ..interfaces import RoiRepo
 from ..models import RoiForm
 from . import config
 
@@ -37,22 +37,23 @@ log = logging.getLogger(__name__.split(".")[-1])
 # -------------------------------
 
 
-class RoiProvImpl(RoiProv):
+class RoiRepoImpl(RoiRepo):
     def set_default(self, roi_id: ObjId) -> None:
-        with get_session() as session:
-            log.info("saving default roi_id: %d", roi_id)
-            config.save(session, "roi", "roi_id", str(roi_id))
+        with get_db_session() as session:
+            with session.begin():
+                log.info("saving default roi_id: %d", roi_id)
+                config.save(session, "roi", "roi_id", str(roi_id))
 
     def get_default(self) -> ObjId:
-        with get_session() as session:
+        with get_db_session() as session:
             roi_id = config.load(session, "roi", "roi_id")
             if roi_id is None:
                 raise MissingDefaultRoiError
-            log.info("loading default roi_id: %d", roi_id)
+            log.info("loading default roi_id: %s", roi_id)
             return int(roi_id)
 
     def create(self, form: RoiForm) -> int:
-        with get_session() as session:
+        with get_db_session() as session:
             rect = None
             try:
                 with session.begin():
@@ -74,7 +75,7 @@ class RoiProvImpl(RoiProv):
         return roi_id
 
     def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> int:
-        with get_session() as session:
+        with get_db_session() as session:
             try:
                 with session.begin():
                     log.info("adding new roi from image '%s'", metadata)

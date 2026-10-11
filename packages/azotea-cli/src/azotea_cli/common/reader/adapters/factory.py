@@ -1,6 +1,6 @@
 import os
 
-from ..interfaces import ImageReader, ReaderFactory
+from ..interfaces import ImageReader, ImageReaderFactory
 from .exif import ExifReader
 from .fits import FitsReader
 
@@ -10,7 +10,7 @@ def is_fits(path: str) -> bool:
     _, ext = os.path.splitext(path)
     return ext.lower() in FITS_EXTENSIONS
 
-class ReaderFactoryImpl(ReaderFactory):
+class ImageReaderFactoryImpl(ImageReaderFactory):
     def get_reader(self, path: str) -> ImageReader:
         if is_fits(path):
             return FitsReader()

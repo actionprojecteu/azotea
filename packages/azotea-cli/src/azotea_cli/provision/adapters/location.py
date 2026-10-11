@@ -15,14 +15,14 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 
 from azotea_cli.common.models import ObjId
-from azotea_cli.infra.sqlalchemy import Location, get_session
+from azotea_cli.infra.sqlalchemy import Location, get_db_session
 
 from ..errors import (
     LocationExistsError,
     LocationMissingError,
     MissingDefaultLocationError,
 )
-from ..interfaces import LocationProv
+from ..interfaces import LocationRepo
 from ..models import LocationForm
 from . import config
 
@@ -38,22 +38,23 @@ log = logging.getLogger(__name__.split(".")[-1])
 # -------------------------------
 
 
-class LocationProvImpl(LocationProv):
+class LocationRepoImpl(LocationRepo):
     def set_default(self, location_id: ObjId):
-        with get_session() as session:
-            log.info("saving default location_id: %d", location_id)
-            config.save(session, "location", "location_id", str(location_id))
+        with get_db_session() as session:
+            with session.begin():
+                log.info("saving default location_id: %d", location_id)
+                config.save(session, "location", "location_id", str(location_id))
 
     def get_default(self) -> ObjId:
-        with get_session() as session:
+        with get_db_session() as session:
             location_id = config.load(session, "location", "location_id")
             if location_id is None:
                 raise MissingDefaultLocationError
-            log.info("loading default location_id: %d", location_id)
+            log.info("loading default location_id: %s", location_id)
             return int(location_id)
 
     def create(self, form: LocationForm) -> int:
-        with get_session() as session:
+        with get_db_session() as session:
             try:
                 with session.begin():
                     log.info("adding new location: %s", form)
@@ -76,7 +77,7 @@ class LocationProvImpl(LocationProv):
         sql = select(Location).where(
             Location.site_name == form.site_name, Location.location == form.location
         )
-        with get_session() as session:
+        with get_db_session() as session:
             with session.begin():
                 prev_loc = session.scalars(sql).one_or_none()
                 if prev_loc is None:

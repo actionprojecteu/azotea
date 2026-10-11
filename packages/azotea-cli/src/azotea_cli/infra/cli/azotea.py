@@ -15,7 +15,23 @@ from lica.cli import execute
 # --------------
 # local imports
 # -------------
+
 from azotea_cli import __version__
+from azotea_cli.common.errors import AzoteaError
+from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
+
+from azotea_cli.provision.adapters import (
+    CameraRepoImpl,
+    ConsentRepoImpl,
+    LocationRepoImpl,
+    ObserverRepoImpl,
+    OpticsRepoImpl,
+    RoiRepoImpl,
+)
+
+from azotea_cli.operation.adapters import ImagesRepoImpl
+from azotea_cli.operation.use_cases import RegisterImagesUseCase, SkyStatisticsUseCase
+from azotea_cli.operation.models import RegisterForm
 
 # ----------------
 # Module constants
@@ -41,12 +57,14 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 def add_args(parser: ArgumentParser) -> None:
+
     # --------------------------
     # Create first level parsers
     # --------------------------
 
     subparser = parser.add_subparsers(dest="command")
     parser_batch = subparser.add_parser("batch", help="observer commands")
+    parser_batch.set_defaults(func=cli_batch)
 
     # -----------------------------
     # Arguments for 'batch' command
@@ -73,7 +91,44 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_batch(args: Namespace) -> None:
-    log.info("AZOTEA to be built .....")
+    consent = ConsentRepoImpl()
+    camera = CameraRepoImpl()
+    location = LocationRepoImpl()
+    observer = ObserverRepoImpl()
+    optics = OpticsRepoImpl()
+    roi = RoiRepoImpl()
+    repository = ImagesRepoImpl()
+    factory = ImageReaderFactoryImpl()
+    use_case1 = RegisterImagesUseCase(
+        consent = consent,
+        camera = camera,
+        location = location,
+        observer = observer,
+        optics = optics,
+        factory = factory,
+        repository = repository,
+    )
+    use_case2 = SkyStatisticsUseCase(
+        consent = consent,
+        camera = camera,
+        location = location,
+        observer = observer,
+        roi = roi,
+        factory = factory,
+    )
+    form = RegisterForm(images_dir=args.images_dir, depth=args.depth)
+    try:
+        if args.only_load:
+            use_case1.register_images(form)
+        elif args.only_sky:
+            use_case2.compute_sky_statistics()
+        elif args.only_publish:
+            raise NotImplementedError
+        else:
+            use_case1.register_images(form)
+            use_case2.compute_sky_statistics()
+    except AzoteaError as e:
+        log.error(e)
 
 
 def cli_main(args: Namespace) -> None:

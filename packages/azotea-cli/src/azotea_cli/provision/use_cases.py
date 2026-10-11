@@ -1,16 +1,16 @@
 import logging
 
-from azotea_cli.common.reader.interfaces import ReaderFactory
+from azotea_cli.common.reader.interfaces import ImageReaderFactory
 from azotea_cli.common.rect import Point, Rect
 
 from .interfaces import (
-    CameraProv,
-    ConsentProv,
+    CameraRepo,
+    ConsentRepo,
     Display,
-    LocationProv,
-    ObserverProv,
-    OpticsProv,
-    RoiProv,
+    LocationRepo,
+    ObserverRepo,
+    OpticsRepo,
+    RoiRepo,
 )
 from .models import (
     CameraForm,
@@ -25,19 +25,19 @@ from .models import (
 log = logging.getLogger(__name__.split(".")[-2])
 
 
-def consent_view_and_agree(consent: ConsentProv, display: Display, agreed: bool) -> None:
+def consent_view_and_agree(consent: ConsentRepo, display: Display, agreed: bool) -> None:
     consent.review()
     display.display(consent.review())
     if agreed:
         consent.agree(agreed)
 
 
-def consent_check(consent: ConsentProv) -> None:
+def consent_check(consent: ConsentRepo) -> None:
     consent.check_raises()
 
 
 def create_location(
-    location: LocationProv, consent: ConsentProv, form: LocationForm, as_default: bool
+    location: LocationRepo, consent: ConsentRepo, form: LocationForm, as_default: bool
 ) -> None:
     consent.check_raises()
     loc_id = location.create(form)
@@ -45,19 +45,19 @@ def create_location(
         location.set_default(loc_id)
 
 
-def save_default_optics(optics: OpticsProv, consent: ConsentProv, form: DefaultOpticsForm) -> None:
+def save_default_optics(optics: OpticsRepo, consent: ConsentRepo, form: DefaultOpticsForm) -> None:
     consent.check_raises()
     optics.save(form)
 
 
-def load_default_optics(optics: OpticsProv, consent: ConsentProv) -> DefaultOptics:
+def load_default_optics(optics: OpticsRepo, consent: ConsentRepo) -> DefaultOptics:
     consent.check_raises()
     data = optics.load()
     return data
 
 
 def create_versioned_observer(
-    observer: ObserverProv, consent: ConsentProv, form: ObserverForm, as_default: bool
+    observer: ObserverRepo, consent: ConsentRepo, form: ObserverForm, as_default: bool
 ) -> None:
     consent.check_raises()
     obs_id = observer.create_versioned(form)
@@ -65,13 +65,13 @@ def create_versioned_observer(
         observer.set_default(obs_id)
 
 
-def update_observer(observer: ObserverProv, consent: ConsentProv, form: ObserverForm) -> None:
+def update_observer(observer: ObserverRepo, consent: ConsentRepo, form: ObserverForm) -> None:
     consent.check_raises()
     observer.update(form)
 
 
 def create_camera(
-    camera: CameraProv, consent: ConsentProv, form: CameraForm, as_default: bool
+    camera: CameraRepo, consent: ConsentRepo, form: CameraForm, as_default: bool
 ) -> None:
     consent.check_raises()
     cam_id = camera.create(form)
@@ -80,10 +80,10 @@ def create_camera(
 
 
 def create_camera_from_image(
-    camera: CameraProv,
-    consent: ConsentProv,
-    optics: OpticsProv,
-    factory: ReaderFactory,
+    camera: CameraRepo,
+    consent: ConsentRepo,
+    optics: OpticsRepo,
+    factory: ImageReaderFactory,
     path: str,
     as_default: bool,
 ) -> None:
@@ -96,7 +96,7 @@ def create_camera_from_image(
         camera.set_default(cam_id)
 
 
-def create_roi(roi: RoiProv, consent: ConsentProv, form: RoiForm, as_default: bool) -> None:
+def create_roi(roi: RoiRepo, consent: ConsentRepo, form: RoiForm, as_default: bool) -> None:
     consent.check_raises()
     roi_id = roi.create(form)
     if as_default:
@@ -104,10 +104,10 @@ def create_roi(roi: RoiProv, consent: ConsentProv, form: RoiForm, as_default: bo
 
 
 def create_roi_from_image(
-    roi: RoiProv,
-    consent: ConsentProv,
-    optics: OpticsProv,
-    factory: ReaderFactory,
+    roi: RoiRepo,
+    consent: ConsentRepo,
+    optics: OpticsRepo,
+    factory: ImageReaderFactory,
     path: str,
     form: RoiCenteredForm,
     as_default: bool,
