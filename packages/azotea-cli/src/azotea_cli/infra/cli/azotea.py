@@ -29,7 +29,7 @@ from azotea_cli.provision.adapters import (
     RoiRepoImpl,
 )
 
-from azotea_cli.operation.adapters import ImagesRepoImpl
+from azotea_cli.operation.adapters import ImagesRepoImpl, SkyBrightnessRepoImpl
 from azotea_cli.operation.use_cases import RegisterImagesUseCase, SkyStatisticsUseCase
 from azotea_cli.operation.models import RegisterForm
 
@@ -97,7 +97,8 @@ def cli_batch(args: Namespace) -> None:
     observer = ObserverRepoImpl()
     optics = OpticsRepoImpl()
     roi = RoiRepoImpl()
-    repository = ImagesRepoImpl()
+    images = ImagesRepoImpl()
+    sky_stats = SkyBrightnessRepoImpl()
     factory = ImageReaderFactoryImpl()
     use_case1 = RegisterImagesUseCase(
         consent = consent,
@@ -106,15 +107,16 @@ def cli_batch(args: Namespace) -> None:
         observer = observer,
         optics = optics,
         factory = factory,
-        repository = repository,
+        images = images,
     )
     use_case2 = SkyStatisticsUseCase(
         consent = consent,
         camera = camera,
-        location = location,
         observer = observer,
         roi = roi,
         factory = factory,
+        images = images,
+        sky_stats = sky_stats
     )
     form = RegisterForm(images_dir=args.images_dir, depth=args.depth)
     try:

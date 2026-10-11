@@ -6,7 +6,6 @@ import logging
 import os
 from datetime import datetime, timezone
 from itertools import batched
-from typing import ParamSpecArgs
 
 # ---------------------
 # Third party libraries
@@ -48,7 +47,7 @@ class RegisterImagesUseCase:
         observer: ObserverRepo,
         optics: OpticsRepo,
         factory: ImageReaderFactory,
-        repository: ImagesRepo,
+        images: ImagesRepo,
     ) -> None:
         self.consent = consent
         self.camera = camera
@@ -56,7 +55,7 @@ class RegisterImagesUseCase:
         self.observer = observer
         self.optics = optics
         self.factory = factory
-        self.repository = repository
+        self.images = images
 
     def one_pass(self, path: str) -> ImageForm:
         reader = self.factory.get_reader(path)
@@ -79,7 +78,6 @@ class RegisterImagesUseCase:
             focal_length=metadata.focal_len,
             f_number=metadata.f_number,
             imagetype=metadata.imagetyp,
-            flagged=False,
             session=self.session,
             date_obs=metadata.timestamp,
             camera_id=self.camera_id,
@@ -98,7 +96,7 @@ class RegisterImagesUseCase:
         self.observer_id = self.observer.get_default()
         extension = self.camera.get_extension_by_id(self.camera_id)
         input_files = scan_images(form.images_dir, form.depth, extension)
-        stored_files = self.repository.get_stored_image_paths()
+        stored_files = self.images.get_stored_image_paths()
         new_files = list(set(input_files) - set(stored_files))
         n_selected = len(new_files)
         n_skipped = 0
@@ -119,8 +117,8 @@ class RegisterImagesUseCase:
                     continue
                 else:
                     images.append(image)
-            log.info("saving a batch of %d images to repository", len(images))
-            self.repository.save_images(images)
+            log.info("saving a batch of %d images to repo", len(images))
+            self.images.save_images(images)
         log.info(
             "%d images analyzed, %d discarded, %d stored",
             n_selected,

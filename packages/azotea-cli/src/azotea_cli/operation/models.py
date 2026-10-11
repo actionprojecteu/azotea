@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from azotea_cli.common.models import ObjId, ImageType
+from azotea_cli.common.models import ImageType, ObjId
+
 
 @dataclass(frozen=True)
 class RegisterForm:
     images_dir: str
     depth: int
+
 
 @dataclass(frozen=True)
 class ImageForm:
@@ -27,8 +29,6 @@ class ImageForm:
     f_number: float | None
     # Either BIAS, DARK, FLAT or LIGHT
     imagetype: ImageType
-    # false = image is ok, true = flagged as corrupt image
-    flagged: bool
     # session identifier "YYYYMMDDHHMMSS"
     session: str
     # date of observation, utc
@@ -37,3 +37,19 @@ class ImageForm:
     camera_id: ObjId
     observer_id: ObjId
     location_id: ObjId
+
+
+@dataclass(frozen=True)
+class SkyStatsForm:
+    image_id: ObjId
+    roi_id: ObjId
+
+    # Sky Brightness measurements
+    aver_signal_R: float
+    vari_signal_R: float
+    aver_signal_G1: float
+    vari_signal_G1: float
+    aver_signal_G2: float
+    vari_signal_G2: float
+    aver_signal_B: float
+    vari_signal_B: float

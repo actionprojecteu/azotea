@@ -13,10 +13,12 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
+from azotea_cli.common.models import ObjId
+
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import Image, get_db_session
+from azotea_cli.infra.sqlalchemy import Image, SkyBrightness, get_db_session
 
 # from ..errors import
 from ..interfaces import ImagesRepo
@@ -53,7 +55,7 @@ class ImagesRepoImpl(ImagesRepo):
             focal_length=image.focal_length,
             f_number=image.f_number,
             imagetype=image.imagetype,
-            flagged=image.flagged,
+            flagged=False,
             session=int(image.session),
             camera_id=image.camera_id,
             observer_id=image.observer_id,
@@ -84,3 +86,14 @@ class ImagesRepoImpl(ImagesRepo):
             except IntegrityError:
                 log.warning("error saving a batch of %d images, looping one by one", len(images))
                 self.save_one_by_one(images)
+
+    def pending_processing_by(self, observer_id: ObjId) -> Sequence[ObjId]:
+        sql = select(Image.image_id).where(
+            Image.observer_id == observer_id,
+            ~select(SkyBrightness.image_id)
+            .where(SkyBrightness.image_id == Image.image_id)
+            .exists(),
+        )
+        with get_db_session() as session:
+            image_ids = session.scalars(sql).all()
+            return image_ids
