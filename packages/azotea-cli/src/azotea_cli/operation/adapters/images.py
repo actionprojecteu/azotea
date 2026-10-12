@@ -96,4 +96,10 @@ class ImagesRepoImpl(ImagesRepo):
         )
         with get_db_session() as session:
             image_ids = session.scalars(sql).all()
-            return image_ids
+        return image_ids
+
+    def to_paths(self, image_ids:  Sequence[ObjId]) -> Sequence[str]:
+        sql = select(Image.directory, Image.name).where(Image.image_id.in_(image_ids))
+        with get_db_session() as session:
+            result = session.execute(sql).all()
+        return [os.path.join(dir, name) for dir, name in result]

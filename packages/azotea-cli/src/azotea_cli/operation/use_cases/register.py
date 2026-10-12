@@ -112,12 +112,12 @@ class RegisterImagesUseCase:
                     )
                     image = self.one_pass(path)
                 except (CameraMissingError, MissingTimestampError, CameraNotDefaultError) as e:
-                    n_skipped = +1
+                    n_skipped += 1
                     log.warning("%s, skipping", e)
                     continue
                 else:
                     images.append(image)
-            log.info("saving a batch of %d images to repo", len(images))
+            log.info("saving a batch of %d images", len(images))
             self.images.save_images(images)
         log.info(
             "%d images analyzed, %d discarded, %d stored",

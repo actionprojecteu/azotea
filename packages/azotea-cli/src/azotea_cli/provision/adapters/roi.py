@@ -9,18 +9,19 @@ import logging
 # ---------------------
 #
 from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from azotea_cli.common.models import ObjId
-from azotea_cli.common.reader.models import ImageMetadata
 
 # ---------------
 # Own dependecies
 # ---------------
+from azotea_cli.common.models import ObjId
+from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.common.rect import Rect
 from azotea_cli.infra.sqlalchemy import get_db_session, Roi
 
-from ..errors import MissingDefaultRoiError, RoiExistsError
+from ..errors import MissingDefaultRoiError, RoiExistsError, RoiMissingError
 from ..interfaces import RoiRepo
 from ..models import RoiForm
 from . import config
@@ -51,6 +52,14 @@ class RoiRepoImpl(RoiRepo):
                 raise MissingDefaultRoiError
             log.info("loading default roi_id: %s", roi_id)
             return int(roi_id)
+
+    def get_as_rect(self, roi_id: ObjId) -> Rect:
+        sql = select(Roi).where(Roi.roi_id == roi_id)
+        with get_db_session() as session:
+            roi = session.scalars(sql).one_or_none()
+            if roi is None:
+                raise RoiMissingError(roi_id)
+            return Rect(roi.x1, roi.y1, roi.x2, roi.y2)
 
     def create(self, form: RoiForm) -> int:
         with get_db_session() as session:

@@ -7,6 +7,7 @@ from .errors import (
     ObserverExistsError,
     ObserverMissingError,
     RoiExistsError,
+    RoiMissingError,
     FocalLenMissingError,
     FNumberMissingError
 )
@@ -49,4 +50,5 @@ __all__ = [
     "FocalLenMissingError",
     "FNumberMissingError",
     "RoiExistsError",
+    "RoiMissingError",
 ]

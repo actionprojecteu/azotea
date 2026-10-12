@@ -66,6 +66,11 @@ class RoiExistsError(AzoteaError):
 
     pass
 
+class RoiMissingError(AzoteaError):
+    """Roi does not exists"""
+
+    pass
+
 class MissingDefaultRoiError(AzoteaError):
     """Default roi is not set"""
 
