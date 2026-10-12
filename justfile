@@ -54,15 +54,15 @@ exif-setup:
     #!/usr/bin/env bash
     set -exuo pipefail
     IMAGES=images/Carpeta1
-    uv run azotool --console consent view --agree
-    uv run azotool --console observer create --default --name Juan --surname "Gómez Pérez" \
+    uv run azotool --console --trace consent view --agree
+    uv run azotool --console --trace observer create --default --name Juan --surname "Gómez Pérez" \
             --affiliation "Agrupación Astronómica de Alcafrán" --acronym AA-ACFN
-    uv run azotool --console location create --default --randomize --site-name Alcafrán --location Alcafrán \
+    uv run azotool --console --trace location create --default --randomize --site-name Alcafrán --location Alcafrán \
             --longitude -2.7335649 --latitude 40.4966031 --utc-offset 1
-    uv run azotool --console configure optics --focal-length 50 --f-number 3.5
-    uv run azotool --console   camera create --default \
+    uv run azotool --console --trace configure optics --focal-length 50 --f-number 3.5
+    uv run azotool --console --trace camera create --default \
         --from-image ${IMAGES}/2020_12_1200_02_329999.CR2
-    uv run azotool --console roi create --default --width 500 --height 400 \
+    uv run azotool --console --trace roi create --default --width 500 --height 400 \
             --from-image ${IMAGES}/2020_12_1200_02_329999.CR2
     #uv run azotool --console configure publishing --username foo --password bar --url http://localhost:8080
 
