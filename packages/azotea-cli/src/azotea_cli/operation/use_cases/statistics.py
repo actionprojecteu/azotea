@@ -4,18 +4,19 @@
 
 import logging
 import os
-from datetime import datetime, timezone
 from itertools import batched
 
 # ---------------------
 # Third party libraries
 # ---------------------
-#
+import numpy as np
+
+from azotea_cli.common.errors import AzoteaError
+
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli.common.models import ObjId
-from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.reader import ImageReaderFactory
 from azotea_cli.provision.interfaces import (
     CameraRepo,
@@ -24,7 +25,7 @@ from azotea_cli.provision.interfaces import (
     RoiRepo,
 )
 
-from ..interfaces import SkyBrightnessRepo, ImagesRepo
+from ..interfaces import ImagesRepo, SkyBrightnessRepo
 from ..models import SkyStatsForm
 
 # -----------------------
@@ -33,6 +34,7 @@ from ..models import SkyStatsForm
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
+
 
 class SkyStatisticsUseCase:
     BATCH_SIZE: int = 100
@@ -56,14 +58,33 @@ class SkyStatisticsUseCase:
         self.sky_stats = sky_stats
 
     def one_pass(self, image_id: ObjId, path: str) -> SkyStatsForm:
-        raise AzoteaError("Not yet implemented")
+        reader = self.factory.get_reader(path)
+        raw_pixels = reader.read_pixels(path)
+        r_channel = raw_pixels.r(self.section)
+        g1_channel = raw_pixels.g1(self.section)
+        g2_channel = raw_pixels.g2(self.section)
+        b_channel = raw_pixels.b(self.section)
+        stats = SkyStatsForm(
+            image_id=image_id,
+            roi_id=self.roi_id,
+            aver_signal_R=np.mean(r_channel),
+            vari_signal_R=np.var(r_channel),
+            aver_signal_G1=np.mean(g1_channel),
+            vari_signal_G1=np.var(g1_channel),
+            aver_signal_G2=np.mean(g2_channel),
+            vari_signal_G2=np.var(g2_channel),
+            aver_signal_B=np.mean(b_channel),
+            vari_signal_B=np.var(b_channel),
+        )
+        log.info(stats)
+        return stats
 
     def compute_sky_statistics(self) -> None:
         self.consent.check_raises()
         log.info("computing sky background statistics")
         observer_id = self.observer.get_default()
         self.roi_id = self.roi.get_default()
-        rect = self.roi.get_as_rect(self.roi_id)
+        self.section = self.roi.get_as_rect(self.roi_id)
         pending_image_ids = self.images.pending_processing_by(observer_id)
         pending_paths = self.images.to_paths(pending_image_ids)
         n_selected = len(pending_image_ids)
@@ -76,7 +97,11 @@ class SkyStatisticsUseCase:
                 perc = int(round(i * 100 / n_selected, 0))
                 try:
                     log.info(
-                        "sky stats for %s [%d/%d] (%d%%)", os.path.basename(path), i, n_selected, perc
+                        "sky stats for %s [%d/%d] (%d%%)",
+                        os.path.basename(path),
+                        i,
+                        n_selected,
+                        perc,
                     )
                     stats = self.one_pass(image_id, path)
                 except AzoteaError as e:
@@ -88,8 +113,8 @@ class SkyStatisticsUseCase:
             log.info("saving a batch of %d images", len(statistics))
             self.sky_stats.save_statistics(statistics)
             log.info(
-                    "%d image statistics selected, %d discarded, %d computed",
-                    n_selected,
-                    n_skipped,
-                    n_selected - n_skipped,
+                "%d image statistics selected, %d discarded, %d computed",
+                n_selected,
+                n_skipped,
+                n_selected - n_skipped,
             )
