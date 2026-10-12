@@ -50,7 +50,7 @@ anew verbose="":
     #uv run azopopulate --console --trace --log-file azotea.log {{ verbose }} all --batch-size 25000
 
 
-setup:
+exif-setup:
     #!/usr/bin/env bash
     set -exuo pipefail
     IMAGES=images/Carpeta1
@@ -78,7 +78,18 @@ exif-register log="":
     fi
     uv run azotea --console  ${logfile} --trace batch --images-dir images --only-load --depth 8
 
+exif-sky log="" :
+        #!/usr/bin/env bash
+        set -exuo pipefail
+        log={{log}}
+        if [ "${log}" != "" ]; then
+            logfile="--log-file azotea.log"
+        else
+             logfile=""
+        fi
+        uv run azotea --console  ${logfile} --trace batch --images-dir images --only-sky --depth 8
 
+exif-all: (anew) (exif-setup) (exif-register) (exif-sky)
 # =======================================================================
 
 # --------------------------------

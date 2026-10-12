@@ -9,32 +9,27 @@
 # -------------------
 
 import logging
-from contextlib import contextmanager
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 # ---------------------
 # Third party libraries
 # ---------------------
 #
 import decouple
-from sqlalchemy import create_engine
-from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine, async_sessionmaker
 
 # get the module logger
 log = logging.getLogger(__name__.split(".")[-1])
 
 url: str = decouple.config("DATABASE_URL")
-engine: Engine = create_engine(url, pool_pre_ping=True, connect_args={"check_same_thread": False})
-_SessionFactory = sessionmaker(engine, autoflush=False, expire_on_commit=False)
+engine: AsyncEngine = create_async_engine(url, pool_pre_ping=True, connect_args={"check_same_thread": False})
+AsyncSessionFactory = async_sessionmaker(engine, autoflush=False, expire_on_commit=False)
 
-@contextmanager
-def get_db_session() -> Generator[Session, None, None]:
-    session = _SessionFactory()
-    try:
+@asynccontextmanager
+async def get_db_session() -> AsyncGenerator[AsyncSession]:
+    async with AsyncSessionFactory() as session:
         yield session
-    finally:
-        session.close()
-
 
 def sqa_logging(debug: bool) -> None:
     if debug:

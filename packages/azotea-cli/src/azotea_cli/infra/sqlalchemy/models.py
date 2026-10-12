@@ -25,11 +25,11 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .metadata import Model, metadata
-
 # ----------------
 # Own dependencies
 # ----------------
+
+from .noasync.metadata import Model, metadata
 from azotea_cli.common.models import BayerPattern, HeaderType, ImageType, ValidState
 
 # -----------------------

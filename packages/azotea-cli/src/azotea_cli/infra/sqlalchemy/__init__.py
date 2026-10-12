@@ -10,8 +10,8 @@ from .models import (
     Time,
 )
 
-from .database import engine, sqa_logging, get_db_session
-from .metadata import Model
+from .noasync.database import engine, sqa_logging, get_db_session
+from .noasync.metadata import Model
 
 __all__ = [
     "engine",
