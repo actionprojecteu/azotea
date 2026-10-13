@@ -55,6 +55,14 @@ class ObserverRepoImpl(ObserverRepo):
             log.info("loading default observer_id: %s", observer_id)
             return int(observer_id)
 
+    def get_name(self, observer_id: ObjId) -> tuple[str,str]:
+        with get_db_session() as session:
+            sql = select(Observer.family_name, Observer.surname).where(Observer.observer_id == observer_id)
+            result = session.execute(sql).one_or_none()
+            if result is None:
+                raise ObserverMissingError()
+            return result
+
     def create_versioned(self, form: ObserverForm) -> ObjId:
         sql = select(Observer).where(
             Observer.family_name == form.family_name,
