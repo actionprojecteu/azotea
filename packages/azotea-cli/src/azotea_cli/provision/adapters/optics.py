@@ -27,7 +27,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 # -------------------------------------
 
 
-class OpticsRepoImpl(OpticsRepo):
+class SqaOpticsRepo(OpticsRepo):
     def save(self, form: DefaultOpticsForm) -> None:
         with get_db_session() as session:
             with session.begin():
@@ -51,4 +51,4 @@ class OpticsRepoImpl(OpticsRepo):
         return data
 
 
-__all__ = ["OpticsRepoImpl"]
+__all__ = ["SqaOpticsRepo"]

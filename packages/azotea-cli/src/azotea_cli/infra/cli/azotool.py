@@ -36,12 +36,12 @@ from azotea_cli.provision import (
     RoiForm,
 )
 from azotea_cli.provision.adapters import (
-    CameraRepoImpl,
-    ConsentRepoImpl,
-    LocationRepoImpl,
-    ObserverRepoImpl,
-    OpticsRepoImpl,
-    RoiRepoImpl,
+    SqaCameraRepo,
+    SqaConsentRepo,
+    SqaLocationRepo,
+    SqaObserverRepo,
+    SqaOpticsRepo,
+    SqaRoiRepo,
 )
 from azotea_cli.provision.use_cases import (
     consent_view_and_agree,
@@ -54,6 +54,8 @@ from azotea_cli.provision.use_cases import (
     save_default_optics,
     update_observer,
 )
+from azotea_cli.reports.adapters import CsvExporterService, SqaReportsService
+from azotea_cli.reports.use_cases import GenerateReportsUseCase
 
 # ----------------
 # Module constants
@@ -235,7 +237,6 @@ def add_args(parser: ArgumentParser) -> None:
     roicre = subparser.add_parser("create", help="Create a new region of interest in the database")
     roicre.set_defaults(func=cli_roi)
 
-
     group = roicre.add_mutually_exclusive_group(required=True)
     roicre.add_argument("--default", action="store_true", help="Set this ROI as the default ROI")
     group.add_argument(
@@ -258,7 +259,6 @@ def add_args(parser: ArgumentParser) -> None:
     roicre.add_argument("--x2", type=int, default=None, help="Ending pixel column")
     roicre.add_argument("--y2", type=int, default=None, help="Ending pixel row")
     roicre.add_argument("--comment", type=str, default=None, help="Additional region comment")
-
 
     # ------------------------------------------
     # Create second level parsers for 'sky'
@@ -327,14 +327,14 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_consent(args: Namespace) -> None:
-    consent = ConsentRepoImpl()
+    consent = SqaConsentRepo()
     display = StdoutDisplay()
     consent_view_and_agree(consent, display, args.agree)
 
 
 def cli_location(args: Namespace) -> None:
-    location = LocationRepoImpl()
-    consent = ConsentRepoImpl()
+    location = SqaLocationRepo()
+    consent = SqaConsentRepo()
     form = LocationForm(
         site_name=args.site_name,
         location=args.location,
@@ -346,8 +346,8 @@ def cli_location(args: Namespace) -> None:
 
 
 def cli_optics(args: Namespace) -> None:
-    optics = OpticsRepoImpl()
-    consent = ConsentRepoImpl()
+    optics = SqaOpticsRepo()
+    consent = SqaConsentRepo()
     form = DefaultOpticsForm(
         focal_len=args.focal_length,
         f_number=args.f_number,
@@ -356,9 +356,9 @@ def cli_optics(args: Namespace) -> None:
 
 
 def cli_camera(args: Namespace) -> None:
-    camera = CameraRepoImpl()
-    consent = ConsentRepoImpl()
-    optics = OpticsRepoImpl()
+    camera = SqaCameraRepo()
+    consent = SqaConsentRepo()
+    optics = SqaOpticsRepo()
     factory = ImageReaderFactoryImpl()
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
@@ -382,10 +382,10 @@ def cli_camera(args: Namespace) -> None:
 
 
 def cli_roi(args: Namespace) -> None:
-    roi = RoiRepoImpl()
+    roi = SqaRoiRepo()
     factory = ImageReaderFactoryImpl()
-    consent = ConsentRepoImpl()
-    optics = OpticsRepoImpl()
+    consent = SqaConsentRepo()
+    optics = SqaOpticsRepo()
 
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
@@ -399,8 +399,8 @@ def cli_roi(args: Namespace) -> None:
 
 
 def cli_observer(args: Namespace) -> None:
-    observer = ObserverRepoImpl()
-    consent = ConsentRepoImpl()
+    observer = SqaObserverRepo()
+    consent = SqaConsentRepo()
     form = ObserverForm(
         family_name=args.name,
         surname=args.surname,
@@ -413,33 +413,40 @@ def cli_observer(args: Namespace) -> None:
         create_versioned_observer(observer, consent, form, args.default)
 
 
+def cli_sky_export(args: Namespace) -> None:
+    consent = SqaConsentRepo()
+    reporter = SqaReportsService()
+    observer = SqaObserverRepo()
+    exporter = CsvExporterService(args.csv_dir)
+    use_case = GenerateReportsUseCase(consent, observer, reporter, exporter)
+    if args.all:
+        use_case.generate_report_all()
+    elif args.unpublished:
+        use_case.generate_report_unpublished()
+    elif args.range:
+        use_case.generate_report_by_date_range(args.from_date, args.to_date)
+    elif args.latest_night:
+        use_case.generate_report_latest_night()
+    elif args.latest_month:
+        use_case.generate_report_latest_month()
+    else:
+        pass
+
+
+def cli_sky_summary(args: Namespace) -> None:
+    pass
+
+
+def cli_img_summary(args: Namespace) -> None:
+    pass
+
+
 def cli_main(args: Namespace) -> None:
     try:
         args.func(args)
     except AzoteaError as e:
         log.error(e)
         engine.dispose()
-
-
-def cli_sky_export(args: Namespace) -> None:
-    consent = ConsentRepoImpl()
-    service = ReportsServiceImpl()
-    observer = ObserverRepoImpl()
-    exporter = CsvExporterImpl(args.csv_dir)
-    use_case = GenerateReportsUseCase(consent, observer, service, exporter)
-    if args.all:
-        use_case.generate_report_all()
-    elif args.unpublished:
-        use_case.generate_report_unpublished()
-    elif args.range:
-        use_case.generate_report_range(args.from_date, args.to_date)
-    elif args.latest_night:
-         use_case.generate_report_latets_month()
-    elif args.latest_month:
-         use_case.generate_report_latets_month()
-    else:
-        pass
-
 
 
 def main():

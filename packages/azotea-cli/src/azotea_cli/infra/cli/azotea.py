@@ -20,16 +20,16 @@ from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 # local imports
 # -------------
 from azotea_cli.infra.sqlalchemy.noasync import engine
-from azotea_cli.operation.adapters import ImagesRepoImpl, SkyBrightnessRepoImpl
+from azotea_cli.operation.adapters import SqaImagesRepo, SqaSkyBrightnessRepo
 from azotea_cli.operation.models import RegisterForm
 from azotea_cli.operation.use_cases import RegisterImagesUseCase, SkyStatisticsUseCase
 from azotea_cli.provision.adapters import (
-    CameraRepoImpl,
-    ConsentRepoImpl,
-    LocationRepoImpl,
-    ObserverRepoImpl,
-    OpticsRepoImpl,
-    RoiRepoImpl,
+    SqaCameraRepo,
+    SqaConsentRepo,
+    SqaLocationRepo,
+    SqaObserverRepo,
+    SqaOpticsRepo,
+    SqaRoiRepo,
 )
 
 # ----------------
@@ -89,14 +89,14 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_batch(args: Namespace) -> None:
-    consent = ConsentRepoImpl()
-    camera = CameraRepoImpl()
-    location = LocationRepoImpl()
-    observer = ObserverRepoImpl()
-    optics = OpticsRepoImpl()
-    roi = RoiRepoImpl()
-    images = ImagesRepoImpl()
-    sky_stats = SkyBrightnessRepoImpl()
+    consent = SqaConsentRepo()
+    camera = SqaCameraRepo()
+    location = SqaLocationRepo()
+    observer = SqaObserverRepo()
+    optics = SqaOpticsRepo()
+    roi = SqaRoiRepo()
+    images = SqaImagesRepo()
+    sky_stats = SqaSkyBrightnessRepo()
     factory = ImageReaderFactoryImpl()
     use_case1 = RegisterImagesUseCase(
         consent=consent,

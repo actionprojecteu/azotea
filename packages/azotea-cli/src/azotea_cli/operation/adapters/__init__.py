@@ -1,3 +1,3 @@
-from .images import ImagesRepoImpl
-from .sky import SkyBrightnessRepoImpl
-__all__ = ["ImagesRepoImpl"]
+from .images import SqaImagesRepo
+from .sky import SqaSkyBrightnessRepo
+__all__ = ["SqaImagesRepo"]

@@ -38,7 +38,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 # -------------------------------
 
 
-class RoiRepoImpl(RoiRepo):
+class SqaRoiRepo(RoiRepo):
     def set_default(self, roi_id: ObjId) -> None:
         with get_db_session() as session:
             with session.begin():

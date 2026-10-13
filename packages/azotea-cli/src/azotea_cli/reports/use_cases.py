@@ -21,12 +21,12 @@ class GenerateReportsUseCase:
         self,
         consent: ConsentRepo,
         observer: ObserverRepo,
-        service: ReportsService,
+        reporter: ReportsService,
         exporter: ExporterService,
     ) -> None:
         self.consent = consent
         self.observer = observer
-        self.service = service
+        self.reporter = reporter
         self.exporter = exporter
 
     def generate_report_all(self) -> None:
@@ -34,7 +34,7 @@ class GenerateReportsUseCase:
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
         log.info("generating complete report for %s %s", name, surname)
-        data = self.service.get_all_data_by(observer_id)
+        data = self.reporter.get_all_data_by(observer_id)
         self.exporter.export(data)
 
     def generate_report_unpublished(self) -> None:
@@ -42,7 +42,7 @@ class GenerateReportsUseCase:
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
         log.info("generating unpublised report for %s %s", name, surname)
-        data = self.service.get_unpublished_data_by(observer_id)
+        data = self.reporter.get_unpublished_data_by(observer_id)
         self.exporter.export(data)
 
     def generate_report_by_date_range(self, since: datetime, until: datetime) -> None:
@@ -50,7 +50,7 @@ class GenerateReportsUseCase:
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
         log.info("generating data range report for %s %s", name, surname)
-        data = self.service.get_ranged_data_by(observer_id, since, until)
+        data = self.reporter.get_ranged_data_by(observer_id, since, until)
         self.exporter.export(data)
 
 
@@ -59,7 +59,7 @@ class GenerateReportsUseCase:
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
         log.info("generating latest night report for %s %s", name, surname)
-        data = self.service.get_latest_night_data_by(observer_id)
+        data = self.reporter.get_latest_night_data_by(observer_id)
         self.exporter.export(data)
 
     def generate_report_latest_month(self) -> None:
@@ -67,5 +67,5 @@ class GenerateReportsUseCase:
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
         log.info("generating latest month report for %s %s", name, surname)
-        data = self.service.get_latest_month_data_by(observer_id)
+        data = self.reporter.get_latest_month_data_by(observer_id)
         self.exporter.export(data)

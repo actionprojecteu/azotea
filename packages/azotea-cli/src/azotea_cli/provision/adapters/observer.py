@@ -40,7 +40,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 # -------------------------------
 
 
-class ObserverRepoImpl(ObserverRepo):
+class SqaObserverRepo(ObserverRepo):
     def set_default(self, observer_id: ObjId) -> None:
         with get_db_session() as session:
             with session.begin():

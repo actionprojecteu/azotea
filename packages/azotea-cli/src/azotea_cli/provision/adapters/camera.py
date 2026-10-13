@@ -38,7 +38,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 # -------------------------------
 
 
-class CameraRepoImpl(CameraRepo):
+class SqaCameraRepo(CameraRepo):
     def set_default(self, camera_id: ObjId) -> None:
         with get_db_session() as session:
             with session.begin():

@@ -30,7 +30,7 @@ from ..models import SkyStatsForm
 log = logging.getLogger(__name__.split(".")[-1])
 
 
-class SkyBrightnessRepoImpl(SkyBrightnessRepo):
+class SqaSkyBrightnessRepo(SkyBrightnessRepo):
     def _translate(self, stats: SkyStatsForm) -> SkyBrightness:
         return SkyBrightness(
             image_id=stats.image_id,

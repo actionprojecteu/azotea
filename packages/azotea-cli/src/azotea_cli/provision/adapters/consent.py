@@ -28,7 +28,7 @@ from . import config
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-class ConsentRepoImpl(ConsentRepo):
+class SqaConsentRepo(ConsentRepo):
     def review(self) -> str:
         return text()
 

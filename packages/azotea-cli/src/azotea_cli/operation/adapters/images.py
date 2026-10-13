@@ -12,7 +12,6 @@ from datetime import datetime
 # ---------------------
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
 
 from azotea_cli.common.models import ObjId
 
@@ -32,7 +31,7 @@ from ..models import ImageForm
 log = logging.getLogger(__name__.split(".")[-1])
 
 
-class ImagesRepoImpl(ImagesRepo):
+class SqaImagesRepo(ImagesRepo):
     def get_stored_image_paths(self) -> list[str]:
         with get_db_session() as session:
             sql = select(Image.directory, Image.name)

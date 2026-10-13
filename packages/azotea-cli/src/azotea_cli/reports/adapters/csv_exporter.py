@@ -3,6 +3,7 @@
 # ------------------
 
 import logging
+from collections.abc import Sequence
 
 # ---------------------
 # Third party libraries
@@ -12,19 +13,13 @@ from sqlalchemy.exc import IntegrityError
 
 from azotea_cli.common.models import ObjId
 
-
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import Camera, get_db_session
+from azotea_cli.infra.sqlalchemy import get_db_session
 
-from ..errors import (
-    CameraMissingError,
-    MissingDefaultCameraError,
-)
-from ..interfaces import ReportsService
+from ..interfaces import ExporterService
 from ..models import ObservationReport
-
 
 # -----------------------
 # Module global variables
@@ -38,5 +33,9 @@ log = logging.getLogger(__name__.split(".")[-1])
 # -------------------------------
 
 
-class ReportsServiceImpl(ReportsService):
-    pass
+class CsvExporterService(ExporterService):
+    def __init__(self, output_dir: str) -> None:
+        self.output_dir = output_dir
+
+    def export(self, data: Sequence[ObservationReport]) -> None:
+        pass

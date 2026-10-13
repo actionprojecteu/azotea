@@ -37,7 +37,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 # -------------------------------
 
 
-class LocationRepoImpl(LocationRepo):
+class SqaLocationRepo(LocationRepo):
     def set_default(self, location_id: ObjId):
         with get_db_session() as session:
             with session.begin():
