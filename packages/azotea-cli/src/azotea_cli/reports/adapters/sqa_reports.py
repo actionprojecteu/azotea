@@ -41,13 +41,13 @@ class SqaReportsService(ReportsService):
     def get_ranged_data_by(
         self, observer_id: ObjId, since: datetime, until: datetime
     ) -> Sequence[ObservationReport]:
-        return list()
+        raise NotImplementedError
 
     def get_unpublished_data_by(self, observer_id: ObjId) -> Sequence[ObservationReport]:
-        return list()
+        raise NotImplementedError
 
     def get_latest_night_data_by(self, observer_id: ObjId) -> Sequence[ObservationReport]:
-        return list()
+        raise NotImplementedError
 
     def get_latest_month_data_by(self, observer_id: ObjId) -> Sequence[ObservationReport]:
-        return list()
+        raise NotImplementedError

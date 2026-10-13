@@ -38,4 +38,4 @@ class CsvExporterService(ExporterService):
         self.output_dir = output_dir
 
     def export(self, data: Sequence[ObservationReport]) -> None:
-        pass
+        raise NotImplementedError
