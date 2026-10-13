@@ -4,10 +4,13 @@ from datetime import datetime, timezone
 from fractions import Fraction
 from typing import Any, Mapping
 
+import numpy as np
 import exifread
 import rawpy
+from rawpy._rawpy import RawPy
 
-from azotea_cli.common.models import BayerPattern, HeaderType, BayerIndex
+from azotea_cli.common.models import BayerIndex, BayerPattern, HeaderType
+from azotea_cli.common.rect import Point, Rect
 
 from ..errors import (
     MissingCameraModelError,
@@ -15,9 +18,10 @@ from ..errors import (
     ReadMetadataError,
     UnknownDateTimeFormatError,
     UnsupportedCFAError,
+    OutOfBoundsError,
 )
 from ..interfaces import ImageReader, RawPixels
-from ..models import ImageMetadata
+from ..models import ImageMetadata, IntArray2D
 from ..utils import image_type_by_path
 
 # get the root logger
@@ -33,32 +37,32 @@ def to_positive_float(value: Any, default: float) -> float:
         return default
     return result if result > 0 else default
 
+
 def handle_date_obs(exif: Mapping[str, Any], path: str) -> datetime:
-     date_obs = None
-     for key in ("Image DateTime", "EXIF DateTimeOriginal"):
-         date_obs = exif.get(key)
-         if date_obs:
-             date_obs = str(date_obs)
-             break
-     if date_obs is None:
-         raise MissingDateObsError(os.path.basename(path))
-     new_date_obs = None
-     for fmt in ("%Y:%m:%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S%z"):
-         try:
-             new_date_obs = datetime.strptime(date_obs, fmt)
-         except Exception:
-             pass
-         else:
-             break
-     if new_date_obs is None:
-         raise UnknownDateTimeFormatError(date_obs)
-     return new_date_obs.replace(tzinfo=timezone.utc)
+    date_obs = None
+    for key in ("Image DateTime", "EXIF DateTimeOriginal"):
+        date_obs = exif.get(key)
+        if date_obs:
+            date_obs = str(date_obs)
+            break
+    if date_obs is None:
+        raise MissingDateObsError(os.path.basename(path))
+    new_date_obs = None
+    for fmt in ("%Y:%m:%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S%z"):
+        try:
+            new_date_obs = datetime.strptime(date_obs, fmt)
+        except Exception:
+            pass
+        else:
+            break
+    if new_date_obs is None:
+        raise UnknownDateTimeFormatError(date_obs)
+    return new_date_obs.replace(tzinfo=timezone.utc)
+
 
 class ExifReader(ImageReader):
     def header_type(self) -> HeaderType:
         return HeaderType.EXIF
-
-
 
     def handle_optics(
         self, exif: Mapping[str, Any], def_focal_len: float, def_f_number: float
@@ -93,9 +97,14 @@ class ExifReader(ImageReader):
             color_desc = img.color_desc.decode("utf-8")
             if color_desc != "RGBG":
                 raise UnsupportedCFAError(color_desc)
-            cfa = "".join(map(lambda c: {"Gr": "G", "Gb": "G"}.get(c, c), [BayerIndex(i).name for i in img.raw_pattern.ravel()]))
+            cfa = "".join(
+                map(
+                    lambda c: {"Gr": "G", "Gb": "G"}.get(c, c),
+                    [BayerIndex(i).name for i in img.raw_pattern.ravel()],
+                )
+            )
             bayer = BayerPattern(cfa)
-            header_type=self.header_type()
+            header_type = self.header_type()
             _, extension = os.path.splitext(path)
 
         metadata = ImageMetadata(
@@ -119,4 +128,54 @@ class ExifReader(ImageReader):
 
     def read_pixels(self, path: str) -> RawPixels:
         """returns an object that implements the RawPixels interface"""
-        ...
+        raw = rawpy.imread(path)
+        return ExifRawPixels(raw)
+
+
+class ExifRawPixels:
+    def __init__(self, raw: RawPy) -> None:
+        self.img = raw
+        self.black_levels = raw.black_level_per_channel
+        self.shape = raw.raw_image.shape
+        self.pattern = raw.raw_pattern
+
+
+    def __del__(self) -> None:
+        try:
+            if self.img is not None:
+                self.black_levels = None
+                self.shape = None
+                self.img.close()
+        finally:
+            self.img = None
+
+    def _section(self,  x: int, y: int, section: Rect | None,) -> IntArray2D:
+        screen = Rect.from_points(Point.zero(), Point(x=self.shape[1], y=self.shape[0])) // 2
+        if section is None:
+            section = screen
+        elif not screen.contains(section):
+            raise OutOfBoundsError(section)
+        section = section * 2
+        x1 = x + section.x1
+        y1 = y + section.y1
+        x2 = section.x2
+        y2 = section.y2
+        return self.img.raw_image[y1:y2:2, x1:x2:2]
+
+    def r(self, section: Rect | None) -> IntArray2D:
+        y, x = np.argwhere(self.pattern == BayerIndex.R)[0]
+        return self._section(x, y, section)
+    def gr(self, section: Rect | None) -> IntArray2D:
+        y, x = np.argwhere(self.pattern == BayerIndex.Gr)[0]
+        return self._section(x, y, section)
+    def gb(self, section: Rect | None) -> IntArray2D:
+        y, x = np.argwhere(self.pattern == BayerIndex.Gb)[0]
+        return self._section(x, y, section)
+    def b(self, section: Rect | None) -> IntArray2D:
+        y, x = np.argwhere(self.pattern == BayerIndex.B)[0]
+        return self._section(x, y, section)
+
+    def r_black(self) -> int: ...
+    def g1_black(self) -> int: ...
+    def g2_black(self) -> int: ...
+    def b_black(self) -> int: ...

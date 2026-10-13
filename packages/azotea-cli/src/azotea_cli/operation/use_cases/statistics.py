@@ -10,6 +10,7 @@ from itertools import batched
 # Third party libraries
 # ---------------------
 import numpy as np
+from numpy._core import greater
 
 from azotea_cli.common.errors import AzoteaError
 
@@ -61,22 +62,21 @@ class SkyStatisticsUseCase:
         reader = self.factory.get_reader(path)
         raw_pixels = reader.read_pixels(path)
         r_channel = raw_pixels.r(self.section)
-        g1_channel = raw_pixels.g1(self.section)
-        g2_channel = raw_pixels.g2(self.section)
+        gr_channel = raw_pixels.gr(self.section)
+        gb_channel = raw_pixels.gb(self.section)
         b_channel = raw_pixels.b(self.section)
         stats = SkyStatsForm(
             image_id=image_id,
             roi_id=self.roi_id,
             aver_signal_R=np.mean(r_channel),
             vari_signal_R=np.var(r_channel),
-            aver_signal_G1=np.mean(g1_channel),
-            vari_signal_G1=np.var(g1_channel),
-            aver_signal_G2=np.mean(g2_channel),
-            vari_signal_G2=np.var(g2_channel),
+            aver_signal_G1=np.mean(gr_channel),
+            vari_signal_G1=np.var(gr_channel),
+            aver_signal_G2=np.mean(gb_channel),
+            vari_signal_G2=np.var(gb_channel),
             aver_signal_B=np.mean(b_channel),
             vari_signal_B=np.var(b_channel),
         )
-        log.info(stats)
         return stats
 
     def compute_sky_statistics(self) -> None:
@@ -112,9 +112,9 @@ class SkyStatisticsUseCase:
                     statistics.append(stats)
             log.info("saving a batch of %d images", len(statistics))
             self.sky_stats.save_statistics(statistics)
-            log.info(
-                "%d image statistics selected, %d discarded, %d computed",
-                n_selected,
-                n_skipped,
-                n_selected - n_skipped,
-            )
+        log.info(
+            "%d image statistics selected, %d computed, %d discarded",
+            n_selected,
+            n_selected - n_skipped,
+            n_skipped,
+        )

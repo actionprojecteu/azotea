@@ -28,3 +28,8 @@ class UnknownDateTimeFormatError(AzoteaError):
     """unknown observation date format string"""
 
     pass
+
+class OutOfBoundsError(AzoteaError):
+    """out of bounds rectangle"""
+
+    pass
