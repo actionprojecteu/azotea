@@ -29,18 +29,18 @@ def scan_images(
     extensions = (extension.lower(),)
     images = list()
 
-    for dirpath, _dirnames, filenames in os.walk(root):
-        current = Path(dirpath)
+    for dir_path, _dir_names, file_names in os.walk(root):
+        current = Path(dir_path)
         current_depth = len(current.parts) - root_depth
         if current_depth > depth:
             # Avoid descending into directories beyond the requested depth.
-            _dirnames[:] = []
+            _dir_names[:] = []
             continue
-        for filename in filenames:
-            suffix = Path(filename).suffix.lower()
+        for file_name in file_names:
+            suffix = Path(file_name).suffix.lower()
             if suffix in extensions:
-                images.append(str(current / filename))
-    return images
+                images.append(str(current / file_name))
+    return sorted(images)
 
 
 def hash_func(path: str) -> bytes:
