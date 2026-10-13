@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 from fractions import Fraction
 from typing import Any, Mapping
 
-import numpy as np
 import exifread
+import numpy as np
 import rawpy
 from rawpy._rawpy import RawPy
 
@@ -15,10 +15,10 @@ from azotea_cli.common.rect import Point, Rect
 from ..errors import (
     MissingCameraModelError,
     MissingDateObsError,
+    OutOfBoundsError,
     ReadMetadataError,
     UnknownDateTimeFormatError,
     UnsupportedCFAError,
-    OutOfBoundsError,
 )
 from ..interfaces import ImageReader, RawPixels
 from ..models import ImageMetadata, IntArray2D
@@ -150,7 +150,12 @@ class ExifRawPixels:
         finally:
             self.img = None
 
-    def _section(self,  x: int, y: int, section: Rect | None,) -> IntArray2D:
+    def _section(
+        self,
+        x: int,
+        y: int,
+        section: Rect | None,
+    ) -> IntArray2D:
         screen = Rect.from_points(Point.zero(), Point(x=self.shape[1], y=self.shape[0])) // 2
         if section is None:
             section = screen
@@ -166,21 +171,27 @@ class ExifRawPixels:
     def r(self, section: Rect | None) -> IntArray2D:
         y, x = np.argwhere(self.pattern == BayerIndex.R)[0]
         return self._section(x, y, section)
+
     def gr(self, section: Rect | None) -> IntArray2D:
         y, x = np.argwhere(self.pattern == BayerIndex.Gr)[0]
         return self._section(x, y, section)
+
     def gb(self, section: Rect | None) -> IntArray2D:
         y, x = np.argwhere(self.pattern == BayerIndex.Gb)[0]
         return self._section(x, y, section)
+
     def b(self, section: Rect | None) -> IntArray2D:
         y, x = np.argwhere(self.pattern == BayerIndex.B)[0]
         return self._section(x, y, section)
 
     def r_black(self) -> int:
         return self.black_levels[BayerIndex.R]
+
     def gr_black(self) -> int:
-         return self.black_levels[BayerIndex.Gr]
+        return self.black_levels[BayerIndex.Gr]
+
     def gb_black(self) -> int:
-         return self.black_levels[BayerIndex.Gb]
+        return self.black_levels[BayerIndex.Gb]
+
     def b_black(self) -> int:
-         return self.black_levels[BayerIndex.B]
+        return self.black_levels[BayerIndex.B]
