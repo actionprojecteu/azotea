@@ -18,8 +18,8 @@ from azotea_cli.common.models import ObjId
 # ---------------
 from azotea_cli.infra.sqlalchemy import get_db_session
 
-from ..interfaces import ExporterService
-from ..models import ObservationReport
+from azotea_cli.reports.interfaces import ExporterService
+from azotea_cli.reports.models import ObservationReport
 
 # -----------------------
 # Module global variables
