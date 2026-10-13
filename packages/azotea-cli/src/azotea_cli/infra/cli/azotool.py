@@ -17,15 +17,16 @@ from argparse import ArgumentParser, Namespace
 from lica.cli import execute
 from lica.validators import vdate, vfile
 
+from azotea_cli import __version__
+from azotea_cli.common.errors import AzoteaError
+from azotea_cli.common.models import BayerPattern, HeaderType
+from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
+from azotea_cli.infra.cli.display import StdoutDisplay
+
 # --------------
 # local imports
 # -------------
-#
-from azotea_cli import __version__
-from azotea_cli.common.models import BayerPattern, HeaderType
-from azotea_cli.common.errors import AzoteaError
-from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
-from azotea_cli.infra.cli.display import StdoutDisplay
+from azotea_cli.infra.sqlalchemy.noasync import engine
 from azotea_cli.provision import (
     CameraForm,
     DefaultOpticsForm,
@@ -346,10 +347,7 @@ def cli_location(args: Namespace) -> None:
         latitude=args.latitude,
         utc_offset=args.utc_offset,
     )
-    try:
-        create_location(location, consent, form, args.default)
-    except AzoteaError as e:
-        log.error(e)
+    create_location(location, consent, form, args.default)
 
 
 def cli_optics(args: Namespace) -> None:
@@ -359,10 +357,7 @@ def cli_optics(args: Namespace) -> None:
         focal_len=args.focal_length,
         f_number=args.f_number,
     )
-    try:
-        save_default_optics(optics, consent, form)
-    except AzoteaError as e:
-        log.error(e)
+    save_default_optics(optics, consent, form)
 
 
 def cli_camera(args: Namespace) -> None:
@@ -386,18 +381,9 @@ def cli_camera(args: Namespace) -> None:
             x_pixsize=args.x_pixsize,
             y_pixsize=args.y_pixsize,
         )
-        try:
-            create_camera(camera, consent, form, args.default)
-        except AzoteaError as e:
-            log.error(e)
-
+        create_camera(camera, consent, form, args.default)
     else:
-        try:
-            create_camera_from_image(
-                camera, consent, optics, factory, args.from_image, args.default
-            )
-        except AzoteaError as e:
-            log.error(e)
+        create_camera_from_image(camera, consent, optics, factory, args.from_image, args.default)
 
 
 def cli_roi(args: Namespace) -> None:
@@ -411,19 +397,10 @@ def cli_roi(args: Namespace) -> None:
         if args.x1 is None:
             raise AzoteaError("Camera model is required in --as-given")
         form = RoiForm(x1=args.x1, y1=args.y1, x2=args.x2, y2=args.y2, comment=args.comment)
-        try:
-            create_roi(roi, consent, form, args.default)
-        except AzoteaError as e:
-            log.error(e)
-
+        create_roi(roi, consent, form, args.default)
     else:
         form = RoiCenteredForm(width=args.width, height=args.height)
-        try:
-            create_roi_from_image(
-                roi, consent, optics, factory, args.from_image, form, args.default
-            )
-        except AzoteaError as e:
-            log.error(e)
+        create_roi_from_image(roi, consent, optics, factory, args.from_image, form, args.default)
 
 
 def cli_observer(args: Namespace) -> None:
@@ -435,17 +412,18 @@ def cli_observer(args: Namespace) -> None:
         affiliation=args.affiliation,
         acronym=args.acronym,
     )
-    try:
-        if args.fix:
-            update_observer(observer, consent, form)
-        else:
-            create_versioned_observer(observer, consent, form, args.default)
-    except AzoteaError as e:
-        log.error(e)
+    if args.fix:
+        update_observer(observer, consent, form)
+    else:
+        create_versioned_observer(observer, consent, form, args.default)
 
 
 def cli_main(args: Namespace) -> None:
-    args.func(args)
+    try:
+        args.func(args)
+    except AzoteaError as e:
+        log.error(e)
+        engine.dispose()
 
 
 def main():

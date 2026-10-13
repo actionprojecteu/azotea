@@ -22,8 +22,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 # get the module logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-url: str = decouple.config("DATABASE_URL")
-engine: AsyncEngine = create_async_engine(url, pool_pre_ping=True, connect_args={"check_same_thread": False})
+database_url: str = decouple.config("DATABASE_URL")
+engine: AsyncEngine = create_async_engine(database_url, pool_pre_ping=True, connect_args={"check_same_thread": False})
 AsyncSessionFactory = async_sessionmaker(engine, autoflush=False, expire_on_commit=False)
 
 @asynccontextmanager

@@ -23,8 +23,8 @@ from sqlalchemy.orm import Session, sessionmaker
 # get the module logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-url: str = decouple.config("DATABASE_URL")
-engine: Engine = create_engine(url, pool_pre_ping=True, connect_args={"check_same_thread": False})
+database_url: str = decouple.config("DATABASE_URL")
+engine: Engine = create_engine(database_url, pool_pre_ping=True, connect_args={"check_same_thread": False})
 SessionFactory = sessionmaker(engine, autoflush=False, expire_on_commit=False)
 
 @contextmanager

@@ -12,14 +12,17 @@ from argparse import ArgumentParser, Namespace
 # -------------------
 from lica.cli import execute
 
-# --------------
-# local imports
-# -------------
-
 from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 
+# --------------
+# local imports
+# -------------
+from azotea_cli.infra.sqlalchemy.noasync import engine
+from azotea_cli.operation.adapters import ImagesRepoImpl, SkyBrightnessRepoImpl
+from azotea_cli.operation.models import RegisterForm
+from azotea_cli.operation.use_cases import RegisterImagesUseCase, SkyStatisticsUseCase
 from azotea_cli.provision.adapters import (
     CameraRepoImpl,
     ConsentRepoImpl,
@@ -28,10 +31,6 @@ from azotea_cli.provision.adapters import (
     OpticsRepoImpl,
     RoiRepoImpl,
 )
-
-from azotea_cli.operation.adapters import ImagesRepoImpl, SkyBrightnessRepoImpl
-from azotea_cli.operation.use_cases import RegisterImagesUseCase, SkyStatisticsUseCase
-from azotea_cli.operation.models import RegisterForm
 
 # ----------------
 # Module constants
@@ -57,7 +56,6 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 def add_args(parser: ArgumentParser) -> None:
-
     # --------------------------
     # Create first level parsers
     # --------------------------
@@ -101,40 +99,41 @@ def cli_batch(args: Namespace) -> None:
     sky_stats = SkyBrightnessRepoImpl()
     factory = ImageReaderFactoryImpl()
     use_case1 = RegisterImagesUseCase(
-        consent = consent,
-        camera = camera,
-        location = location,
-        observer = observer,
-        optics = optics,
-        factory = factory,
-        images = images,
+        consent=consent,
+        camera=camera,
+        location=location,
+        observer=observer,
+        optics=optics,
+        factory=factory,
+        images=images,
     )
     use_case2 = SkyStatisticsUseCase(
-        consent = consent,
-        camera = camera,
-        observer = observer,
-        roi = roi,
-        factory = factory,
-        images = images,
-        sky_stats = sky_stats
+        consent=consent,
+        camera=camera,
+        observer=observer,
+        roi=roi,
+        factory=factory,
+        images=images,
+        sky_stats=sky_stats,
     )
     form = RegisterForm(images_dir=args.images_dir, depth=args.depth)
-    try:
-        if args.only_load:
-            use_case1.register_images(form)
-        elif args.only_sky:
-            use_case2.compute_sky_statistics()
-        elif args.only_publish:
-            raise NotImplementedError
-        else:
-            use_case1.register_images(form)
-            use_case2.compute_sky_statistics()
-    except AzoteaError as e:
-        log.error(e)
+    if args.only_load:
+        use_case1.register_images(form)
+    elif args.only_sky:
+        use_case2.compute_sky_statistics()
+    elif args.only_publish:
+        raise NotImplementedError
+    else:
+        use_case1.register_images(form)
+        use_case2.compute_sky_statistics()
 
 
 def cli_main(args: Namespace) -> None:
-    args.func(args)
+    try:
+        args.func(args)
+    except AzoteaError as e:
+        log.error(e)
+        engine.dispose()
 
 
 def main():
