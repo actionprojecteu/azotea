@@ -13,24 +13,25 @@ from datetime import datetime
 # ---------------------
 # Third party libraries
 # ---------------------
-
 from sqlalchemy import (
-    Enum,
     BigInteger,
     DateTime,
+    Enum,
     ForeignKey,
     LargeBinary,
     String,
     UniqueConstraint,
+    select,
 )
 from sqlalchemy.orm import Mapped, mapped_column
+
+from azotea_cli.common.models import BayerPattern, HeaderType, ImageType, ValidState
 
 # ----------------
 # Own dependencies
 # ----------------
-
 from .noasync.metadata import Model, metadata
-from azotea_cli.common.models import BayerPattern, HeaderType, ImageType, ValidState
+from .view import view
 
 # -----------------------
 # Database Enums mappsing
@@ -76,6 +77,7 @@ DbImageType: Enum = Enum(
 # ---------------
 # Database Models
 # ---------------
+
 
 class Config(Model):
     __tablename__ = "config_t"
@@ -158,7 +160,7 @@ class Observer(Model):
     affiliation: Mapped[str | None]
     acronym: Mapped[str | None]
     valid_since: Mapped[datetime] = mapped_column(DateTime)
-    valid_until: Mapped[datetime]= mapped_column(DateTime)
+    valid_until: Mapped[datetime] = mapped_column(DateTime)
     valid_state: Mapped[ValidState] = mapped_column(DbValidState)
 
     __table_args__ = (
@@ -257,8 +259,8 @@ class Image(Model):
 class SkyBrightness(Model):
     __tablename__ = "sky_brightness_t"
 
-    image_id: Mapped[int] =  mapped_column(ForeignKey("image_t.image_id"), primary_key=True)
-    roi_id: Mapped[int] =  mapped_column(ForeignKey("roi_t.roi_id"), primary_key=True)
+    image_id: Mapped[int] = mapped_column(ForeignKey("image_t.image_id"), primary_key=True)
+    roi_id: Mapped[int] = mapped_column(ForeignKey("roi_t.roi_id"), primary_key=True)
 
     # Sky Brightness measurements
     aver_signal_R: Mapped[float]
@@ -271,3 +273,34 @@ class SkyBrightness(Model):
     vari_signal_B: Mapped[float]
     # published to server
     published: Mapped[bool]
+
+
+# ---------------------------------------------------
+# Auxiliar view to browse schema using a graphic tool
+# ---------------------------------------------------
+
+selectable = (
+    select(
+        Image.image_id.label("image_id"),
+        Image.name.label("name"),
+        Roi.display_name.label("display_name"),
+        Roi.comment.label("comment"),
+        (Roi.x2 - Roi.x1).label("width"),
+        (Roi.y2 - Roi.y1).label("height"),
+        SkyBrightness.aver_signal_R.label("aver_R"),
+        SkyBrightness.vari_signal_R.label("vari_R"),
+        SkyBrightness.aver_signal_G1.label("aver_G1"),
+        SkyBrightness.vari_signal_G1.label("vari_G1"),
+        SkyBrightness.aver_signal_G2.label("aver_G2"),
+        SkyBrightness.vari_signal_G2.label("vari_G2"),
+        SkyBrightness.aver_signal_B.label("aver_B"),
+        SkyBrightness.vari_signal_B.label("vari_B"),
+    )
+    .select_from(SkyBrightness)
+    .join(Image, Image.image_id == SkyBrightness.image_id)
+    .join(Roi, Roi.roi_id == SkyBrightness.roi_id)
+)
+sky_brightness_v = view("sky_brightness_v", metadata, selectable)
+
+class SampleView(Model):
+    __table__ = sky_brightness_v
