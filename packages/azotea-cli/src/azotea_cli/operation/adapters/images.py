@@ -12,6 +12,7 @@ from datetime import datetime
 # ---------------------
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from azotea_cli.common.models import ObjId
 
@@ -64,18 +65,43 @@ class ImagesRepoImpl(ImagesRepo):
             time_id=time_id,
         )
 
-    def save_one_by_one(self, images: Sequence[ImageForm]) -> None:
-        for image in images:
-            try:
-                with get_db_session() as session:
-                    with session.begin():
-                        session.add(self._translate(image))
-            except IntegrityError:
+    def _update(
+        self,
+        images: Sequence[ImageForm],
+    ) -> None:
+        with get_db_session() as session:
+            for image in images:
+                sql =  select(Image).where(Image.hash == image.hash)
+                existing = session.scalars(sql).one_or_none()
+                if existing is None:
+                    log.warning(
+                        "Integrity error but no existing image found for hash %s",
+                        image.hash,
+                    )
+                    return
                 log.warning(
-                    "Skipping image already present or violating a constraint: %s",
-                    image.name,
-                    exc_info=True,
+                    "Changing image path from %s to %s",
+                    os.path.join(existing.directory, existing.name),
+                    os.path.join(image.directory, image.name),
                 )
+                existing.name = image.name
+                existing.directory = image.directory
+                session.add(existing)
+
+    def save_one_by_one(self, images: Sequence[ImageForm]) -> None:
+        existing_images = list()
+        for image in images:
+            with get_db_session() as session:
+                with session.begin():
+                    session.add(self._translate(image))
+                    try:
+                        log.info("retrying %s", image.name)
+                        session.commit()
+                    except IntegrityError:
+                        session.rollback()
+                        existing_images.append(image)
+        self._update(existing_images)
+
 
     def save_images(self, images: Sequence[ImageForm]) -> None:
         with get_db_session() as session:
@@ -98,7 +124,7 @@ class ImagesRepoImpl(ImagesRepo):
             image_ids = session.scalars(sql).all()
         return image_ids
 
-    def to_paths(self, image_ids:  Sequence[ObjId]) -> Sequence[str]:
+    def to_paths(self, image_ids: Sequence[ObjId]) -> Sequence[str]:
         sql = select(Image.directory, Image.name).where(Image.image_id.in_(image_ids))
         with get_db_session() as session:
             result = session.execute(sql).all()
