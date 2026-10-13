@@ -20,12 +20,12 @@ from azotea_cli.common.constants import FOREVER
 from azotea_cli.common.models import ObjId, ValidState
 from azotea_cli.infra.sqlalchemy import Observer, get_db_session
 
-from ..errors import (
+from ...errors import (
     MissingDefaultObserverError,
     ObserverMissingError,
 )
-from ..interfaces import ObserverRepo
-from ..models import ObserverForm
+from ...interfaces import ObserverRepo
+from ...models import ObserverForm
 from . import config
 
 # -----------------------

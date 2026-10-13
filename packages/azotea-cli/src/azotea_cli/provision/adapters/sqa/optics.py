@@ -9,9 +9,9 @@ import logging
 # ---------------
 from azotea_cli.infra.sqlalchemy import get_db_session
 
-from ..errors import FNumberMissingError, FocalLenMissingError
-from ..interfaces import OpticsRepo
-from ..models import DefaultOptics, DefaultOpticsForm
+from ...errors import FNumberMissingError, FocalLenMissingError
+from ...interfaces import OpticsRepo
+from ...models import DefaultOptics, DefaultOpticsForm
 from . import config
 
 # -----------------------

@@ -11,14 +11,14 @@ from datetime import datetime, timezone
 # ---------------------
 from sqlalchemy.orm import Session
 
-from ..errors import ConsentNotAgreedError
 
 # ---------------
 # Own dependecies
 # ---------------
 
 from azotea_cli.infra.sqlalchemy import get_db_session
-from ..interfaces import ConsentRepo
+from ...errors import ConsentNotAgreedError
+from ...interfaces import ConsentRepo
 from . import config
 
 # -----------------------

@@ -1,9 +1,9 @@
-from .camera import SqaCameraRepo
-from .consent import SqaConsentRepo
-from .location import SqaLocationRepo
-from .observer import SqaObserverRepo
-from .optics import SqaOpticsRepo
-from .roi import SqaRoiRepo
+from .sqa.camera import SqaCameraRepo
+from .sqa.consent import SqaConsentRepo
+from .sqa.location import SqaLocationRepo
+from .sqa.observer import SqaObserverRepo
+from .sqa.optics import SqaOpticsRepo
+from .sqa.roi import SqaRoiRepo
 
 __all__ = [
     "SqaConsentRepo",

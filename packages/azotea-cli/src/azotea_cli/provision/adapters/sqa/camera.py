@@ -18,12 +18,12 @@ from azotea_cli.common.reader.models import ImageMetadata
 # ---------------
 from azotea_cli.infra.sqlalchemy import Camera, get_db_session
 
-from ..errors import (
+from ...errors import (
     CameraMissingError,
     MissingDefaultCameraError,
 )
-from ..interfaces import CameraRepo
-from ..models import CameraForm
+from ...interfaces import CameraRepo
+from ...models import CameraForm
 from . import config
 
 # -----------------------

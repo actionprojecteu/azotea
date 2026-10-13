@@ -17,12 +17,12 @@ from sqlalchemy.exc import IntegrityError
 from azotea_cli.common.models import ObjId
 from azotea_cli.infra.sqlalchemy import Location, get_db_session
 
-from ..errors import (
+from ...errors import (
     LocationMissingError,
     MissingDefaultLocationError,
 )
-from ..interfaces import LocationRepo
-from ..models import LocationForm
+from ...interfaces import LocationRepo
+from ...models import LocationForm
 from . import config
 
 # -----------------------
