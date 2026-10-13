@@ -24,7 +24,7 @@ from ...errors import (
     MissingDefaultObserverError,
     ObserverMissingError,
 )
-from azotea_cli.provision.interfaces import ObserverRepo
+from azotea_cli.provision.ports import ObserverRepo
 from azotea_cli.provision.models import ObserverForm
 from . import config
 

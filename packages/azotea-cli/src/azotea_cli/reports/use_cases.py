@@ -1,12 +1,12 @@
 import logging
 from datetime import datetime
 
-from azotea_cli.provision.interfaces import (
+from azotea_cli.provision.ports import (
     ConsentRepo,
     ObserverRepo,
 )
 
-from .interfaces import ExporterService, ReportsService
+from .ports import ExporterService, ReportsService
 
 # -----------------------
 # Module global variables

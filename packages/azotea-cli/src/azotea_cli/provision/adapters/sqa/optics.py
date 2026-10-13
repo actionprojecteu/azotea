@@ -10,7 +10,7 @@ import logging
 from azotea_cli.infra.sqlalchemy import get_db_session
 
 from azotea_cli.provision.errors import FNumberMissingError, FocalLenMissingError
-from azotea_cli.provision.interfaces import OpticsRepo
+from azotea_cli.provision.ports import OpticsRepo
 from azotea_cli.provision.models import DefaultOptics, DefaultOpticsForm
 from . import config
 

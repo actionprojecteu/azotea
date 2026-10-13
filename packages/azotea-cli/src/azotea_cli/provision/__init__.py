@@ -7,7 +7,7 @@ from .errors import (
     ObserverMissingError,
     RoiMissingError,
 )
-from .interfaces import (
+from .ports import (
     CameraRepo,
     LocationRepo,
     ObserverRepo,

@@ -18,7 +18,7 @@ from azotea_cli.common.models import ObjId
 # Own dependecies
 # ---------------
 from azotea_cli.infra.sqlalchemy import get_db_session
-from azotea_cli.reports.interfaces import DisplayService
+from azotea_cli.reports.ports import DisplayService
 from azotea_cli.reports.models import SummaryRanged, SummaryTotals
 
 # -----------------------

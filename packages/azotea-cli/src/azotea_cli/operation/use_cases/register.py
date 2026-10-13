@@ -15,7 +15,7 @@ from itertools import batched
 # ---------------
 from azotea_cli.common.reader import ImageReaderFactory
 from azotea_cli.provision.errors import CameraMissingError
-from azotea_cli.provision.interfaces import (
+from azotea_cli.provision.ports import (
     CameraRepo,
     ConsentRepo,
     LocationRepo,
@@ -23,10 +23,10 @@ from azotea_cli.provision.interfaces import (
     OpticsRepo,
 )
 
-from ..errors import CameraNotDefaultError, MissingTimestampError
-from ..filesystem import hash_func, scan_images
-from ..interfaces import ImagesRepo
-from ..models import ImageForm, RegisterForm
+from azotea_cli.operation.errors import CameraNotDefaultError, MissingTimestampError
+from azotea_cli.operation.filesystem import hash_func, scan_images
+from azotea_cli.operation.ports import ImagesRepo
+from azotea_cli.operation.models import ImageForm, RegisterForm
 
 # -----------------------
 # Module global variables

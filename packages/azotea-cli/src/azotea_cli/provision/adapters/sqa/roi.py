@@ -22,7 +22,7 @@ from azotea_cli.common.rect import Rect
 from azotea_cli.infra.sqlalchemy import get_db_session, Roi
 
 from azotea_cli.provision.errors import MissingDefaultRoiError, RoiMissingError
-from azotea_cli.provision.interfaces import RoiRepo
+from azotea_cli.provision.ports import RoiRepo
 from azotea_cli.provision.models import RoiForm
 from . import config
 

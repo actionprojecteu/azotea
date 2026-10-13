@@ -1,6 +1,6 @@
 import os
 
-from ..interfaces import ImageReader, ImageReaderFactory
+from ..ports import ImageReader, ImageReaderFactory
 from .exif import ExifReader
 from .fits import FitsReader
 

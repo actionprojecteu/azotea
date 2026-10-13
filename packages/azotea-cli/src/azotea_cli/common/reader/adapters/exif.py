@@ -21,7 +21,7 @@ from ..errors import (
     UnknownDateTimeFormatError,
     UnsupportedCFAError,
 )
-from ..interfaces import ImageReader, RawPixels
+from ..ports import ImageReader, RawPixels
 from ..models import ImageMetadata, IntArray2D
 from ..utils import image_type_by_path
 

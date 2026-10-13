@@ -1,4 +1,4 @@
-from azotea_cli.provision.interfaces import Display
+from azotea_cli.provision.ports import Display
 
 class StdoutDisplay(Display):
     def display(self, text: str) -> None:

@@ -19,7 +19,7 @@ from azotea_cli.common.models import ObjId
 # ---------------
 from azotea_cli.infra.sqlalchemy import Image, SkyBrightness, get_db_session
 
-from azotea_cli.operation.interfaces import  SkyBrightnessRepo
+from azotea_cli.operation.ports import  SkyBrightnessRepo
 from azotea_cli.operation.models import SkyStatsForm
 
 # -----------------------

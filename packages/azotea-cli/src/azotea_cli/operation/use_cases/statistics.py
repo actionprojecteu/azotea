@@ -18,15 +18,15 @@ from azotea_cli.common.errors import AzoteaError
 # ---------------
 from azotea_cli.common.models import ObjId
 from azotea_cli.common.reader import ImageReaderFactory
-from azotea_cli.provision.interfaces import (
+from azotea_cli.provision.ports import (
     CameraRepo,
     ConsentRepo,
     ObserverRepo,
     RoiRepo,
 )
 
-from ..interfaces import ImagesRepo, SkyBrightnessRepo
-from ..models import SkyStatsForm
+from azotea_cli.operation.ports import ImagesRepo, SkyBrightnessRepo
+from azotea_cli.operation.models import SkyStatsForm
 
 # -----------------------
 # Module global variables

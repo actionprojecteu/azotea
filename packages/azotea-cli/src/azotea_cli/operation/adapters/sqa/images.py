@@ -21,7 +21,7 @@ from azotea_cli.common.models import ObjId
 from azotea_cli.infra.sqlalchemy import Image, SkyBrightness, get_db_session
 
 # from ...errors import
-from ...interfaces import ImagesRepo
+from ...ports import ImagesRepo
 from ...models import ImageForm
 
 # -----------------------

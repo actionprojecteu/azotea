@@ -1,9 +1,9 @@
 import logging
 
-from azotea_cli.common.reader.interfaces import ImageReaderFactory
+from azotea_cli.common.reader.ports import ImageReaderFactory
 from azotea_cli.common.rect import Point, Rect
 
-from .interfaces import (
+from .ports import (
     CameraRepo,
     ConsentRepo,
     Display,

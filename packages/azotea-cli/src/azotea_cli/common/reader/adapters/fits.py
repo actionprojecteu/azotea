@@ -1,7 +1,7 @@
 
 from azotea_cli.common.models import HeaderType
 
-from ..interfaces import ImageReader
+from ..ports import ImageReader
 
 class FitsReader(ImageReader):
 

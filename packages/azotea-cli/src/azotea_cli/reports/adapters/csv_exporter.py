@@ -18,7 +18,7 @@ from azotea_cli.common.models import ObjId
 # ---------------
 from azotea_cli.infra.sqlalchemy import get_db_session
 
-from azotea_cli.reports.interfaces import ExporterService
+from azotea_cli.reports.ports import ExporterService
 from azotea_cli.reports.models import ObservationReport
 
 # -----------------------

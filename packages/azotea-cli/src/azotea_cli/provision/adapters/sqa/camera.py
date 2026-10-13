@@ -22,7 +22,7 @@ from ...errors import (
     CameraMissingError,
     MissingDefaultCameraError,
 )
-from azotea_cli.provision.interfaces import CameraRepo
+from azotea_cli.provision.ports import CameraRepo
 from azotea_cli.provision.models import CameraForm
 from . import config
 
