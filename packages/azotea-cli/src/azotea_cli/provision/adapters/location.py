@@ -18,7 +18,6 @@ from azotea_cli.common.models import ObjId
 from azotea_cli.infra.sqlalchemy import Location, get_db_session
 
 from ..errors import (
-    LocationExistsError,
     LocationMissingError,
     MissingDefaultLocationError,
 )
@@ -53,7 +52,7 @@ class LocationRepoImpl(LocationRepo):
             log.info("loading default location_id: %s", location_id)
             return int(location_id)
 
-    def create(self, form: LocationForm) -> int:
+    def create(self, form: LocationForm) -> ObjId:
         with get_db_session() as session:
             try:
                 with session.begin():
@@ -68,10 +67,12 @@ class LocationRepoImpl(LocationRepo):
                     )
                     session.add(loc)
                     session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
-                    location_id = loc.location_id
+                    return loc.location_id
             except IntegrityError:
-                raise LocationExistsError(f"({form.site_name}, {form.location})")
-        return location_id
+                log.warning("location (%s, %s) already exists", form.site_name, form.location)
+                sql = select(Location.location_id).where(Location.site_name == form.site_name, Location.location == form.location)
+                with get_db_session() as session:
+                    return session.scalars(sql).one()
 
     def update(self, form: LocationForm) -> None:
         sql = select(Location).where(

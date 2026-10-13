@@ -19,7 +19,6 @@ from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.infra.sqlalchemy import Camera, get_db_session
 
 from ..errors import (
-    CameraExistsError,
     CameraMissingError,
     MissingDefaultCameraError,
 )
@@ -70,7 +69,7 @@ class CameraRepoImpl(CameraRepo):
                 raise CameraMissingError(model)
             return camera_id
 
-    def create(self, form: CameraForm) -> int:
+    def create(self, form: CameraForm) -> ObjId:
         with get_db_session() as session:
             try:
                 with session.begin():
@@ -88,22 +87,24 @@ class CameraRepoImpl(CameraRepo):
                     )
                     session.add(cam)
                     session.flush()
-                    camera_id = cam.camera_id
+                    return cam.camera_id
             except IntegrityError:
-                raise CameraExistsError(form.model)
-        return camera_id
+                log.warning("camera %s already exists", form.model)
+                sql = select(Camera.camera_id).where(Camera.model == form.model)
+                with get_db_session() as session:
+                    return session.scalars(sql).one()
 
-    def create_from_image(self, metadata: ImageMetadata) -> int:
+
+    def create_from_image(self, metadata: ImageMetadata) -> ObjId:
+        model = (
+            metadata.model
+            if metadata.model.startswith(metadata.make)
+            else f"{metadata.make} {metadata.model}"
+        )
         with get_db_session() as session:
-            model = None
             try:
                 with session.begin():
                     log.info("adding new camera from metadata: %s", metadata)
-                    model = (
-                        metadata.model
-                        if metadata.model.startswith(metadata.make)
-                        else f"{metadata.make} {metadata.model}"
-                    )
                     cam = Camera(
                         model=model,
                         bias=metadata.black_level,
@@ -115,7 +116,9 @@ class CameraRepoImpl(CameraRepo):
                     )
                     session.add(cam)
                     session.flush()
-                    camera_id = cam.camera_id
+                    return cam.camera_id
             except IntegrityError:
-                raise CameraExistsError(model)
-        return camera_id
+                log.warning("camera %s already exists", model)
+                sql = select(Camera.camera_id).where(Camera.model == model)
+                with get_db_session() as session:
+                    return session.scalars(sql).one()

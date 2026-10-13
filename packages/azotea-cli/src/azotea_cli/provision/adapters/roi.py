@@ -21,7 +21,7 @@ from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.common.rect import Rect
 from azotea_cli.infra.sqlalchemy import get_db_session, Roi
 
-from ..errors import MissingDefaultRoiError, RoiExistsError, RoiMissingError
+from ..errors import MissingDefaultRoiError, RoiMissingError
 from ..interfaces import RoiRepo
 from ..models import RoiForm
 from . import config
@@ -61,7 +61,7 @@ class RoiRepoImpl(RoiRepo):
                 raise RoiMissingError(roi_id)
             return Rect(roi.x1, roi.y1, roi.x2, roi.y2)
 
-    def create(self, form: RoiForm) -> int:
+    def create(self, form: RoiForm) -> ObjId:
         with get_db_session() as session:
             rect = None
             try:
@@ -78,21 +78,24 @@ class RoiRepoImpl(RoiRepo):
                     )
                     session.add(roi)
                     session.flush()
-                    roi_id = roi.roi_id
+                    return roi.roi_id
             except IntegrityError:
-                raise RoiExistsError(str(rect))
-        return roi_id
+                log.warning("roi %s already exists", rect)
+                sql = select(Roi.roi_id).where(Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2,Roi.y2 == rect.y2)
+                with get_db_session() as session:
+                    return session.scalars(sql).one()
 
-    def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> int:
+
+    def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> ObjId:
+        model = (
+            metadata.model
+            if metadata.model.startswith(metadata.make)
+            else f"{metadata.make} {metadata.model}"
+        )
         with get_db_session() as session:
             try:
                 with session.begin():
                     log.info("adding new roi from image '%s'", metadata)
-                    model = (
-                        metadata.model
-                        if metadata.model.startswith(metadata.make)
-                        else f"{metadata.make} {metadata.model}"
-                    )
                     center = rect.central()
                     comment = f"ROI for {model}, centered at P={center}, width={rect.width()}, height={rect.height()}"
                     roi = Roi(
@@ -105,7 +108,9 @@ class RoiRepoImpl(RoiRepo):
                     )
                     session.add(roi)
                     session.flush()
-                    roi_id = roi.roi_id
+                    return roi.roi_id
             except IntegrityError:
-                raise RoiExistsError(str(rect))
-        return roi_id
+                log.warning("roi %s already exists", rect)
+                sql = select(Roi.roi_id).where(Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2,Roi.y2 == rect.y2)
+                with get_db_session() as session:
+                    return session.scalars(sql).one()

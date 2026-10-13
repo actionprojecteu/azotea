@@ -15,18 +15,18 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 # Own dependecies
 # ---------------
+from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.constants import FOREVER
-from azotea_cli.common.models import ValidState, ObjId
+from azotea_cli.common.models import ObjId, ValidState
 from azotea_cli.infra.sqlalchemy import Observer, get_db_session
 
-from . import config
 from ..errors import (
-    ObserverExistsError,
-    ObserverMissingError,
     MissingDefaultObserverError,
+    ObserverMissingError,
 )
-from ..models import ObserverForm
 from ..interfaces import ObserverRepo
+from ..models import ObserverForm
+from . import config
 
 # -----------------------
 # Module global variables
@@ -39,14 +39,13 @@ log = logging.getLogger(__name__.split(".")[-1])
 # Create/Update location use case
 # -------------------------------
 
-class ObserverRepoImpl(ObserverRepo):
 
+class ObserverRepoImpl(ObserverRepo):
     def set_default(self, observer_id: ObjId) -> None:
         with get_db_session() as session:
             with session.begin():
                 log.info("saving default observer_id: %d", observer_id)
                 config.save(session, "observer", "observer", str(observer_id))
-
 
     def get_default(self) -> ObjId:
         with get_db_session() as session:
@@ -56,7 +55,7 @@ class ObserverRepoImpl(ObserverRepo):
             log.info("loading default observer_id: %s", observer_id)
             return int(observer_id)
 
-    def create_versioned(self, form: ObserverForm) -> int:
+    def create_versioned(self, form: ObserverForm) -> ObjId:
         sql = select(Observer).where(
             Observer.family_name == form.family_name,
             Observer.surname == form.surname,
@@ -99,13 +98,16 @@ class ObserverRepoImpl(ObserverRepo):
                         session.add(obs)
                         session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
                         observer_id = obs.observer_id
-                        log.info("create a new version with id %d of observer: %s", observer_id, form)
+                        log.info(
+                            "create a new version with id %d of observer: %s", observer_id, form
+                        )
                     else:
-                         observer_id = prev_obs.observer_id
+                        log.warning("observer (%s, %s) already exists", form.surname, form.family_name)
+                        observer_id = prev_obs.observer_id
                     return observer_id
-            except IntegrityError:
-                raise ObserverExistsError(f"{form.family_name} {form.surname}")
-
+            except IntegrityError as e:
+                # this should never happen
+                raise AzoteaError(str(e))
 
     def update(self, form: ObserverForm) -> None:
         sql = select(Observer).where(
