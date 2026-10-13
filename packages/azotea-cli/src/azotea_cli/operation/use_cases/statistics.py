@@ -77,6 +77,10 @@ class SkyStatisticsUseCase:
             aver_signal_B=np.mean(b_channel),
             vari_signal_B=np.var(b_channel),
         )
+        log.debug("black level R %d", raw_pixels.r_black())
+        log.debug("black level Gr %d", raw_pixels.gr_black())
+        log.debug("black level Gb %d", raw_pixels.gb_black())
+        log.debug("black level B %d", raw_pixels.b_black())
         return stats
 
     def compute_sky_statistics(self) -> None:
