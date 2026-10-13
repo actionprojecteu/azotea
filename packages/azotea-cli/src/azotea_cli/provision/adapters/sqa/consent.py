@@ -17,8 +17,8 @@ from sqlalchemy.orm import Session
 # ---------------
 
 from azotea_cli.infra.sqlalchemy import get_db_session
-from ...errors import ConsentNotAgreedError
-from ...interfaces import ConsentRepo
+from azotea_cli.provision.errors import ConsentNotAgreedError
+from azotea_cli.provision.interfaces import ConsentRepo
 from . import config
 
 # -----------------------

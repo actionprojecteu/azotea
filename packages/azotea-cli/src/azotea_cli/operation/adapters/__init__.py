@@ -1,3 +1,3 @@
-from .images import SqaImagesRepo
-from .sky import SqaSkyBrightnessRepo
-__all__ = ["SqaImagesRepo"]
+from .sqa.images import SqaImagesRepo
+from .sqa.sky import SqaSkyBrightnessRepo
+__all__ = ["SqaImagesRepo","SqaSkyBrightnessRepo"]

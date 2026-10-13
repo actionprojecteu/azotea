@@ -22,8 +22,8 @@ from ...errors import (
     CameraMissingError,
     MissingDefaultCameraError,
 )
-from ...interfaces import CameraRepo
-from ...models import CameraForm
+from azotea_cli.provision.interfaces import CameraRepo
+from azotea_cli.provision.models import CameraForm
 from . import config
 
 # -----------------------

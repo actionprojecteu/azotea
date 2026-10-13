@@ -21,8 +21,8 @@ from ...errors import (
     LocationMissingError,
     MissingDefaultLocationError,
 )
-from ...interfaces import LocationRepo
-from ...models import LocationForm
+from azotea_cli.provision.interfaces import LocationRepo
+from azotea_cli.provision.models import LocationForm
 from . import config
 
 # -----------------------
