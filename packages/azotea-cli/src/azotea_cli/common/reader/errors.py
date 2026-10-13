@@ -1,5 +1,6 @@
 from azotea_cli.common.errors import AzoteaError
 
+
 class MissingCameraModelError(AzoteaError):
     """missing camera moedel from metadata"""
 
@@ -29,7 +30,14 @@ class UnknownDateTimeFormatError(AzoteaError):
 
     pass
 
+
 class OutOfBoundsError(AzoteaError):
     """out of bounds rectangle"""
+
+    pass
+
+
+class MissingImageError(AzoteaError):
+    """Image path does not exists"""
 
     pass

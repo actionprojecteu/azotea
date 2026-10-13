@@ -13,6 +13,7 @@ from azotea_cli.common.models import BayerIndex, BayerPattern, HeaderType
 from azotea_cli.common.rect import Point, Rect
 
 from ..errors import (
+    MissingImageError,
     MissingCameraModelError,
     MissingDateObsError,
     OutOfBoundsError,
@@ -128,6 +129,8 @@ class ExifReader(ImageReader):
 
     def read_pixels(self, path: str) -> RawPixels:
         """returns an object that implements the RawPixels interface"""
+        if not os.path.isfile(path):
+            raise  MissingImageError(path)
         raw = rawpy.imread(path)
         return ExifRawPixels(raw)
 

@@ -10,7 +10,6 @@ from itertools import batched
 # Third party libraries
 # ---------------------
 import numpy as np
-from numpy._core import greater
 
 from azotea_cli.common.errors import AzoteaError
 
