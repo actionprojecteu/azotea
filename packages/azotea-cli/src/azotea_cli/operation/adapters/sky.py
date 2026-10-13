@@ -46,7 +46,7 @@ class SkyBrightnessRepoImpl(SkyBrightnessRepo):
             published=False,
         )
 
-    def save_one_by_one(self, statistics: Sequence[SkyStatsForm]) -> None:
+    def _save_one_by_one(self, statistics: Sequence[SkyStatsForm]) -> None:
         for stats in statistics:
             try:
                 with get_db_session() as session:
@@ -69,7 +69,7 @@ class SkyBrightnessRepoImpl(SkyBrightnessRepo):
                 log.warning(
                     "error saving a batch of %d statistics, looping one by one", len(statistics)
                 )
-                self.save_one_by_one(statistics)
+                self._save_one_by_one(statistics)
 
     def pending_processing_by(self, observer_id: ObjId) -> Sequence[ObjId]:
         sql = select(Image.image_id).where(

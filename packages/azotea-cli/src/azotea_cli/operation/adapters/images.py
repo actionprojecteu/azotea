@@ -88,7 +88,7 @@ class ImagesRepoImpl(ImagesRepo):
                 existing.directory = image.directory
                 session.add(existing)
 
-    def save_one_by_one(self, images: Sequence[ImageForm]) -> None:
+    def _save_one_by_one(self, images: Sequence[ImageForm]) -> None:
         existing_images = list()
         for image in images:
             with get_db_session() as session:
@@ -111,7 +111,7 @@ class ImagesRepoImpl(ImagesRepo):
                         session.add(self._translate(image))
             except IntegrityError:
                 log.warning("error saving a batch of %d images, looping one by one", len(images))
-                self.save_one_by_one(images)
+                self._save_one_by_one(images)
 
     def pending_processing_by(self, observer_id: ObjId) -> Sequence[ObjId]:
         sql = select(Image.image_id).where(
