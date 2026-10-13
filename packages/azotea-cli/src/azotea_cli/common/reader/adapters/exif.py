@@ -139,7 +139,8 @@ class ExifRawPixels:
         self.shape = raw.raw_image.shape
         self.pattern = raw.raw_pattern
 
-
+    # No context managers here, we need to keep the internal numpy
+    # raw_pixels array alive while statistics are being computed
     def __del__(self) -> None:
         try:
             if self.img is not None:
@@ -175,7 +176,11 @@ class ExifRawPixels:
         y, x = np.argwhere(self.pattern == BayerIndex.B)[0]
         return self._section(x, y, section)
 
-    def r_black(self) -> int: ...
-    def g1_black(self) -> int: ...
-    def g2_black(self) -> int: ...
-    def b_black(self) -> int: ...
+    def r_black(self) -> int:
+        return self.black_levels[BayerIndex.R]
+    def gr_black(self) -> int:
+         return self.black_levels[BayerIndex.Gr]
+    def gb_black(self) -> int:
+         return self.black_levels[BayerIndex.Gb]
+    def b_black(self) -> int:
+         return self.black_levels[BayerIndex.B]
