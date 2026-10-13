@@ -120,8 +120,8 @@ class RegisterImagesUseCase:
             log.info("saving a batch of %d images", len(images))
             self.images.save_images(images)
         log.info(
-            "%d images analyzed, %d discarded, %d stored",
+            "%d images analyzed, %d stored,  %d discarded",
             n_selected,
-            n_skipped,
             n_selected - n_skipped,
+            n_skipped,
         )
