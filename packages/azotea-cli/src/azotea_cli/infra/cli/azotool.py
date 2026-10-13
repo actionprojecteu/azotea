@@ -234,10 +234,7 @@ def add_args(parser: ArgumentParser) -> None:
 
     roicre = subparser.add_parser("create", help="Create a new region of interest in the database")
     roicre.set_defaults(func=cli_roi)
-    roiswi = subparser.add_parser(
-        "switch",
-        help="Switch default ROI to the auto centered ROI for the given camera and width and height",
-    )
+
 
     group = roicre.add_mutually_exclusive_group(required=True)
     roicre.add_argument("--default", action="store_true", help="Set this ROI as the default ROI")
@@ -262,11 +259,6 @@ def add_args(parser: ArgumentParser) -> None:
     roicre.add_argument("--y2", type=int, default=None, help="Ending pixel row")
     roicre.add_argument("--comment", type=str, default=None, help="Additional region comment")
 
-    roiswi.add_argument(
-        "--model", type=str, default=None, help="Camera Model (taken from EXIF data)"
-    )
-    roiswi.add_argument("--width", type=int, default=500, help="Width of central rectangle")
-    roiswi.add_argument("--height", type=int, default=400, help="height of central rectangle")
 
     # ------------------------------------------
     # Create second level parsers for 'sky'
@@ -275,6 +267,7 @@ def add_args(parser: ArgumentParser) -> None:
     subparser = parser_sky.add_subparsers(dest="subcommand")
 
     skyexp = subparser.add_parser("export", help="Export to CSV")
+    skyexp.set_defaults(func=cli_sky_export)
     skyexp.add_argument(
         "--csv-dir",
         type=str,
@@ -300,6 +293,7 @@ def add_args(parser: ArgumentParser) -> None:
     )
 
     skyview = subparser.add_parser("summary", help="view sky summary data")
+    skyview.set_defaults(func=cli_sky_summary)
 
     # --------------------------------------------
     # Create second level parsers for 'configure'
@@ -329,6 +323,7 @@ def add_args(parser: ArgumentParser) -> None:
 
     subparser = parser_img.add_subparsers(dest="subcommand")
     imgview = subparser.add_parser("summary", help="View image summary data")
+    imgview.set_defaults(func=cli_img_summary)
 
 
 def cli_consent(args: Namespace) -> None:
@@ -424,6 +419,27 @@ def cli_main(args: Namespace) -> None:
     except AzoteaError as e:
         log.error(e)
         engine.dispose()
+
+
+def cli_sky_export(args: Namespace) -> None:
+    consent = ConsentRepoImpl()
+    service = ReportsServiceImpl()
+    observer = ObserverRepoImpl()
+    exporter = CsvExporterImpl(args.csv_dir)
+    use_case = GenerateReportsUseCase(consent, observer, service, exporter)
+    if args.all:
+        use_case.generate_report_all()
+    elif args.unpublished:
+        use_case.generate_report_unpublished()
+    elif args.range:
+        use_case.generate_report_range(args.from_date, args.to_date)
+    elif args.latest_night:
+         use_case.generate_report_latets_month()
+    elif args.latest_month:
+         use_case.generate_report_latets_month()
+    else:
+        pass
+
 
 
 def main():
