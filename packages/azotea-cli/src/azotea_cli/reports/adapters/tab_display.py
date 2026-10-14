@@ -14,7 +14,7 @@ from tabulate import tabulate
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from azotea_cli.common.models import ObjId
+from azotea_cli.common.models import ObjId, DataClass
 
 # ---------------
 # Own dependecies
@@ -36,10 +36,5 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 class TabDisplayService(DisplayService):
-    def show_totals(self, data: Sequence[SummaryTotals]) -> None:
-        print(tabulate(data, headers="keys", tablefmt="grid"))
-
-
-
-    def show_ranged_summary(self, data: Sequence[SummaryRanged]) -> None:
+    def show(self, data: Sequence[DataClass]) -> None:
         print(tabulate(data, headers="keys", tablefmt="grid"))

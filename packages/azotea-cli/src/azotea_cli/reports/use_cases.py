@@ -112,9 +112,9 @@ class GenerateSummaryUseCase:
         self.consent.check_raises()
         observer_id = self.observer.get_default()
         data = self.summarizer.totals_by(observer_id)
-        self.display.show_totals(data)
+        self.display.show(data)
 
     def show_sky_summary(self) -> None:
         self.consent.check_raises()
         data = self.summarizer.ranged_summary()
-        self.display.show_ranged_summary(data)
+        self.display.show(data)

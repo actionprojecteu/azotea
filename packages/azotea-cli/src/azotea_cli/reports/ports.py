@@ -2,7 +2,7 @@ from typing import Protocol
 from collections.abc import Sequence
 from datetime import datetime
 
-from azotea_cli.common.models import ObjId
+from azotea_cli.common.models import ObjId, DataClass
 
 from .models import ObservationReport, SummaryTotals, SummaryRanged
 
@@ -23,5 +23,4 @@ class ExporterService(Protocol):
     def export(self, report_name: str, data:Sequence[ObservationReport]) -> None: ...
 
 class DisplayService(Protocol):
-    def show_totals(self, data:Sequence[SummaryTotals]) -> None: ...
-    def show_ranged_summary(self, data:Sequence[SummaryRanged]) -> None: ...
+    def show(self, data:Sequence[DataClass]) -> None: ...
