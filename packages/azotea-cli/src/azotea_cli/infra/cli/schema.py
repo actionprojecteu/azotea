@@ -120,8 +120,9 @@ def cli_populate_date(args: Namespace) -> None:
     for i, batch in enumerate(batched(date_objs, args.batch_size), start=1):
         log.info("Writing Date batch #%d (%d records)", i, len(batch))
         with get_db_session() as session:
-            for obj in batch:
-                session.add(obj)
+            with session.begin():
+                for obj in batch:
+                    session.add(obj)
 
 
 def cli_populate_time(args: Namespace) -> None:
@@ -141,16 +142,18 @@ def cli_populate_time(args: Namespace) -> None:
     for i, batch in enumerate(batched(time_objs, args.batch_size), start=1):
         log.info("Writing Time batch #%d (%d records)", i, len(batch))
         with get_db_session() as session:
-            for obj in batch:
-                session.add(obj)
+            with session.begin():
+                for obj in batch:
+                    session.add(obj)
 
 
 def cli_populate_config(args: Namespace) -> None:
     id = Config(section="database", property="uuid", value=str(uuid.uuid4()))
     version = Config(section="database", property="version", value="03")
     with get_db_session() as session:
-        session.add(id)
-        session.add(version)
+        with session.begin():
+            session.add(id)
+            session.add(version)
 
 
 def cli_populate_all(args: Namespace) -> None:
