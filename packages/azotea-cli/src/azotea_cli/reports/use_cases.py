@@ -35,7 +35,11 @@ class GenerateReportsUseCase:
         name, surname = self.observer.get_name(observer_id)
         log.info("generating complete report for %s %s", name, surname)
         data = self.reporter.get_all_data_by(observer_id)
-        self.exporter.export(data)
+        log.info("#" * 72)
+        log.info(data)
+        log.info("#" * 72)
+        report_name = f"{surname}-all"
+        self.exporter.export(report_name, data)
 
     def generate_report_unpublished(self) -> None:
         self.consent.check_raises()

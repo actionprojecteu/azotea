@@ -20,14 +20,14 @@ class ObservationReport:
     gain: float | None
     roi: str
     exptime: float
-    aver_signal_r: float
-    vari_signal_r: float
-    aver_signal_g1: float
-    vari_signal_g1: float
-    aver_signal_g2: float
-    vari_signal_g2: float
-    aver_signal_b: float
-    vari_signal_b: float
+    aver_signal_R: float
+    vari_signal_R: float
+    aver_signal_G1: float
+    vari_signal_G1: float
+    aver_signal_G2: float
+    vari_signal_G2: float
+    aver_signal_B: float
+    vari_signal_B: float
     bias: int
 
 

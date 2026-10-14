@@ -151,9 +151,12 @@ def cli_populate_config(session: Session, args: Namespace) -> None:
 
 
 def cli_populate_all(session: Session, args: Namespace) -> None:
-    cli_populate_date(session, args)
-    cli_populate_time(session, args)
-    cli_populate_config(session, args)
+    with session.begin():
+        cli_populate_date(session, args)
+    with session.begin():
+        cli_populate_time(session, args)
+    with session.begin():
+        cli_populate_config(session, args)
 
 
 def add_args(parser: ArgumentParser) -> None:
