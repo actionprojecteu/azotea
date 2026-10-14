@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from azotea_cli.provision.ports import (
-    ConsentRepo,
+    ConsentService,
     ObserverRepo,
 )
 
@@ -20,7 +20,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 class GenerateReportsUseCase:
     def __init__(
         self,
-        consent: ConsentRepo,
+        consent: ConsentService,
         observer: ObserverRepo,
         reporter: ReportsService,
         exporter: ExporterService,
@@ -99,7 +99,7 @@ class GenerateReportsUseCase:
 class GenerateSummaryUseCase:
     def __init__(
         self,
-        consent: ConsentRepo,
+        consent: ConsentService,
         observer: ObserverRepo,
         summarizer: SummaryService,
         display: DisplayService,

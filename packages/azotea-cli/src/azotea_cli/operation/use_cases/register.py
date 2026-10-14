@@ -17,7 +17,7 @@ from azotea_cli.common.reader import ImageReaderFactory
 from azotea_cli.provision.errors import CameraMissingError
 from azotea_cli.provision.ports import (
     CameraRepo,
-    ConsentRepo,
+    ConsentService,
     LocationRepo,
     ObserverRepo,
     OpticsRepo,
@@ -41,7 +41,7 @@ class RegisterImagesUseCase:
 
     def __init__(
         self,
-        consent: ConsentRepo,
+        consent: ConsentService,
         camera: CameraRepo,
         location: LocationRepo,
         observer: ObserverRepo,
