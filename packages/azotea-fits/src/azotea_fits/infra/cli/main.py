@@ -5,24 +5,23 @@
 # ----------------------------------------------------------------------
 #
 import logging
-from datetime import datetime
 from argparse import ArgumentParser, Namespace
+from datetime import datetime
 
-from azotea_cli.common.errors import AzoteaError
-from azotea_cli.common.models import ImageType, BayerPattern
+from azotea_cli.common.models import BayerPattern, ImageType
 
 # -------------------
 # Third party imports
 # -------------------
 from lica.cli import execute
-from lica.validators import vfile, vdir, vdate
+from lica.validators import vdate, vdir, vfile
 
 # --------------
 # local imports
 # -------------
-
 from azotea_fits import __version__
 from azotea_fits.enums import SwCreator
+from azotea_fits.errors import FitsError
 
 # ----------------
 # Module constants
@@ -72,7 +71,6 @@ def add_args(parser: ArgumentParser) -> None:
         help="single FITS file path",
     )
 
-
     # --------------------------
     # Create first level parsers
     # --------------------------
@@ -86,7 +84,7 @@ def add_args(parser: ArgumentParser) -> None:
     # --------------------------------------
 
     parser_edit.set_defaults(func=cli_edit)
-    parser_edit.add_argument("--camera", type=str,  default=None, help="Camera model")
+    parser_edit.add_argument("--camera", type=str, default=None, help="Camera model")
     parser_edit.add_argument(
         "--comment", type=str, default=None, help="Optional comment keyword to add"
     )
@@ -100,7 +98,9 @@ def add_args(parser: ArgumentParser) -> None:
     parser_edit.add_argument("--image-type", choices=ImageType, default=None, help="Image type")
     parser_edit.add_argument("--diameter", type=float, default=None, help="Optics diameter in mm.")
     parser_edit.add_argument("--focal-length", type=float, default=None, help="Focal length in mm.")
-    parser_edit.add_argument("--date-obs", type=datetime, default=None, help="Exposure time in sec.")
+    parser_edit.add_argument(
+        "--date-obs", type=datetime, default=None, help="Exposure time in sec."
+    )
     parser_edit.add_argument("--exptime", type=float, default=None, help="Exposure time in sec.")
 
     # FITS specific editing info
@@ -114,16 +114,19 @@ def add_args(parser: ArgumentParser) -> None:
     )
     parser_creator.set_defaults(func=cli_sw_creator)
 
+
 def cli_edit(args: Namespace) -> None:
     pass
+
 
 def cli_sw_creator(args: Namespace) -> None:
     pass
 
+
 def cli_main(args: Namespace) -> None:
     try:
         args.func(args)
-    except AzoteaError as e:
+    except FitsError as e:
         log.error(e)
 
 
