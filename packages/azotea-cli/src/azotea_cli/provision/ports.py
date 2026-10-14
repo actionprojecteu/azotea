@@ -18,10 +18,6 @@ from .models import (
 # ----------
 
 
-class Display(Protocol):
-    def display(self, text: str) -> None: ...
-
-
 class ConsentRepo(Protocol):
     def review(self) -> str: ...
     def agree(self, agreed: bool) -> None: ...

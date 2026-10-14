@@ -1,12 +1,12 @@
 import logging
 
+from azotea_cli.common.ports import DisplayService
 from azotea_cli.common.reader.ports import ImageReaderFactory
 from azotea_cli.common.rect import Point, Rect
 
 from .ports import (
     CameraRepo,
     ConsentRepo,
-    Display,
     LocationRepo,
     ObserverRepo,
     OpticsRepo,
@@ -25,9 +25,9 @@ from .models import (
 log = logging.getLogger(__name__.split(".")[-2])
 
 
-def consent_view_and_agree(consent: ConsentRepo, display: Display, agreed: bool) -> None:
+def consent_view_and_agree(consent: ConsentRepo, display: DisplayService, agreed: bool) -> None:
     consent.review()
-    display.display(consent.review())
+    display.show(consent.review())
     if agreed:
         consent.agree(agreed)
 

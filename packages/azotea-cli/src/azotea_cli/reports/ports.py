@@ -21,6 +21,3 @@ class SummaryService(Protocol):
 
 class ExporterService(Protocol):
     def export(self, report_name: str, data:Sequence[ObservationReport]) -> None: ...
-
-class DisplayService(Protocol):
-    def show(self, data:Sequence[DataClass]) -> None: ...

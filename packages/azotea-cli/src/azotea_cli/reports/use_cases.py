@@ -6,7 +6,8 @@ from azotea_cli.provision.ports import (
     ObserverRepo,
 )
 
-from .ports import ExporterService, ReportsService, SummaryService, DisplayService
+from azotea_cli.common.ports import DisplayService
+from .ports import ExporterService, ReportsService, SummaryService
 
 # -----------------------
 # Module global variables
@@ -112,9 +113,9 @@ class GenerateSummaryUseCase:
         self.consent.check_raises()
         observer_id = self.observer.get_default()
         data = self.summarizer.totals_by(observer_id)
-        self.display.show(data)
+        self.display.show_tabular(data)
 
     def show_sky_summary(self) -> None:
         self.consent.check_raises()
         data = self.summarizer.ranged_summary()
-        self.display.show(data)
+        self.display.show_tabular(data)

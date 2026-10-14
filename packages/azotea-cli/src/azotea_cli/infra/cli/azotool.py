@@ -58,7 +58,6 @@ from azotea_cli.reports.adapters import (
     CsvExporterService,
     SqaReportsService,
     SqaSummaryService,
-    TabDisplayService,
 )
 from azotea_cli.reports.use_cases import GenerateReportsUseCase, GenerateSummaryUseCase
 
@@ -442,7 +441,7 @@ def cli_sky_summary(args: Namespace) -> None:
     consent = SqaConsentRepo()
     observer = SqaObserverRepo()
     summarizer = SqaSummaryService()
-    display = TabDisplayService()
+    display = StdoutDisplay()
     use_case = GenerateSummaryUseCase(consent, observer, summarizer, display)
     use_case.show_sky_summary()
 
@@ -451,7 +450,7 @@ def cli_img_summary(args: Namespace) -> None:
     consent = SqaConsentRepo()
     observer = SqaObserverRepo()
     summarizer = SqaSummaryService()
-    display = TabDisplayService()
+    display = StdoutDisplay()
     use_case = GenerateSummaryUseCase(consent, observer, summarizer, display)
     use_case.show_image_summary()
 
