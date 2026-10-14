@@ -2,27 +2,20 @@
 # standard libraries
 # ------------------
 
-import os
-import logging
-from collections.abc import Sequence
 import csv
+import logging
+import os
+from collections.abc import Sequence
 from dataclasses import asdict
 
 # ---------------------
 # Third party libraries
 # ---------------------
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
-
-from azotea_cli.common.models import ObjId
-
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import get_db_session
-
-from azotea_cli.reports.ports import ExporterService
 from azotea_cli.reports.models import ObservationReport
+from azotea_cli.reports.ports import ExporterService
 
 # -----------------------
 # Module global variables

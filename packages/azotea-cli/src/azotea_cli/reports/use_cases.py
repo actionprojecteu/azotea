@@ -33,43 +33,64 @@ class GenerateReportsUseCase:
         self.consent.check_raises()
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
-        log.info("generating complete report for %s %s", name, surname)
         data = self.reporter.get_all_data_by(observer_id)
-        log.info("#" * 72)
-        log.info(data)
-        log.info("#" * 72)
         report_name = f"{surname}-all"
-        self.exporter.export(report_name, data)
+        length = len(data)
+        if length:
+            log.info("generating '%s' report for '%s %s' (%d rows)", report_name,  name, surname, length)
+            self.exporter.export(report_name, data)
+        else:
+            log.warning("No data to export")
 
     def generate_report_unpublished(self) -> None:
         self.consent.check_raises()
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
-        log.info("generating unpublised report for %s %s", name, surname)
         data = self.reporter.get_unpublished_data_by(observer_id)
-        self.exporter.export(data)
+        report_name = f"{surname}-unpublished"
+        length = len(data)
+        if length:
+            log.info("generating '%s' report for '%s %s' (%d rows)", report_name,  name, surname, length)
+            self.exporter.export(report_name, data)
+        else:
+            log.warning("No data to export")
 
     def generate_report_by_date_range(self, since: datetime, until: datetime) -> None:
         self.consent.check_raises()
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
-        log.info("generating data range report for %s %s", name, surname)
         data = self.reporter.get_ranged_data_by(observer_id, since, until)
-        self.exporter.export(data)
-
+        report_name = f"{surname}-since-{since.strftime("%Y%m%d")}-until-{until.strftime("%Y%m%d")}"
+        length = len(data)
+        if length:
+            log.info("generating '%s' report for '%s %s' (%d rows)", report_name,  name, surname, length)
+            self.exporter.export(report_name, data)
+        else:
+            log.warning("No data to export")
 
     def generate_report_latest_night(self) -> None:
         self.consent.check_raises()
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
-        log.info("generating latest night report for %s %s", name, surname)
+        log.info("generating latest night report for '%s %s'", name, surname)
         data = self.reporter.get_latest_night_data_by(observer_id)
-        self.exporter.export(data)
+        report_name = f"{surname}-latest-day"
+        length = len(data)
+        if length:
+            log.info("generating '%s' report for '%s %s' (%d rows)", report_name,  name, surname, length)
+            self.exporter.export(report_name, data)
+        else:
+            log.warning("No data to export")
 
     def generate_report_latest_month(self) -> None:
         self.consent.check_raises()
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
-        log.info("generating latest month report for %s %s", name, surname)
         data = self.reporter.get_latest_month_data_by(observer_id)
-        self.exporter.export(data)
+        report_name = f"{surname}-latest-month"
+        length = len(data)
+        if length:
+            log.info("generating '%s' report for '%s %s' (%d rows)", report_name,  name, surname, length)
+            self.exporter.export(report_name, data)
+        else:
+            log.warning("No data to export")
