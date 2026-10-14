@@ -5,10 +5,12 @@
 import logging
 from collections.abc import Sequence
 from datetime import datetime
+from dataclasses import asdict
 
 # ---------------------
 # Third party libraries
 # ---------------------
+from tabulate import tabulate
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
@@ -35,7 +37,9 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 class TabDisplayService(DisplayService):
     def show_totals(self, data: Sequence[SummaryTotals]) -> None:
-        raise NotImplementedError
+        print(tabulate(data, headers="keys", tablefmt="grid"))
+
+
 
     def show_ranged_summary(self, data: Sequence[SummaryRanged]) -> None:
-        raise NotImplementedError
+        print(tabulate(data, headers="keys", tablefmt="grid"))
