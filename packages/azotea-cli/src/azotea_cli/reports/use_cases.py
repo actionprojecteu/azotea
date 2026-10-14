@@ -73,8 +73,8 @@ class GenerateReportsUseCase:
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
         log.info("generating latest night report for '%s %s'", name, surname)
-        data = self.reporter.get_latest_night_data_by(observer_id)
-        report_name = f"{surname}-latest-day"
+        data, latest_day = self.reporter.get_latest_night_data_by(observer_id)
+        report_name = f"{surname}-{latest_day.strftime("%Y%m%d")}"
         length = len(data)
         if length:
             log.info("generating '%s' report for '%s %s' (%d rows)", report_name,  name, surname, length)
@@ -86,8 +86,8 @@ class GenerateReportsUseCase:
         self.consent.check_raises()
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
-        data = self.reporter.get_latest_month_data_by(observer_id)
-        report_name = f"{surname}-latest-month"
+        data, latest_month = self.reporter.get_latest_month_data_by(observer_id)
+        report_name = f"{surname}-{latest_month.strftime("%Y%m")}"
         length = len(data)
         if length:
             log.info("generating '%s' report for '%s %s' (%d rows)", report_name,  name, surname, length)

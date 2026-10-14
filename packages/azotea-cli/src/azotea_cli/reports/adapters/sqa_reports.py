@@ -73,7 +73,7 @@ class SqaReportsService(ReportsService):
                 Image.exptime.label("exptime"),
                 SkyBrightness.aver_signal_R.label("aver_R"),
                 SkyBrightness.vari_signal_R.label("vari_R"),
-                SkyBrightness.aver_signal_G1.label("aver_g1"),
+                SkyBrightness.aver_signal_G1.label("aver_G1"),
                 SkyBrightness.vari_signal_G1.label("vari_G1"),
                 SkyBrightness.aver_signal_G2.label("aver_G2"),
                 SkyBrightness.vari_signal_G2.label("vari_G2"),
@@ -149,20 +149,24 @@ class SqaReportsService(ReportsService):
             rows = session.execute(query).mappings()
             return [self._to_all(dict(row)) for row in rows]
 
-    def get_latest_night_data_by(self, observer_id: ObjId) -> Sequence[ObservationReport]:
+    def get_latest_night_data_by(self, observer_id: ObjId) -> tuple[Sequence[ObservationReport], datetime]:
         with get_db_session() as session:
             _, max_date_id = self._get_observer_date_range(session, observer_id)
             if max_date_id is None:
                 raise RuntimeError("This should not happen (max_date_id)")
+            max_year = max_date_id // 10000
+            max_month = (max_date_id % 10000) // 100
+            max_day = max_date_id % 100
             query = (
                 self._report_selector(observer_id)
                 .where(Image.date_id == max_date_id)
                 .order_by(Image.date_id.desc(), Image.time_id.desc())
             )
             rows = session.execute(query).mappings()
-            return [self._to_all(dict(row)) for row in rows]
+            max_date = datetime(year=max_year, month=max_month, day=max_day)
+            return [self._to_all(dict(row)) for row in rows], max_date
 
-    def get_latest_month_data_by(self, observer_id: ObjId) -> Sequence[ObservationReport]:
+    def get_latest_month_data_by(self, observer_id: ObjId) -> tuple[Sequence[ObservationReport], datetime]:
         with get_db_session() as session:
             _, max_date_id = self._get_observer_date_range(session, observer_id)
             if max_date_id is None:
@@ -176,4 +180,5 @@ class SqaReportsService(ReportsService):
                 .order_by(Image.date_id.desc(), Image.time_id.desc())
             )
             rows = session.execute(query).mappings()
-            return [self._to_all(dict(row)) for row in rows]
+            max_date = datetime(year=max_year, month=max_month, day=1)
+            return [self._to_all(dict(row)) for row in rows], max_date
