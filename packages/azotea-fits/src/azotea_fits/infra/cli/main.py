@@ -5,28 +5,30 @@
 # ----------------------------------------------------------------------
 #
 import logging
+from datetime import datetime
 from argparse import ArgumentParser, Namespace
+
+from azotea_cli.common.errors import AzoteaError
+from azotea_cli.common.models import ImageType, BayerPattern
 
 # -------------------
 # Third party imports
 # -------------------
 from lica.cli import execute
-from azotea_cli.common.errors import AzoteaError
-
-from azotea_fits import __version__
-
-
+from lica.validators import vfile, vdir, vdate
 
 # --------------
 # local imports
 # -------------
 
+from azotea_fits import __version__
+from azotea_fits.enums import SwCreator
 
 # ----------------
 # Module constants
 # ----------------
 
-DESCRIPTION = "AZOTEA FITS image preprocessor"
+DESCRIPTION = "AZOTEA FITS image pre-processor"
 
 # -----------------------
 # Module global variables
@@ -46,16 +48,84 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 def add_args(parser: ArgumentParser) -> None:
+    parser.add_argument(
+        "--dir-depth",
+        type=int,
+        default=None,
+        help="Images directory depth, unlimited by default, 0=scan only base directory",
+    )
+    group1 = parser.add_mutually_exclusive_group(required=True)
+    group1.add_argument(
+        "-d",
+        "--images-dir",
+        type=vdir,
+        action="store",
+        metavar="<path>",
+        help="Base directory to edit FITS files",
+    )
+    group1.add_argument(
+        "-f",
+        "--image-file",
+        type=vfile,
+        action="store",
+        metavar="<path>",
+        help="single FITS file path",
+    )
+
+
+    # --------------------------
+    # Create first level parsers
+    # --------------------------
+
+    subparser = parser.add_subparsers(dest="command")
+    parser_edit = subparser.add_parser("edit", help="consent command")
+    parser_creator = subparser.add_parser("creator", help="observer commands")
+
+    # --------------------------------------
+    # Create second level parsers for 'edit'
+    # --------------------------------------
+
+    parser_edit.set_defaults(func=cli_edit)
+    parser_edit.add_argument("--camera", type=str,  default=None, help="Camera model")
+    parser_edit.add_argument(
+        "--comment", type=str, default=None, help="Optional comment keyword to add"
+    )
+    parser_edit.add_argument(
+        "--bayer-pattern", choices=BayerPattern, default=None, help="Bayer pattern layout"
+    )
+    parser_edit.add_argument("--gain", type=float, default=None, help="CMOS detector GAIN settings")
+    parser_edit.add_argument("--bias", type=int, default=None, help="Global Bias for every image")
+    parser_edit.add_argument("--x-pixsize", type=float, default=None, help="Pixel width in um.")
+    parser_edit.add_argument("--y-pixsize", type=float, default=None, help="Pixel height in um.")
+    parser_edit.add_argument("--image-type", choices=ImageType, default=None, help="Image type")
+    parser_edit.add_argument("--diameter", type=float, default=None, help="Optics diameter in mm.")
+    parser_edit.add_argument("--focal-length", type=float, default=None, help="Focal length in mm.")
+    parser_edit.add_argument("--date-obs", type=datetime, default=None, help="Exposure time in sec.")
+    parser_edit.add_argument("--exptime", type=float, default=None, help="Exposure time in sec.")
+
+    # FITS specific editing info
+
+    parser_creator.add_argument(
+        "--swcreator",
+        choices=SwCreator,
+        default=None,
+        action="store",
+        help="Name of software that created the FITS files",
+    )
+    parser_creator.set_defaults(func=cli_sw_creator)
+
+def cli_edit(args: Namespace) -> None:
     pass
 
-
-
+def cli_sw_creator(args: Namespace) -> None:
+    pass
 
 def cli_main(args: Namespace) -> None:
     try:
         args.func(args)
     except AzoteaError as e:
         log.error(e)
+
 
 def main():
     """main entry point specified by pyproject.toml"""

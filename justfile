@@ -90,6 +90,7 @@ exif-sky log="" :
         uv run azotea --console  ${logfile} --trace batch --images-dir images --only-sky --depth 8
 
 exif-all: (anew) (exif-setup) (exif-register) (exif-sky)
+
 # =======================================================================
 
 # --------------------------------
@@ -166,6 +167,116 @@ export-night:
 
 export-unpublished:
      uv run azotool --console --trace sky export --unpublished --csv-dir .
+
+# =====================
+# FITS IMAGE PROCESSING
+# =====================
+
+fits-anew:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    src="images/FITS_copia"
+    dst="images/FITS"
+    cp -fr ${src}/* ${dst}
+
+[private]
+fits-setup dir image:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    AZOTEA_HOME=$(pwd)
+    IMAGES={{dir}}
+    IMAGE={{image}}
+    uv run azotool --console consent view  --agree
+    uv run azotool --console  observer create --default --name Juan --surname "Gómez Pérez" \
+        --affiliation "Agrupación Astronómica de Alcafrán" --acronym AA-ACFN
+    uv run azotool  --console location create --default --site-name Alcafrán --location Alcafrán \
+        --longitude -2.7335649 --latitude 40.4966031 --utc-offset 1
+    uv run azotool --console camera create --default \
+        --from-image ${IMAGES}/${IMAGE}
+    uv run azotool  --console roi create --default --width 500 --height 400 \
+        --from-image ${IMAGES}/${IMAGE}
+    uv run azotool --console configure optics --focal-length 50 --f-number 3.5  # (8)
+    uv run azotool --console configure publishing --username foo --password bar --url http://localhost:8080
+
+[private]
+fits-register dir log:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    log={{log}}
+    dir={{dir}}
+    if [ "${log}" != "" ]; then
+        logfile="--log-file azotea.log"
+    else
+         logfile=""
+    fi
+    uv run azotea --console --verbose ${logfile} batch -i ${dir} --only-load --depth 8
+
+[private]
+fits-sky dir log:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    log={{log}}
+    dir={{dir}}
+    if [ "${log}" != "" ]; then
+        logfile="--log-file azotea.log"
+    else
+         logfile=""
+    fi
+    uv run azotea --console --verbose ${logfile} batch -i ${dir} --only-sky --depth 8
+
+# ================================
+# FITS / SHAPPCAP IMAGE PROCESSING
+# ================================
+
+sharpcap-edit log="" :
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    log={{log}}
+    dir=images/FITS/sharpcap
+    if [ "${log}" != "" ]; then
+        logfile="--log-file azotea.log"
+    else
+        logfile=""
+    fi
+    uv run azofits --console  ${logfile} --images-dir ${dir} edit \
+         --bias 100 --image-type LIGHT
+
+
+sharpcap-setup: (sharpcap-edit) (fits-setup "images/FITS/sharpcap" "Capture_00008.fits")
+
+sharpcap-register log="": (fits-register "images/FITS/sharpcap" log)
+
+sharpcap-sky log="": (fits-sky "images/FITS/sharpcap" log)
+
+sharpcap-all: (anew) (fits-anew) (sharpcap-setup) (sharpcap-register) (sharpcap-sky)
+
+# ===================================
+# FITS / CAPTURAFITS IMAGE PROCESSING
+# ===================================
+
+capturafits-setup: (capturafits-edit) (fits-setup "images/FITS/capturafits" "20220101-180045.10000.fits")
+
+capturafits-register log="": (fits-register "images/FITS/capturafits" log)
+
+capturafits-sky log="": (fits-sky "images/FITS/capturafits" log)
+
+capturafits-edit log="":
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    log={{log}}
+    dir=images/FITS/capturafits
+    if [ "${log}" != "" ]; then
+        logfile="--log-file azotea.log"
+    else
+        logfile=""
+    fi
+    uv run azofits --console  ${logfile} --images-dir ${dir} creator --swcreator capturafits
+    uv run azofits --console  ${logfile} --images-dir ${dir} edit \
+         --camera "ZWO ASI224 MC" --bayer-pattern RGGB  --bias 100 --image-type LIGHT
+
+
+capturafits-all: (anew) (fits-anew) (capturafits-setup) (capturafits-register) (capturafits-sky)
+
 
 [private]
 check_mnt mnt:
