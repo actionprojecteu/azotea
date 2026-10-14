@@ -7,10 +7,12 @@
 [tool.uv.workspace]
 members = [
     "packages/azotea-cli",
+    "packages/azotea-fits",
 ]
 
 [tool.uv.sources]
-azotea-cli = { workspace = true }
+azotea-client = { workspace = true }
+azotea-fits = { workspace = true }
 
 [dependency-groups]
 dev = [

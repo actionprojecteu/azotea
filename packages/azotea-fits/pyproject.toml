@@ -1,0 +1,42 @@
+[project]
+name = "azotea-fits"
+version = "0.1.0"
+description = "FITS files pre-processor for AZOTEA"
+readme = "README.md"
+requires-python = ">=3.12"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Rafael González", email = "rafael08@ucm.es"},
+    {name = "Jaime Zamorano", email ="jzamoran@ucm.es"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+
+dependencies = [
+    "azotea-client",
+    "astropy >= 8.0",
+]
+
+[project.scripts]
+# The azofits program
+azofits = "azotea_fits.infra.cli.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/azotea_fits"]
+
+# -----------
+# Other stuff
+# -----------
+
+[tool.ruff]
+line-length = 100
