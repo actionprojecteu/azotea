@@ -6,7 +6,7 @@ from azotea_cli.provision.ports import (
     ObserverRepo,
 )
 
-from .ports import ExporterService, ReportsService
+from .ports import ExporterService, ReportsService, SummaryService, DisplayService
 
 # -----------------------
 # Module global variables
@@ -94,3 +94,27 @@ class GenerateReportsUseCase:
             self.exporter.export(report_name, data)
         else:
             log.warning("No data to export")
+
+class GenerateSummaryUseCase:
+    def __init__(
+        self,
+        consent: ConsentRepo,
+        observer: ObserverRepo,
+        summarizer: SummaryService,
+        display: DisplayService,
+    ) -> None:
+        self.consent = consent
+        self.observer = observer
+        self.summarizer = summarizer
+        self.display = display
+
+    def show_image_summary(self) -> None:
+        self.consent.check_raises()
+        observer_id = self.observer.get_default()
+        data = self.summarizer.totals_by(observer_id)
+        self.display.show_totals(data)
+
+    def show_sky_summary(self) -> None:
+        self.consent.check_raises()
+        data = self.summarizer.ranged_summary()
+        self.display.show_ranged_summary(data)
