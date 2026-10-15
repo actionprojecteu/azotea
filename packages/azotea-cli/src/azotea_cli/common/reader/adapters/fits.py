@@ -1,5 +1,5 @@
 
-from azotea_cli.common.models import HeaderType
+from azotea_cli.common.types import HeaderType
 
 from ..ports import ImageReader
 

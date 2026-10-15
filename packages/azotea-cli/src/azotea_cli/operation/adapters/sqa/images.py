@@ -13,7 +13,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from azotea_cli.common.models import ObjId
+from azotea_cli.common.types import ObjId
 
 # ---------------
 # Own dependecies

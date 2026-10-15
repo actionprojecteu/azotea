@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from azotea_cli.common.models import HeaderType
+from azotea_cli.common.types import HeaderType
 from azotea_cli.common.rect import Rect
 
 from .models import IntArray2D, ImageMetadata

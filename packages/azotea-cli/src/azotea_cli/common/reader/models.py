@@ -3,7 +3,7 @@ from datetime import datetime
 
 import numpy as np
 
-from azotea_cli.common.models import BayerPattern, ImageType, HeaderType
+from azotea_cli.common.types import BayerPattern, ImageType, HeaderType
 
 # type alias
 type IntArray2D = np.ndarray[tuple[int, int], np.dtype[np.uint16]]

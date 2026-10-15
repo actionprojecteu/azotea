@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 # Own dependecies
 # ---------------
 
-from azotea_cli.common.models import ObjId
+from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import Location, get_db_session
 
 from ...errors import (

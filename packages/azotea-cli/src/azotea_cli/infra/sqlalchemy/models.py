@@ -25,7 +25,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from azotea_cli.common.models import BayerPattern, HeaderType, ImageType, ValidState
+from azotea_cli.common.types import BayerPattern, HeaderType, ImageType, ValidState
 
 # ----------------
 # Own dependencies

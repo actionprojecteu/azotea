@@ -16,7 +16,7 @@ from azotea_cli.common.errors import AzoteaError
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.common.models import ObjId
+from azotea_cli.common.types import ObjId
 from azotea_cli.common.reader import ImageReaderFactory
 from azotea_cli.provision.ports import (
     CameraRepo,

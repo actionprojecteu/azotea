@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from azotea_cli.common.models import ImageType
+from azotea_cli.common.types import ImageType
 
 
 @dataclass(frozen=True)

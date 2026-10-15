@@ -10,7 +10,7 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from azotea_cli.common.models import ObjId
+from azotea_cli.common.types import ObjId
 from azotea_cli.common.reader.models import ImageMetadata
 
 # ---------------

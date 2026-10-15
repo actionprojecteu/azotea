@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Protocol
 
 from astropy.io.fits import Header
-from azotea_cli.common.models import BayerPattern, ImageType
+from azotea_cli.common.types import BayerPattern, ImageType
 
 
 class MetadataFix(Protocol):

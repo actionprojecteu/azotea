@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from azotea_cli.common.models import BayerPattern, HeaderType
+from azotea_cli.common.types import BayerPattern, HeaderType
 
 
 @dataclass(frozen=True)

@@ -2,7 +2,7 @@ from typing import Protocol
 from collections.abc import Sequence
 
 from .models import ImageForm, SkyStatsForm
-from azotea_cli.common.models import ObjId
+from azotea_cli.common.types import ObjId
 
 class ImagesRepo(Protocol):
     def get_stored_image_paths(self) -> Sequence[str]: ...

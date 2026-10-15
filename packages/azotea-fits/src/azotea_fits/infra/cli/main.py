@@ -8,7 +8,7 @@ import logging
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
 
-from azotea_cli.common.models import BayerPattern, ImageType
+from azotea_cli.common.types import BayerPattern, ImageType
 
 # -------------------
 # Third party imports

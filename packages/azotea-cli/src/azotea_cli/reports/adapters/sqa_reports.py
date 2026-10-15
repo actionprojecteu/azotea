@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 # Own dependecies
 # ---------------
 from azotea_cli import __version__
-from azotea_cli.common.models import ObjId
+from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import (
     Camera,
     Date,

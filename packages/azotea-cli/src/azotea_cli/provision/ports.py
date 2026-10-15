@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from azotea_cli.common.models import ObjId
+from azotea_cli.common.types import ObjId
 from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.common.rect import Rect
 

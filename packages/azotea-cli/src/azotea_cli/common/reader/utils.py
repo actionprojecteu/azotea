@@ -1,7 +1,7 @@
 import os
 import re
 
-from azotea_cli.common.models import ImageType
+from azotea_cli.common.types import ImageType
 
 
 def mk_test_img_type(regexp: re.Pattern[str]):

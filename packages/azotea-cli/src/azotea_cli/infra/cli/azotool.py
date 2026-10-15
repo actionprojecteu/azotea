@@ -19,7 +19,7 @@ from lica.validators import vdate, vfile
 
 from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
-from azotea_cli.common.models import BayerPattern, HeaderType
+from azotea_cli.common.types import BayerPattern, HeaderType
 from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 from azotea_cli.common.display.adapters import StdoutDisplay
 

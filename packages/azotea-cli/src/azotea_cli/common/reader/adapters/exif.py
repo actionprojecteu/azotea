@@ -9,7 +9,7 @@ import numpy as np
 import rawpy
 from rawpy._rawpy import RawPy
 
-from azotea_cli.common.models import BayerIndex, BayerPattern, HeaderType
+from azotea_cli.common.types import BayerIndex, BayerPattern, HeaderType
 from azotea_cli.common.rect import Point, Rect
 
 from ..errors import (
