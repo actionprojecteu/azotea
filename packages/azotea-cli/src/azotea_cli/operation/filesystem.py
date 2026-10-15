@@ -1,6 +1,7 @@
 import hashlib
 import os
 from pathlib import Path
+from collections.abc import Iterable
 
 
 def scan_non_empty_dirs(root_dir: str, depth: int | None = None):
@@ -17,7 +18,7 @@ def scan_non_empty_dirs(root_dir: str, depth: int | None = None):
 def scan_images(
     root_dir: str,
     depth: int,
-    extension: str,
+    extensions: Iterable[str],
 ) -> list[str]:
     """
     Return absolute paths of images below root_dir, up to depth levels.
@@ -26,7 +27,7 @@ def scan_images(
     """
     root = Path(root_dir).resolve()
     root_depth = len(root.parts)
-    extensions = (extension.lower(),)
+    extensions = tuple(ext.lower() for ext in extensions)
     images = list()
 
     for dir_path, _dir_names, file_names in os.walk(root):

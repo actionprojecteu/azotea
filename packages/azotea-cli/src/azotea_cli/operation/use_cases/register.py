@@ -95,7 +95,7 @@ class RegisterImagesUseCase:
         self.location_id = self.location.get_default()
         self.observer_id = self.observer.get_default()
         extension = self.camera.get_extension_by_id(self.camera_id)
-        input_files = scan_images(form.images_dir, form.depth, extension)
+        input_files = scan_images(form.images_dir, form.depth, (extension,))
         stored_files = self.images.get_stored_image_paths()
         new_files = list(set(input_files) - set(stored_files))
         n_selected = len(new_files)
