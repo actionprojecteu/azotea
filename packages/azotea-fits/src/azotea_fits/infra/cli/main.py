@@ -6,7 +6,6 @@
 #
 import logging
 from argparse import ArgumentParser, Namespace
-from datetime import datetime
 
 from azotea_cli.common.types import BayerPattern, ImageType
 
@@ -22,6 +21,7 @@ from lica.validators import vdate, vdir, vfile
 from azotea_fits import __version__
 from azotea_fits.enums import SwCreator
 from azotea_fits.errors import FitsError
+from azotea_fits.adapters.factory import EditorFactoryImpl
 
 # ----------------
 # Module constants
@@ -99,7 +99,7 @@ def add_args(parser: ArgumentParser) -> None:
     parser_edit.add_argument("--diameter", type=float, default=None, help="Optics diameter in mm.")
     parser_edit.add_argument("--focal-length", type=float, default=None, help="Focal length in mm.")
     parser_edit.add_argument(
-        "--date-obs", type=datetime, default=None, help="Exposure time in sec."
+        "--date-obs", type=vdate, default=None, metavar="<YYYY-MM-DDTHH:MM:SS>", help="UTC Observation date."
     )
     parser_edit.add_argument("--exptime", type=float, default=None, help="Exposure time in sec.")
 
@@ -116,7 +116,7 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_edit(args: Namespace) -> None:
-    pass
+    factory = EditorFactoryImpl()
 
 
 def cli_sw_creator(args: Namespace) -> None:

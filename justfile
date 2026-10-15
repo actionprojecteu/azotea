@@ -209,7 +209,7 @@ fits-register dir log:
     else
          logfile=""
     fi
-    uv run azotea --console --verbose ${logfile} batch -i ${dir} --only-load --depth 8
+    uv run azotea --console --trace --verbose ${logfile} batch -i ${dir} --only-load --depth 8
 
 [private]
 fits-sky dir log:
@@ -222,7 +222,7 @@ fits-sky dir log:
     else
          logfile=""
     fi
-    uv run azotea --console --verbose ${logfile} batch -i ${dir} --only-sky --depth 8
+    uv run azotea --console --trace --verbose ${logfile} batch -i ${dir} --only-sky --depth 8
 
 # ================================
 # FITS / SHAPPCAP IMAGE PROCESSING
@@ -238,7 +238,7 @@ sharpcap-edit log="" :
     else
         logfile=""
     fi
-    uv run azofits --console  ${logfile} --images-dir ${dir} edit \
+    uv run azofits --console --trace ${logfile} --images-dir ${dir} edit \
          --bias 100 --image-type LIGHT
 
 
@@ -270,8 +270,8 @@ capturafits-edit log="":
     else
         logfile=""
     fi
-    uv run azofits --console  ${logfile} --images-dir ${dir} creator --swcreator capturafits
-    uv run azofits --console  ${logfile} --images-dir ${dir} edit \
+    uv run azofits --console --trace ${logfile} --images-dir ${dir} creator --swcreator capturafits
+    uv run azofits --console --trace ${logfile} --images-dir ${dir} edit \
          --camera "ZWO ASI224 MC" --bayer-pattern RGGB  --bias 100 --image-type LIGHT
 
 

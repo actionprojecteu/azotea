@@ -1,8 +1,5 @@
-from azotea_cli.common.errors import AzoteaError
-
-
-class FitsError(AzoteaError):
-    """Generic FITS error"""
+class FitsError(Exception):
+    """FITS error"""
 
     pass
 
