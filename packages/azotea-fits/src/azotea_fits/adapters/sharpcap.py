@@ -114,7 +114,8 @@ class SharpCapMetadataFix(GenericMetadataFix):
         new_keyw_y = "XBAYROFF"
         value_x = header.get(old_keyw_x)
         value_y = header.get(old_keyw_x)
-        if all([value_x is not None, value_y is not None]):
+        first_time = all([value_x is not None, value_y is not None])
+        if first_time:
             del header[old_keyw_x]
             del header[old_keyw_y]
             header[new_keyw_x] = value_x
@@ -123,7 +124,7 @@ class SharpCapMetadataFix(GenericMetadataFix):
             log.info(msg)
             history.append(msg)
         bayer_pat = header.get(BAYERPAT)
-        if bayer_pat is not None:
+        if bayer_pat is not None and first_time:
             bayer_pat_new = str(bayer_pat[2:4]) + str(bayer_pat[0:2])
             msg = f"flipped prev BAYERPAT & COLORTYP from {bayer_pat} to {bayer_pat_new}"
             header[BAYERPAT] = bayer_pat_new

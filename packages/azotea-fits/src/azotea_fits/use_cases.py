@@ -7,11 +7,17 @@ from .models import FitsForm, ScanForm, EXTENSIONS
 from .ports import EditorFactory
 
 
+# get the root logger
+log = logging.getLogger(__name__.split(".")[-1])
+
+
+
 def edit_fits_file(path: str, form: FitsForm, factory: EditorFactory) -> None:
     editor = factory.get_editor(path)
     with fits.open(path, mode='update') as hdul:
         header = hdul[0].header
         history = list()
+        log.info("-" * 57)
         editor.fix.camera(header, history)
         editor.fix.gain(header, history)
         editor.fix.xpixsize(header, history)
