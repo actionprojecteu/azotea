@@ -1,11 +1,18 @@
 from collections.abc import MutableSequence, Sequence
-
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol
-from dataclasses import dataclass
 
 from astropy.io.fits import Header
 from azotea_cli.common.types import BayerPattern, ImageType
+
+from .models import FitsKeyword
+
+
+class MetadataLookup(Protocol):
+    """lookup selected keyword values"""
+
+    def keywords(self, header: Header) -> Sequence[FitsKeyword]: ...
 
 
 class MetadataFix(Protocol):
@@ -116,10 +123,11 @@ class MetadataInsert(Protocol):
     def add_history(self, header: Header, history: Sequence[str]) -> None: ...
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Editor:
     fix: MetadataFix
     edit: MetadataInsert
+    read: MetadataLookup
 
 
 class EditorFactory(Protocol):

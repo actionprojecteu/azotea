@@ -1,6 +1,7 @@
 import logging
 import os
 from collections.abc import MutableSequence, Sequence
+from dataclasses import fields
 from datetime import datetime
 from typing import Any
 
@@ -22,7 +23,8 @@ from azotea_cli.common.reader.adapters.fits import (
 )
 from azotea_cli.common.types import BayerPattern, ImageType
 
-from ..ports import MetadataFix, MetadataInsert
+from ..models import SWCREATOR, FitsData, FitsKeyword
+from ..ports import MetadataFix, MetadataInsert, MetadataLookup
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
@@ -44,9 +46,9 @@ def edit_keyword(
         log.info("%s: %s", name, msg)
         header[keyword] = value
         if comment:
-             header[keyword] = (value, comment)
+            header[keyword] = (value, comment)
         else:
-             header[keyword] = value
+            header[keyword] = value
     return msg
 
 
@@ -221,3 +223,23 @@ class GenericMetadataInsert(MetadataInsert):
         for item in history:
             if item is not None:
                 header["HISTORY"] = item
+
+
+class GenericMetadataLookup(MetadataLookup):
+
+    def keywords(self, header: Header) -> Sequence[FitsKeyword]:
+        data = FitsData(
+            camera=str(header.get(INSTRUME)),
+            bayer_pattern=str(header.get(BAYERPAT)),
+            gain=str(header.get(LOG_GAIN)),
+            bias=str(header.get(PEDESTAL)),
+            x_pixsize=str(header.get(XPIXSIZE)),
+            y_pixsize=str(header.get(YPIXSIZE)),
+            image_type=str(header.get(IMAGETYP)),
+            diameter=str(header.get(APTDIA)),
+            focal_length=str(header.get(FOCALLEN)),
+            date_obs=str(header.get(DATE_OBS)),
+            exptime=str(header.get(EXPTIME)),
+            swcreator=str(header.get(SWCREATOR)),
+        )
+        return tuple((f.name, f.metadata["fits"], getattr(data, f.name)) for f in fields(data))

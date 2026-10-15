@@ -10,6 +10,7 @@ from argparse import ArgumentParser, Namespace
 # --------------
 # local imports
 # -------------
+from azotea_cli.common.display.adapters.std_display import StdoutDisplay
 from azotea_cli.common.types import BayerPattern, ImageType
 
 # -------------------
@@ -18,13 +19,17 @@ from azotea_cli.common.types import BayerPattern, ImageType
 from lica.cli import execute
 from lica.validators import vdate, vdir, vfile
 
-#
 from azotea_fits import __version__
 from azotea_fits.adapters.factory import EditorFactoryImpl
 from azotea_fits.enums import SwCreator
 from azotea_fits.errors import AzoteaFitsError
 from azotea_fits.models import FitsForm, ScanForm
-from azotea_fits.use_cases import edit_fits_file, edit_fits_files
+from azotea_fits.use_cases import (
+    edit_fits_file,
+    edit_fits_files,
+    show_file_metadata,
+    show_files_metadata,
+)
 
 # ----------------
 # Module constants
@@ -79,14 +84,17 @@ def add_args(parser: ArgumentParser) -> None:
     # --------------------------
 
     subparser = parser.add_subparsers(dest="command")
-    parser_edit = subparser.add_parser("edit", help="consent command")
-    parser_creator = subparser.add_parser("creator", help="observer commands")
+    parser_edit = subparser.add_parser("edit", help="edit command")
+    parser_edit.set_defaults(func=cli_edit)
+    parser_creator = subparser.add_parser("creator", help="sw creator commands")
+    parser_creator.set_defaults(func=cli_sw_creator)
+    parser_view = subparser.add_parser("view", help="view metadata command")
+    parser_view.set_defaults(func=cli_view)
 
     # --------------------------------------
     # Create second level parsers for 'edit'
     # --------------------------------------
 
-    parser_edit.set_defaults(func=cli_edit)
     parser_edit.add_argument("--camera", type=str, default=None, help="Camera model")
     parser_edit.add_argument(
         "--comment", type=str, default=None, help="Optional comment keyword to add"
@@ -111,15 +119,13 @@ def add_args(parser: ArgumentParser) -> None:
     parser_edit.add_argument("--exptime", type=float, default=None, help="Exposure time in sec.")
 
     # FITS specific editing info
-
     parser_creator.add_argument(
-        "--swcreator",
+        "--set",
         choices=SwCreator,
         default=None,
         action="store",
-        help="Name of software that created the FITS files",
+        help="Set the name of software that created the FITS files",
     )
-    parser_creator.set_defaults(func=cli_sw_creator)
 
 
 def cli_edit(args: Namespace) -> None:
@@ -146,6 +152,16 @@ def cli_edit(args: Namespace) -> None:
 
 def cli_sw_creator(args: Namespace) -> None:
     pass
+
+
+def cli_view(args: Namespace) -> None:
+    factory = EditorFactoryImpl()
+    display = StdoutDisplay()
+    if args.images_dir:
+        scan = ScanForm(images_dir=args.images_dir, depth=args.dir_depth)
+        show_files_metadata(scan, factory, display)
+    else:
+        show_file_metadata(args.image_file, factory, display)
 
 
 def cli_main(args: Namespace) -> None:

@@ -5,17 +5,10 @@ from collections.abc import MutableSequence
 
 from astropy.io.fits import Header
 from azotea_cli.common.reader.adapters.fits import (
-    APTDIA,
     BAYERPAT,
-    COMMENT,
     DATE_OBS,
-    EXPTIME,
-    FOCALLEN,
-    HISTORY,
-    IMAGETYP,
     INSTRUME,
     LOG_GAIN,
-    PEDESTAL,
     XPIXSIZE,
     YPIXSIZE,
 )
@@ -82,9 +75,9 @@ class SharpCapMetadataFix(GenericMetadataFix):
     def xpixsize(self, header: Header, history: MutableSequence[str | None]) -> None:
         keyword = XPIXSIZE
         log.debug("fixing %s", keyword)
-        oldpixsz: float = header.get(keyword)
+        oldpixsz = header.get(keyword)
         if oldpixsz is not None:
-            pixsz = round(oldpixsz, 2)
+            pixsz = round(float(oldpixsz), 2)
             if oldpixsz != pixsz:
                 header[keyword] = pixsz
                 header.comments[keyword] = "[um]"
@@ -118,7 +111,7 @@ class SharpCapMetadataFix(GenericMetadataFix):
             del header[old_keyw_y]
             header[new_keyw_x] = value_x
             header[new_keyw_y] = value_y
-            msg = f"subst. {old_keyw_x}->{new_keyw_x} , {old_keyw_y}->{new_keyw_y}"
+            msg = f"subst. {old_keyw_x}->{new_keyw_x}, {old_keyw_y}->{new_keyw_y}"
             log.info(msg)
             history.append(msg)
         bayer_pat = header.get(BAYERPAT)

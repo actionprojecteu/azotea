@@ -3,6 +3,8 @@ import logging
 from astropy.io import fits
 
 from azotea_cli.common.filesystem import scan_images
+from azotea_cli.common.display.ports import DisplayService
+
 from .models import FitsForm, ScanForm, EXTENSIONS
 from .ports import EditorFactory
 
@@ -10,6 +12,20 @@ from .ports import EditorFactory
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
+def show_file_metadata(path: str,  factory: EditorFactory, display: DisplayService) -> None:
+    editor = factory.get_editor(path)
+    with fits.open(path) as hdul:
+        data = editor.read.keywords(hdul[0].header)
+        display.show_tabular(data, keys=("Field","Keyword","Value"))
+
+def show_files_metadata(scan: ScanForm,  factory: EditorFactory, display: DisplayService) -> None:
+    paths = scan_images(scan.images_dir, scan.depth, EXTENSIONS)
+    for path in paths:
+        show_file_metadata(path, factory, display)
+
+
+def set_software_creator(path: str, name: str, factory: EditorFactory) -> None:
+    pass
 
 
 def edit_fits_file(path: str, form: FitsForm, factory: EditorFactory) -> None:

@@ -224,6 +224,19 @@ fits-sky dir log:
     fi
     uv run azotea --console --trace --verbose ${logfile} batch -i ${dir} --only-sky --depth 8
 
+[private]
+fits-view dir log="":
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    log={{log}}
+    dir={{dir}}
+    if [ "${log}" != "" ]; then
+        logfile="--log-file azotea.log"
+    else
+         logfile=""
+    fi
+    uv run azofits --console --trace ${logfile} --images-dir ${dir} view
+
 # ================================
 # FITS / SHAPPCAP IMAGE PROCESSING
 # ================================
@@ -250,6 +263,8 @@ sharpcap-sky log="": (fits-sky "images/FITS/sharpcap" log)
 
 sharpcap-all: (anew) (fits-anew) (sharpcap-setup) (sharpcap-register) (sharpcap-sky)
 
+sharpcap-view log="": (fits-view "images/FITS/sharpcap" log)
+
 # ===================================
 # FITS / CAPTURAFITS IMAGE PROCESSING
 # ===================================
@@ -259,6 +274,8 @@ capturafits-setup: (capturafits-edit) (fits-setup "images/FITS/capturafits" "202
 capturafits-register log="": (fits-register "images/FITS/capturafits" log)
 
 capturafits-sky log="": (fits-sky "images/FITS/capturafits" log)
+
+capturafits-view log="": (fits-view "images/FITS/capturafits" log)
 
 capturafits-edit log="":
     #!/usr/bin/env bash
@@ -270,7 +287,7 @@ capturafits-edit log="":
     else
         logfile=""
     fi
-    uv run azofits --console --trace ${logfile} --images-dir ${dir} creator --swcreator capturafits
+    uv run azofits --console --trace ${logfile} --images-dir ${dir} creator --set capturafits
     uv run azofits --console --trace ${logfile} --images-dir ${dir} edit \
          --camera "ZWO ASI224 MC" --bayer-pattern RGGB  --bias 100 --image-type LIGHT
 

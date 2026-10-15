@@ -1,10 +1,32 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
+from azotea_cli.common.reader.adapters.fits import (
+    APTDIA,
+    BAYERPAT,
+    DATE_OBS,
+    EXPTIME,
+    FOCALLEN,
+    IMAGETYP,
+    INSTRUME,
+    LOG_GAIN,
+    PEDESTAL,
+    XPIXSIZE,
+    YPIXSIZE,
+)
 from azotea_cli.common.types import BayerPattern, ImageType
 
+from .enums import SwCreator
+
 SWCREATOR = "SWCREATE"
-EXTENSIONS = (".fit", ".fits", ".fts") # case-insensitive
+EXTENSIONS = (".fit", ".fits", ".fts")  # case-insensitive
+
+
+@dataclass(frozen=True)
+class ScanForm:
+    images_dir: str
+    depth: int
+
 
 @dataclass(frozen=True)
 class FitsForm:
@@ -20,7 +42,20 @@ class FitsForm:
     date_obs: datetime | None
     exptime: float | None
 
+
+FitsKeyword = tuple[str, str, str]  # (dataclass_field below, FITS keyword, value)
+
 @dataclass(frozen=True)
-class ScanForm:
-    images_dir: str
-    depth: int
+class FitsData:
+    camera: str = field(metadata={"fits": INSTRUME})
+    bayer_pattern: str = field(metadata={"fits": BAYERPAT})
+    gain: str = field(metadata={"fits": LOG_GAIN})
+    bias: str = field(metadata={"fits": PEDESTAL})
+    x_pixsize: str = field(metadata={"fits": XPIXSIZE})
+    y_pixsize: str = field(metadata={"fits": YPIXSIZE})
+    image_type: str = field(metadata={"fits": IMAGETYP})
+    diameter: str = field(metadata={"fits": APTDIA})
+    focal_length: str = field(metadata={"fits": FOCALLEN})
+    date_obs: str = field(metadata={"fits": DATE_OBS})
+    exptime: str = field(metadata={"fits": EXPTIME})
+    swcreator: str = field(metadata={"fits": SWCREATOR})

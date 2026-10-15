@@ -6,7 +6,7 @@ from ..enums import SwCreator
 from ..models import SWCREATOR
 from ..ports import Editor, EditorFactory
 from .capturafits import CapturaFitsMetadataFix, CapturaFitsMetadataInsert
-from .generic import GenericMetadataFix, GenericMetadataInsert
+from .generic import GenericMetadataFix, GenericMetadataInsert, GenericMetadataLookup
 from .sharpcap import SharpCapMetadataFix, SharpCapMetadataInsert
 
 # -----------------------
@@ -26,13 +26,25 @@ class EditorFactoryImpl(EditorFactory):
                 swcreator = SwCreator(swcreator.lower())
             except Exception:
                 log.warning("Creating the generic FITS editor")
-                return Editor(fix=GenericMetadataFix(path), edit=GenericMetadataInsert(path))
+                return Editor(
+                    fix=GenericMetadataFix(path),
+                    edit=GenericMetadataInsert(path),
+                    read=GenericMetadataLookup(),
+                )
             else:
                 if swcreator == SwCreator.SHARPCAP:
                     log.info("Creating the %s FITS editor", str(swcreator))
-                    return Editor(fix=SharpCapMetadataFix(path), edit=SharpCapMetadataInsert(path))
+                    return Editor(
+                        fix=SharpCapMetadataFix(path),
+                        edit=SharpCapMetadataInsert(path),
+                        read=GenericMetadataLookup(),
+                    )
                 elif swcreator == SwCreator.CAPTURAFITS:
                     log.info("Creating the %s FITS editor", str(swcreator))
-                    return Editor(fix=CapturaFitsMetadataFix(path), edit=CapturaFitsMetadataInsert(path))
+                    return Editor(
+                        fix=CapturaFitsMetadataFix(path),
+                        edit=CapturaFitsMetadataInsert(path),
+                        read=GenericMetadataLookup(),
+                    )
                 else:
                     raise NotImplementedError("missing FITS editor")
