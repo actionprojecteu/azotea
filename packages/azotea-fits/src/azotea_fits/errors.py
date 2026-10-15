@@ -7,3 +7,7 @@ class FitsError(Exception):
 class UnknownSoftwareCreatorError(FitsError):
     """Unknown FITS software creator"""
     pass
+
+class MissingFitsFileError(FitsError):
+    """Unknown FITS software creator"""
+    pass

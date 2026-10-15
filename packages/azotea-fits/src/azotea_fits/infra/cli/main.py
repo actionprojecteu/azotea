@@ -7,6 +7,9 @@
 import logging
 from argparse import ArgumentParser, Namespace
 
+# --------------
+# local imports
+# -------------
 from azotea_cli.common.types import BayerPattern, ImageType
 
 # -------------------
@@ -15,13 +18,13 @@ from azotea_cli.common.types import BayerPattern, ImageType
 from lica.cli import execute
 from lica.validators import vdate, vdir, vfile
 
-# --------------
-# local imports
-# -------------
+#
 from azotea_fits import __version__
+from azotea_fits.adapters.factory import EditorFactoryImpl
 from azotea_fits.enums import SwCreator
 from azotea_fits.errors import FitsError
-from azotea_fits.adapters.factory import EditorFactoryImpl
+from azotea_fits.models import FitsForm, ScanForm
+from azotea_fits.use_cases import edit_fits_file, edit_fits_files
 
 # ----------------
 # Module constants
@@ -50,8 +53,8 @@ def add_args(parser: ArgumentParser) -> None:
     parser.add_argument(
         "--dir-depth",
         type=int,
-        default=None,
-        help="Images directory depth, unlimited by default, 0=scan only base directory",
+        default=8,
+        help="Images directory depth, 8 by default, 0=scan only base directory",
     )
     group1 = parser.add_mutually_exclusive_group(required=True)
     group1.add_argument(
@@ -99,7 +102,11 @@ def add_args(parser: ArgumentParser) -> None:
     parser_edit.add_argument("--diameter", type=float, default=None, help="Optics diameter in mm.")
     parser_edit.add_argument("--focal-length", type=float, default=None, help="Focal length in mm.")
     parser_edit.add_argument(
-        "--date-obs", type=vdate, default=None, metavar="<YYYY-MM-DDTHH:MM:SS>", help="UTC Observation date."
+        "--date-obs",
+        type=vdate,
+        default=None,
+        metavar="<YYYY-MM-DDTHH:MM:SS>",
+        help="UTC Observation date.",
     )
     parser_edit.add_argument("--exptime", type=float, default=None, help="Exposure time in sec.")
 
@@ -117,6 +124,24 @@ def add_args(parser: ArgumentParser) -> None:
 
 def cli_edit(args: Namespace) -> None:
     factory = EditorFactoryImpl()
+    form = FitsForm(
+        camera=args.camera,
+        bayer_pattern=args.bayer_pattern,
+        gain=args.gain,
+        bias=args.bias,
+        x_pixsize=args.x_pixsize,
+        y_pixsize=args.y_pixsize,
+        image_type=args.image_type,
+        diameter=args.diameter,
+        focal_length=args.focal_length,
+        date_obs=args.date_obs,
+        exptime=args.exptime,
+    )
+    if args.images_dir:
+        scan = ScanForm(images_dir=args.images_dir, depth=args.dir_depth)
+        edit_fits_files(scan, form, factory)
+    else:
+        edit_fits_file(args.image_file, form, factory)
 
 
 def cli_sw_creator(args: Namespace) -> None:

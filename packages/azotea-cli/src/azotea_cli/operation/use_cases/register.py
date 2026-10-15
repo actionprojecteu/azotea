@@ -23,8 +23,8 @@ from azotea_cli.provision.ports import (
     OpticsRepo,
 )
 
+from azotea_cli.common.filesystem import hash_func, scan_images
 from azotea_cli.operation.errors import CameraNotDefaultError, MissingTimestampError
-from azotea_cli.operation.filesystem import hash_func, scan_images
 from azotea_cli.operation.ports import ImagesRepo
 from azotea_cli.operation.models import ImageForm, RegisterForm
 

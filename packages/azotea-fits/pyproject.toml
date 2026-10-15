@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 license-files = ["LICENSE"]
 authors = [
     {name = "Rafael González", email = "rafael08@ucm.es"},
-    {name = "Jaime Zamorano", email ="jzamoran@ucm.es"}
+    {name = "Jaime Zamorano", email = "jzamoran@ucm.es"}
 ]
 classifiers = [
     "Programming Language :: Python :: 3.12",

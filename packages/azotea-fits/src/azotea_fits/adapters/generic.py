@@ -1,4 +1,5 @@
 import logging
+import os
 from collections.abc import MutableSequence, Sequence
 from datetime import datetime
 from typing import Any
@@ -15,8 +16,6 @@ from azotea_cli.common.reader.adapters.fits import (
     IMAGETYP,
     INSTRUME,
     LOG_GAIN,
-    NAXIS1,
-    NAXIS2,
     PEDESTAL,
     XPIXSIZE,
     YPIXSIZE,
@@ -30,7 +29,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 def edit_keyword(
-    header: Header, keyword: str, value: Any | None, comment: str | None
+    header: Header, keyword: str, value: Any | None, comment: str | None, name: str
 ) -> str | None:
     msg = None
     if value is None:
@@ -39,9 +38,10 @@ def edit_keyword(
     if old_value is None:
         header[keyword] = value
         msg = f"added {keyword} keyword"
-        log.info(msg)
+        log.info("%s: %s", name, msg)
     elif old_value != value:
         msg = f"{keyword}: {old_value} => {value} by azofits"
+        log.info("%s: %s", name, msg)
         header[keyword] = value
         if comment:
             header.comments[keyword] = comment
@@ -50,6 +50,9 @@ def edit_keyword(
 
 class GenericMetadataFix(MetadataFix):
     """Review and edit existing keyword values in-place"""
+
+    def __init__(self, path: str) -> None:
+        self.name = os.path.basename(path)
 
     def camera(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place camera model editing. Changes are annotated in the history mutable sequence"""
@@ -60,7 +63,7 @@ class GenericMetadataFix(MetadataFix):
         pass
 
     def xpixsize(self, header: Header, history: MutableSequence[str | None]) -> None:
-        """In place 'x' pixel sizeediting. Changes are annotated in the history mutable sequence"""
+        """In place 'x' pixel size editing. Changes are annotated in the history mutable sequence"""
         pass
 
     def ypixsize(self, header: Header, history: MutableSequence[str | None]) -> None:
@@ -103,13 +106,16 @@ class GenericMetadataFix(MetadataFix):
 
 
 class GenericMetadataInsert(MetadataInsert):
+    def __init__(self, path: str) -> None:
+        self.name = os.path.basename(path)
+
     def camera(
         self,
         header: Header,
         value: str | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, INSTRUME, value, "Camera model")
+        h = edit_keyword(header, INSTRUME, value, "Camera model", self.name)
         history.append(h)
 
     def gain(
@@ -118,7 +124,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: float | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, LOG_GAIN, value, "amplifer gain, log scale")
+        h = edit_keyword(header, LOG_GAIN, value, "amplifer gain, log scale", self.name)
         history.append(h)
 
     def xpixsize(
@@ -127,7 +133,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: float | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, XPIXSIZE, value, "[um]")
+        h = edit_keyword(header, XPIXSIZE, value, "[um]", self.name)
         history.append(h)
 
     def ypixsize(
@@ -136,7 +142,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: float | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, YPIXSIZE, value, "[um]")
+        h = edit_keyword(header, YPIXSIZE, value, "[um]", self.name)
         history.append(h)
 
     def bayer(
@@ -145,7 +151,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: BayerPattern | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, BAYERPAT, value, "bayer pattern")
+        h = edit_keyword(header, BAYERPAT, value, "bayer pattern", self.name)
         history.append(h)
 
     def bias(
@@ -154,7 +160,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: int | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, PEDESTAL, value, "overall bias")
+        h = edit_keyword(header, PEDESTAL, value, "overall bias", self.name)
         history.append(h)
 
     def image_type(
@@ -163,7 +169,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: ImageType | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, IMAGETYP, value, None)
+        h = edit_keyword(header, IMAGETYP, value, None, self.name)
         history.append(h)
 
     def diameter(
@@ -172,7 +178,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: float | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, APTDIA, value, "[mm]")
+        h = edit_keyword(header, APTDIA, value, "[mm]", self.name)
         history.append(h)
 
     def focal_length(
@@ -181,7 +187,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: float | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, FOCALLEN, value, "[mm]")
+        h = edit_keyword(header, FOCALLEN, value, "[mm]", self.name)
         history.append(h)
 
     def exptime(
@@ -190,7 +196,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: float | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, EXPTIME, value, "[s]")
+        h = edit_keyword(header, EXPTIME, value, "[s]", self.name)
         history.append(h)
 
     def date_obs(
@@ -199,7 +205,7 @@ class GenericMetadataInsert(MetadataInsert):
         value: datetime | None,
         history: MutableSequence[str | None],
     ) -> None:
-        h = edit_keyword(header, DATE_OBS, value, "[UTC]")
+        h = edit_keyword(header, DATE_OBS, value, "[UTC]", self.name)
         history.append(h)
 
     def comment(self, header: Header, value: str | None) -> None:

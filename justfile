@@ -196,7 +196,7 @@ fits-setup dir image:
     uv run azotool  --console roi create --default --width 500 --height 400 \
         --from-image ${IMAGES}/${IMAGE}
     uv run azotool --console configure optics --focal-length 50 --f-number 3.5  # (8)
-    uv run azotool --console configure publishing --username foo --password bar --url http://localhost:8080
+    #uv run azotool --console configure publishing --username foo --password bar --url http://localhost:8080
 
 [private]
 fits-register dir log:

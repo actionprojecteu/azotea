@@ -1,13 +1,12 @@
-
 from collections.abc import MutableSequence, Sequence
-from dataclasses import dataclass
+
 from datetime import datetime
-from typing import Any, Protocol
+from typing import Protocol
+from dataclasses import dataclass
 
 from astropy.io.fits import Header
 from azotea_cli.common.types import BayerPattern, ImageType
 
-SWCREATOR = "SWCREATE"
 
 class MetadataFix(Protocol):
     """Review and edit existing keyword values in-place"""
@@ -124,4 +123,4 @@ class Editor:
 
 
 class EditorFactory(Protocol):
-    def build_editor(self, path: str) -> Editor: ...
+    def get_editor(self, path: str) -> Editor: ...
