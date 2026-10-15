@@ -4,7 +4,6 @@ import re
 from collections.abc import MutableSequence
 
 from astropy.io.fits import Header
-
 from azotea_cli.common.reader.adapters.fits import (
     APTDIA,
     BAYERPAT,
@@ -59,53 +58,52 @@ class SharpCapMetadataFix(GenericMetadataFix):
         return None
 
     def camera(self, header: Header, history: MutableSequence[str | None]) -> None:
-         """In place camera model editing. Changes are annotated in the history mutable sequence"""
-         log.debug("fixing %s", INSTRUME)
-         if header.get(INSTRUME) is None:
-             camera = self._parse_camera()
-             if camera is not None:
-                 header[INSTRUME] = camera
-                 msg = f"added {INSTRUME} keyword"
-                 log.info("%s: %s", self.name, msg)
-                 history.append(msg)
-
+        """In place camera model editing. Changes are annotated in the history mutable sequence"""
+        log.debug("fixing %s", INSTRUME)
+        if header.get(INSTRUME) is None:
+            camera = self._parse_camera()
+            if camera is not None:
+                header[INSTRUME] = camera
+                msg = f"added {INSTRUME} keyword"
+                log.info("%s: %s", self.name, msg)
+                history.append(msg)
 
     def gain(self, header: Header, history: MutableSequence[str | None]) -> None:
-         """In place CMOS gain editing. Changes are annotated in the history mutable sequence"""
-         log.debug("fixing %s", LOG_GAIN)
-         if header.get(LOG_GAIN) is None:
-             camera = self._parse_gain()
-             if camera is not None:
-                 header[LOG_GAIN] = camera
-                 msg = f"added {LOG_GAIN} keyword"
-                 log.info("%s: %s", self.name, msg)
-                 history.append(msg)
+        """In place CMOS gain editing. Changes are annotated in the history mutable sequence"""
+        log.debug("fixing %s", LOG_GAIN)
+        if header.get(LOG_GAIN) is None:
+            camera = self._parse_gain()
+            if camera is not None:
+                header[LOG_GAIN] = camera
+                msg = f"added {LOG_GAIN} keyword"
+                log.info("%s: %s", self.name, msg)
+                history.append(msg)
 
     def xpixsize(self, header: Header, history: MutableSequence[str | None]) -> None:
-        keyword =XPIXSIZE
+        keyword = XPIXSIZE
         log.debug("fixing %s", keyword)
         oldpixsz: float = header.get(keyword)
         if oldpixsz is not None:
-             pixsz = round(oldpixsz, 2)
-             if oldpixsz != pixsz:
-                 header[keyword] = pixsz
-                 header.comments[keyword] = "[mm]"
-                 msg = f"{keyword} rounded to 2 decimals"
-                 history.append(msg)
-                 log.info("%s: %s",self.name, msg)
+            pixsz = round(oldpixsz, 2)
+            if oldpixsz != pixsz:
+                header[keyword] = pixsz
+                header.comments[keyword] = "[um]"
+                msg = f"{keyword} rounded to 2 decimals"
+                history.append(msg)
+                log.info("%s: %s", self.name, msg)
 
     def ypixsize(self, header: Header, history: MutableSequence[str | None]) -> None:
-        keyword =YPIXSIZE
+        keyword = YPIXSIZE
         log.debug("fixing %s", keyword)
         oldpixsz = header.get(keyword)
         if oldpixsz is not None:
-             pixsz = round(float(oldpixsz), 2)
-             if oldpixsz != pixsz:
-                 header[keyword] = pixsz
-                 header.comments[keyword] = "[mm]"
-                 msg = f"{keyword} rounded to 2 decimals"
-                 history.append(msg)
-                 log.info("%s: %s",self.name, msg)
+            pixsz = round(float(oldpixsz), 2)
+            if oldpixsz != pixsz:
+                header[keyword] = pixsz
+                header.comments[keyword] = "[um]"
+                msg = f"{keyword} rounded to 2 decimals"
+                history.append(msg)
+                log.info("%s: %s", self.name, msg)
 
     def bayer(self, header: Header, history: MutableSequence[str | None]) -> None:
         old_keyw_x = "BAYOFFX"
@@ -133,13 +131,12 @@ class SharpCapMetadataFix(GenericMetadataFix):
             history.append(msg)
 
     def date_obs(self, header: Header, history: MutableSequence[str | None]) -> None:
-        return super().date_obs(header, history)
-
-    def exptime(self, header: Header, history: MutableSequence[str | None]) -> None:
-        return super().exptime(header, history)
-
-
-
+        date_obs = header.get(DATE_OBS)
+        if date_obs is not None and len(date_obs) > 19:
+            header[DATE_OBS] = (date_obs[:19], "UTC")
+            msg = f"stripped microseconds in {DATE_OBS} keyword"
+            log.info(msg)
+            history.append(msg)
 
 
 class SharpCapMetadataInsert(GenericMetadataInsert):

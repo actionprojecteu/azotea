@@ -44,7 +44,9 @@ def edit_keyword(
         log.info("%s: %s", name, msg)
         header[keyword] = value
         if comment:
-            header.comments[keyword] = comment
+             header[keyword] = (value, comment)
+        else:
+             header[keyword] = value
     return msg
 
 
