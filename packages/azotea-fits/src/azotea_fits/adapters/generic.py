@@ -52,6 +52,7 @@ class GenericMetadataFix(MetadataFix):
     """Review and edit existing keyword values in-place"""
 
     def __init__(self, path: str) -> None:
+        self.path = path
         self.name = os.path.basename(path)
 
     def camera(self, header: Header, history: MutableSequence[str | None]) -> None:
@@ -107,6 +108,7 @@ class GenericMetadataFix(MetadataFix):
 
 class GenericMetadataInsert(MetadataInsert):
     def __init__(self, path: str) -> None:
+        self.path = path
         self.name = os.path.basename(path)
 
     def camera(

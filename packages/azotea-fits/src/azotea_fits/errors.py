@@ -1,13 +1,16 @@
-class FitsError(Exception):
+class AzoteaFitsError(Exception):
     """FITS error"""
 
     pass
 
 
-class UnknownSoftwareCreatorError(FitsError):
+class UnknownSoftwareCreatorError(AzoteaFitsError):
     """Unknown FITS software creator"""
+
     pass
 
-class MissingFitsFileError(FitsError):
+
+class MissingFitsFileError(AzoteaFitsError):
     """Unknown FITS software creator"""
+
     pass

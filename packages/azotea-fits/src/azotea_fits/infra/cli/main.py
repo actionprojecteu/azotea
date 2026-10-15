@@ -22,7 +22,7 @@ from lica.validators import vdate, vdir, vfile
 from azotea_fits import __version__
 from azotea_fits.adapters.factory import EditorFactoryImpl
 from azotea_fits.enums import SwCreator
-from azotea_fits.errors import FitsError
+from azotea_fits.errors import AzoteaFitsError
 from azotea_fits.models import FitsForm, ScanForm
 from azotea_fits.use_cases import edit_fits_file, edit_fits_files
 
