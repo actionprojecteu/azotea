@@ -25,10 +25,12 @@ from azotea_fits.enums import SwCreator
 from azotea_fits.errors import AzoteaFitsError
 from azotea_fits.models import FitsForm, ScanForm
 from azotea_fits.use_cases import (
-    edit_fits_file,
-    edit_fits_files,
-    show_file_metadata,
-    show_files_metadata,
+    edit_fits,
+    batch_edit_fits,
+    show_fits_metadata,
+    batch_show_fits_metadata,
+    set_software_creator,
+    batch_set_software_creator,
 )
 
 # ----------------
@@ -145,13 +147,18 @@ def cli_edit(args: Namespace) -> None:
     )
     if args.images_dir:
         scan = ScanForm(images_dir=args.images_dir, depth=args.dir_depth)
-        edit_fits_files(scan, form, factory)
+        batch_edit_fits(scan, form, factory)
     else:
-        edit_fits_file(args.image_file, form, factory)
+        edit_fits(args.image_file, form, factory)
 
 
 def cli_sw_creator(args: Namespace) -> None:
-    pass
+    factory = EditorFactoryImpl()
+    if args.images_dir:
+        scan = ScanForm(images_dir=args.images_dir, depth=args.dir_depth)
+        batch_set_software_creator(scan, args.set, factory)
+    else:
+        set_software_creator(args.image_file, args.set, factory)
 
 
 def cli_view(args: Namespace) -> None:
@@ -159,9 +166,9 @@ def cli_view(args: Namespace) -> None:
     display = StdoutDisplay()
     if args.images_dir:
         scan = ScanForm(images_dir=args.images_dir, depth=args.dir_depth)
-        show_files_metadata(scan, factory, display)
+        batch_show_fits_metadata(scan, factory, display)
     else:
-        show_file_metadata(args.image_file, factory, display)
+        show_fits_metadata(args.image_file, factory, display)
 
 
 def cli_main(args: Namespace) -> None:

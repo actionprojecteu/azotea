@@ -118,7 +118,14 @@ class MetadataInsert(Protocol):
         self, header: Header, value: datetime | None, history: MutableSequence[str | None]
     ) -> None: ...
 
+    def sw_creator(
+        self, header: Header, value: str | None, history: MutableSequence[str | None]
+    ) -> None: ...
+
+
     def comment(self, header: Header, value: str | None) -> None: ...
+
+
 
     def add_history(self, header: Header, history: Sequence[str]) -> None: ...
 

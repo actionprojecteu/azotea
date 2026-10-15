@@ -44,7 +44,6 @@ def edit_keyword(
     elif old_value != value:
         msg = f"{keyword}: {old_value} => {value} by azofits"
         log.info("%s: %s", name, msg)
-        header[keyword] = value
         if comment:
             header[keyword] = (value, comment)
         else:
@@ -213,6 +212,23 @@ class GenericMetadataInsert(MetadataInsert):
     ) -> None:
         h = edit_keyword(header, DATE_OBS, value, "[UTC]", self.name)
         history.append(h)
+
+    def sw_creator(
+        self, header: Header, value: str | None, history: MutableSequence[str | None]
+    ) -> None:
+        keyword = SWCREATOR
+        msg = None
+        if value is None:
+            return msg
+        old_value = str(header.get(keyword))
+        if old_value is None:
+            header[keyword] = value
+            msg = f"added {keyword} keyword"
+            log.info("%s: %s", self.name, msg)
+        elif old_value.lower() != value.lower():
+            msg = f"{keyword}: {old_value} => {value} by azofits"
+            log.info("%s: %s", self.name, msg)
+            header[keyword] = value
 
     def comment(self, header: Header, value: str | None) -> None:
         if value is not None:

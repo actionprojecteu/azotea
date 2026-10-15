@@ -1,36 +1,47 @@
 import logging
 
 from astropy.io import fits
-
-from azotea_cli.common.filesystem import scan_images
 from azotea_cli.common.display.ports import DisplayService
+from azotea_cli.common.filesystem import scan_images
 
-from .models import FitsForm, ScanForm, EXTENSIONS
+from .models import EXTENSIONS, FitsForm, ScanForm
 from .ports import EditorFactory
-
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-def show_file_metadata(path: str,  factory: EditorFactory, display: DisplayService) -> None:
+
+def show_fits_metadata(path: str, factory: EditorFactory, display: DisplayService) -> None:
     editor = factory.get_editor(path)
     with fits.open(path) as hdul:
         data = editor.read.keywords(hdul[0].header)
-        display.show_tabular(data, keys=("Field","Keyword","Value"))
+        display.show_tabular(data, keys=("Field", "Keyword", "Value"))
 
-def show_files_metadata(scan: ScanForm,  factory: EditorFactory, display: DisplayService) -> None:
+
+def batch_show_fits_metadata(scan: ScanForm, factory: EditorFactory, display: DisplayService) -> None:
     paths = scan_images(scan.images_dir, scan.depth, EXTENSIONS)
     for path in paths:
-        show_file_metadata(path, factory, display)
+        show_fits_metadata(path, factory, display)
 
 
 def set_software_creator(path: str, name: str, factory: EditorFactory) -> None:
-    pass
-
-
-def edit_fits_file(path: str, form: FitsForm, factory: EditorFactory) -> None:
     editor = factory.get_editor(path)
-    with fits.open(path, mode='update') as hdul:
+    with fits.open(path, mode="update") as hdul:
+        header = hdul[0].header
+        history = list()
+        editor.edit.sw_creator(header, name, history)
+        editor.edit.add_history(header, history)
+
+
+def batch_set_software_creator(scan: ScanForm, name: str, factory: EditorFactory) -> None:
+    paths = scan_images(scan.images_dir, scan.depth, EXTENSIONS)
+    for path in paths:
+        set_software_creator(path, name, factory)
+
+
+def edit_fits(path: str, form: FitsForm, factory: EditorFactory) -> None:
+    editor = factory.get_editor(path)
+    with fits.open(path, mode="update") as hdul:
         header = hdul[0].header
         history = list()
         log.info("-" * 57)
@@ -61,7 +72,7 @@ def edit_fits_file(path: str, form: FitsForm, factory: EditorFactory) -> None:
         editor.edit.add_history(header, history)
 
 
-def edit_fits_files(scan: ScanForm, form: FitsForm, factory: EditorFactory) -> None:
+def batch_edit_fits(scan: ScanForm, form: FitsForm, factory: EditorFactory) -> None:
     paths = scan_images(scan.images_dir, scan.depth, EXTENSIONS)
     for path in paths:
-        edit_fits_file(path, form, factory)
+        edit_fits(path, form, factory)

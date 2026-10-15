@@ -1,18 +1,13 @@
-from collections.abc import Mapping, Sequence
-from dataclasses import is_dataclass
-from typing import Any
+from collections.abc import Sequence
 
 from tabulate import tabulate
 
-from ..ports import DataClass, DisplayService
-
-TableRow = DataClass | Mapping[str, Any] | Sequence[Any]
-TabularData = Sequence[TableRow]
-
+from ..ports import DisplayService, TabularData
 
 class StdoutDisplay(DisplayService):
     def __init__(self, tablefmt: str = "grid") -> None:
         self.tablefmt = tablefmt
+
     def show(self, text: str) -> None:
         print(text)
 
