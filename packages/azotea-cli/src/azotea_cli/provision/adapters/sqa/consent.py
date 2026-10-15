@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from azotea_cli.infra.sqlalchemy import get_db_session
 from azotea_cli.provision.errors import ConsentNotAgreedError
-from azotea_cli.provision.ports import ConsentRepo
+from azotea_cli.provision.ports import ConsentService
 from . import config
 
 # -----------------------
@@ -28,7 +28,7 @@ from . import config
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-class SqaConsentRepo(ConsentRepo):
+class SqaConsentRepo(ConsentService):
     def review(self) -> str:
         return text()
 

@@ -54,8 +54,12 @@ from azotea_cli.provision.use_cases import (
     save_default_optics,
     update_observer,
 )
-from azotea_cli.reports.adapters import CsvExporterService, SqaReportsService
-from azotea_cli.reports.use_cases import GenerateReportsUseCase
+from azotea_cli.reports.adapters import (
+    CsvExporterService,
+    SqaReportsService,
+    SqaSummaryService,
+)
+from azotea_cli.reports.use_cases import GenerateReportsUseCase, GenerateSummaryUseCase
 
 # ----------------
 # Module constants
@@ -434,11 +438,21 @@ def cli_sky_export(args: Namespace) -> None:
 
 
 def cli_sky_summary(args: Namespace) -> None:
-    pass
+    consent = SqaConsentRepo()
+    observer = SqaObserverRepo()
+    summarizer = SqaSummaryService()
+    display = StdoutDisplay()
+    use_case = GenerateSummaryUseCase(consent, observer, summarizer, display)
+    use_case.show_sky_summary()
 
 
 def cli_img_summary(args: Namespace) -> None:
-    pass
+    consent = SqaConsentRepo()
+    observer = SqaObserverRepo()
+    summarizer = SqaSummaryService()
+    display = StdoutDisplay()
+    use_case = GenerateSummaryUseCase(consent, observer, summarizer, display)
+    use_case.show_image_summary()
 
 
 def cli_main(args: Namespace) -> None:

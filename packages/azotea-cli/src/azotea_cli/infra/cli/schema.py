@@ -96,7 +96,7 @@ class DateIterator:
 # -------------
 
 
-def cli_populate_date(session: Session, args: Namespace) -> None:
+def cli_populate_date(args: Namespace) -> None:
     log.info("Generating Date values")
     date_iterator = DateIterator(from_date=args.since, to_date=args.until)
     date_objs = (
@@ -119,11 +119,13 @@ def cli_populate_date(session: Session, args: Namespace) -> None:
     )
     for i, batch in enumerate(batched(date_objs, args.batch_size), start=1):
         log.info("Writing Date batch #%d (%d records)", i, len(batch))
-        for obj in batch:
-            session.add(obj)
+        with get_db_session() as session:
+            with session.begin():
+                for obj in batch:
+                    session.add(obj)
 
 
-def cli_populate_time(session: Session, args: Namespace) -> None:
+def cli_populate_time(args: Namespace) -> None:
     log.info("Generating Time values")
     time_iterator = TimeIterator(step_seconds=args.seconds)
     time_objs = (
@@ -139,24 +141,25 @@ def cli_populate_time(session: Session, args: Namespace) -> None:
     )
     for i, batch in enumerate(batched(time_objs, args.batch_size), start=1):
         log.info("Writing Time batch #%d (%d records)", i, len(batch))
-        for obj in batch:
-            session.add(obj)
+        with get_db_session() as session:
+            with session.begin():
+                for obj in batch:
+                    session.add(obj)
 
 
-def cli_populate_config(session: Session, args: Namespace) -> None:
+def cli_populate_config(args: Namespace) -> None:
     id = Config(section="database", property="uuid", value=str(uuid.uuid4()))
     version = Config(section="database", property="version", value="03")
-    session.add(id)
-    session.add(version)
+    with get_db_session() as session:
+        with session.begin():
+            session.add(id)
+            session.add(version)
 
 
-def cli_populate_all(session: Session, args: Namespace) -> None:
-    with session.begin():
-        cli_populate_date(session, args)
-    with session.begin():
-        cli_populate_time(session, args)
-    with session.begin():
-        cli_populate_config(session, args)
+def cli_populate_all(args: Namespace) -> None:
+    cli_populate_date(args)
+    cli_populate_time(args)
+    cli_populate_config(args)
 
 
 def add_args(parser: ArgumentParser) -> None:
@@ -182,8 +185,7 @@ def cli_main(args: Namespace) -> None:
     with engine.begin():
         Model.metadata.drop_all(bind=engine)
         Model.metadata.create_all(bind=engine)
-        with get_db_session() as session:
-            args.func(session, args)
+        args.func(args)
     engine.dispose()
 
 

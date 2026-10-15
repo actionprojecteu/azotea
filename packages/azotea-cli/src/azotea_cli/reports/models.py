@@ -9,10 +9,10 @@ class ObservationReport:
     version: str
     session: int
     observer: str
-    acronym: str
+    affiliation: str
     site_name: str
     location: str
-    imagetype: ImageType
+    image_type: ImageType
     date_obs: datetime
     image_name: str
     camera_model: str
@@ -34,7 +34,7 @@ class ObservationReport:
 @dataclass(frozen=True)
 class SummaryTotals:
     observer: str
-    imagetype: ImageType
+    image_type: ImageType
     flagged: bool
     count: int
 
@@ -42,7 +42,7 @@ class SummaryTotals:
 @dataclass(frozen=True)
 class SummaryRanged:
     observer: str
-    display_name: str
+    roi: str
     width: int
     height: int
     published: bool

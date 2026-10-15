@@ -2,11 +2,12 @@ import logging
 from datetime import datetime
 
 from azotea_cli.provision.ports import (
-    ConsentRepo,
+    ConsentService,
     ObserverRepo,
 )
 
-from .ports import ExporterService, ReportsService
+from azotea_cli.common.ports import DisplayService
+from .ports import ExporterService, ReportsService, SummaryService
 
 # -----------------------
 # Module global variables
@@ -19,7 +20,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 class GenerateReportsUseCase:
     def __init__(
         self,
-        consent: ConsentRepo,
+        consent: ConsentService,
         observer: ObserverRepo,
         reporter: ReportsService,
         exporter: ExporterService,
@@ -73,8 +74,8 @@ class GenerateReportsUseCase:
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
         log.info("generating latest night report for '%s %s'", name, surname)
-        data = self.reporter.get_latest_night_data_by(observer_id)
-        report_name = f"{surname}-latest-day"
+        data, latest_day = self.reporter.get_latest_night_data_by(observer_id)
+        report_name = f"{surname}-{latest_day.strftime("%Y%m%d")}"
         length = len(data)
         if length:
             log.info("generating '%s' report for '%s %s' (%d rows)", report_name,  name, surname, length)
@@ -86,11 +87,35 @@ class GenerateReportsUseCase:
         self.consent.check_raises()
         observer_id = self.observer.get_default()
         name, surname = self.observer.get_name(observer_id)
-        data = self.reporter.get_latest_month_data_by(observer_id)
-        report_name = f"{surname}-latest-month"
+        data, latest_month = self.reporter.get_latest_month_data_by(observer_id)
+        report_name = f"{surname}-{latest_month.strftime("%Y%m")}"
         length = len(data)
         if length:
             log.info("generating '%s' report for '%s %s' (%d rows)", report_name,  name, surname, length)
             self.exporter.export(report_name, data)
         else:
             log.warning("No data to export")
+
+class GenerateSummaryUseCase:
+    def __init__(
+        self,
+        consent: ConsentService,
+        observer: ObserverRepo,
+        summarizer: SummaryService,
+        display: DisplayService,
+    ) -> None:
+        self.consent = consent
+        self.observer = observer
+        self.summarizer = summarizer
+        self.display = display
+
+    def show_image_summary(self) -> None:
+        self.consent.check_raises()
+        observer_id = self.observer.get_default()
+        data = self.summarizer.totals_by(observer_id)
+        self.display.show_tabular(data)
+
+    def show_sky_summary(self) -> None:
+        self.consent.check_raises()
+        data = self.summarizer.ranged_summary()
+        self.display.show_tabular(data)

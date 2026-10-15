@@ -20,7 +20,7 @@ from azotea_cli.common.models import ObjId
 from azotea_cli.common.reader import ImageReaderFactory
 from azotea_cli.provision.ports import (
     CameraRepo,
-    ConsentRepo,
+    ConsentService,
     ObserverRepo,
     RoiRepo,
 )
@@ -41,7 +41,7 @@ class SkyStatisticsUseCase:
 
     def __init__(
         self,
-        consent: ConsentRepo,
+        consent: ConsentService,
         camera: CameraRepo,
         observer: ObserverRepo,
         roi: RoiRepo,
