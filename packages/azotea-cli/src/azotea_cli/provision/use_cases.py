@@ -1,6 +1,6 @@
 import logging
 
-from azotea_cli.common.ports import DisplayService
+from azotea_cli.common.display.ports import DisplayService
 from azotea_cli.common.reader.ports import ImageReaderFactory
 from azotea_cli.common.rect import Point, Rect
 

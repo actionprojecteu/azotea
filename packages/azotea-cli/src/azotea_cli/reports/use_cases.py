@@ -6,7 +6,7 @@ from azotea_cli.provision.ports import (
     ObserverRepo,
 )
 
-from azotea_cli.common.ports import DisplayService
+from azotea_cli.common.display.ports import DisplayService
 from .ports import ExporterService, ReportsService, SummaryService
 
 # -----------------------

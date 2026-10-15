@@ -1,5 +1,5 @@
 import re
-from .errors import AzoteaError
+from azotea_cli.common.errors import AzoteaError
 
 class InvalidRectStringError(AzoteaError):
     """Rectangle string incorrectly formatted"""

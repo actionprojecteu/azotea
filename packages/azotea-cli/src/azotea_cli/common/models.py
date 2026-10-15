@@ -1,13 +1,5 @@
 
 from enum import StrEnum, IntEnum
-from dataclasses import Field
-from typing import Protocol, Any, ClassVar, TypeVar
-
-# Define nuna anotacion de tipo DC que representa a cualquer dataclass
-class DataclassLike(Protocol):
-    __dataclass_fields__: ClassVar[dict[str, Field[Any]]]
-DataClass = TypeVar("DataClass", bound=DataclassLike)
-
 
 # -----------------
 # Enumeration types

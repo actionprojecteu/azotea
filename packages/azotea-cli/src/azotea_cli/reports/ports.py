@@ -2,7 +2,7 @@ from typing import Protocol
 from collections.abc import Sequence
 from datetime import datetime
 
-from azotea_cli.common.models import ObjId, DataClass
+from azotea_cli.common.models import ObjId
 
 from .models import ObservationReport, SummaryTotals, SummaryRanged
 
