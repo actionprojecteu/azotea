@@ -151,7 +151,7 @@ def cli_sw_creator(args: Namespace) -> None:
 def cli_main(args: Namespace) -> None:
     try:
         args.func(args)
-    except FitsError as e:
+    except AzoteaFitsError as e:
         log.error(e)
 
 

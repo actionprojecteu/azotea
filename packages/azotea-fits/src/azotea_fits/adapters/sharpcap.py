@@ -33,7 +33,7 @@ class SharpCapMetadataFix(GenericMetadataFix):
     def __init__(self, path) -> None:
         super().__init__(path)
         file_name, _ = os.path.splitext(os.path.basename(path))
-        aux_file = os.path.join(os.path.basename(path), file_name + ".CameraSettings.txt")
+        aux_file = os.path.join(os.path.dirname(path), file_name + ".CameraSettings.txt")
         with open(aux_file) as fd:
             self.contents = fd.readlines()
 
