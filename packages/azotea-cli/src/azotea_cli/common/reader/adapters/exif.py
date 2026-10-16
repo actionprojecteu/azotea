@@ -9,37 +9,37 @@ import numpy as np
 import rawpy
 from rawpy._rawpy import RawPy
 
-from azotea_cli.common.types import BayerIndex, BayerPattern, HeaderType
 from azotea_cli.common.rect import Point, Rect
+from azotea_cli.common.types import BayerIndex, BayerPattern, HeaderType
 
 from ..errors import (
-    MissingImageError,
     MissingCameraModelError,
     MissingDateObsError,
+    MissingImageError,
     OutOfBoundsError,
     ReadMetadataError,
     UnknownDateTimeFormatError,
     UnsupportedCFAError,
 )
-from ..ports import ImageReader, RawPixels
 from ..models import ImageMetadata, IntArray2D
+from ..ports import ImageReader, RawPixels
 from ..utils import image_type_by_path
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 
 
-def to_positive_float(value: Any, default: float) -> float:
-    if value in (None, 0, "0"):
-        return default
+def to_positive_float(value: Any | None) -> float | None:
+    if value in (0, "0", None):
+        return None
     try:
         result = round(float(Fraction(str(value))), 2)
     except (ValueError, ZeroDivisionError, TypeError):
-        return default
-    return result if result > 0 else default
+        return None
+    return result if result > 0 else None
 
 
-def handle_date_obs(exif: Mapping[str, Any], path: str) -> datetime:
+def handle_date_obs(exif: Mapping[str, Any], path: str) -> datetime | None:
     date_obs = None
     for key in ("Image DateTime", "EXIF DateTimeOriginal"):
         date_obs = exif.get(key)
@@ -47,7 +47,7 @@ def handle_date_obs(exif: Mapping[str, Any], path: str) -> datetime:
             date_obs = str(date_obs)
             break
     if date_obs is None:
-        raise MissingDateObsError(os.path.basename(path))
+        return None
     new_date_obs = None
     for fmt in ("%Y:%m:%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S%z"):
         try:
@@ -65,30 +65,21 @@ class ExifReader(ImageReader):
     def header_type(self) -> HeaderType:
         return HeaderType.EXIF
 
-    def handle_optics(
-        self, exif: Mapping[str, Any], def_focal_len: float, def_f_number: float
-    ) -> tuple[float, float]:
-        focal_len = to_positive_float(exif.get("EXIF FocalLength"), def_focal_len)
-        f_number = exif.get("EXIF FNumber")
-        f_number = to_positive_float(exif.get("EXIF FNumber"), def_f_number)
-        return (focal_len, f_number)
-
-    def read_metadata(self, path: str, def_focal_len: float, def_f_number: float) -> ImageMetadata:
+    def read_metadata(self, path: str) -> ImageMetadata:
         with open(path, "rb") as fd:
             exif = exifread.process_file(fd, details=True)
         if not exif:
             raise ReadMetadataError(f"{os.path.basename(path)}")
         make = exif.get("Image Make")
-        make = str(make).strip() if make is not None else ""
+        make = str(make).strip() if make is not None else None
         model = exif.get("Image Model")
         model = str(model).strip() if model is not None else None
-        if model is None:
-            raise MissingCameraModelError(f"{os.path.basename(path)}")
-        focal_len, f_number = self.handle_optics(exif, def_focal_len, def_f_number)
+        focal_len = to_positive_float(exif.get("EXIF FocalLength"))
+        f_number = to_positive_float(exif.get("EXIF FNumber"))
         iso = exif.get("EXIF ISOSpeedRatings")
         iso = int(float(str(iso))) if iso is not None else None
         exptime = exif.get("EXIF ExposureTime")
-        exptime = float(Fraction(str(exptime))) if exptime is not None else 0
+        exptime = float(Fraction(str(exptime))) if exptime is not None else None
         timestamp = handle_date_obs(exif, path)
         image_type = image_type_by_path(path)
         with rawpy.imread(path) as img:
@@ -106,7 +97,7 @@ class ExifReader(ImageReader):
             )
             bayer = BayerPattern(cfa)
             header_type = self.header_type()
-            _, extension = os.path.splitext(path)
+            extension = os.path.splitext(path)[1]
 
         metadata = ImageMetadata(
             width=width,
@@ -130,7 +121,7 @@ class ExifReader(ImageReader):
     def read_pixels(self, path: str) -> RawPixels:
         """returns an object that implements the RawPixels interface"""
         if not os.path.isfile(path):
-            raise  MissingImageError(path)
+            raise MissingImageError(path)
         raw = rawpy.imread(path)
         return ExifRawPixels(raw)
 

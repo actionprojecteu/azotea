@@ -70,14 +70,7 @@ class FitsReader(ImageReader):
     MANDATORY_KEYWORDS = {
         NAXIS1,
         NAXIS2,
-        INSTRUME,
-        LOG_GAIN,
-        INSTRUME,
-        PEDESTAL,
         BAYERPAT,
-        EXPTIME,
-        DATE_OBS,
-        IMAGETYP,
     }
 
     def header_type(self) -> HeaderType:
@@ -105,7 +98,7 @@ class FitsReader(ImageReader):
             raise UnknownDateTimeFormatError(date_obs)
         return new_date_obs.replace(tzinfo=timezone.utc)
 
-    def read_metadata(self, path: str, def_focal_len: float, def_f_number: float) -> ImageMetadata:
+    def read_metadata(self, path: str) -> ImageMetadata:
         """returns an instance of ImageMetadata dataclass"""
         with fits.open(path) as hdul:
             header = hdul[0].header
@@ -114,19 +107,19 @@ class FitsReader(ImageReader):
                 raise MissingMandatorFitsError(self.MANDATORY_KEYWORDS - available)
             width = header[NAXIS1]
             height = header[NAXIS2]
-            make = ""
-            model = header[INSTRUME]
-            exptime = header[EXPTIME]
-            gain = header[LOG_GAIN]
-            black_level = header[PEDESTAL]
+            make = None
+            model = header.get(INSTRUME)
+            exptime = header.get(EXPTIME)
+            gain = header.get(LOG_GAIN)
+            black_level = header.get(PEDESTAL)
             bayer = header[BAYERPAT]
-            image_type = header[IMAGETYP]
-            timestamp = self.handle_date_obs(header[DATE_OBS])
-            focal_len = header.get(FOCALLEN) or def_focal_len
+            image_type = header.get(IMAGETYP)
+            timestamp = self.handle_date_obs(header.get(DATE_OBS))
+            focal_len = header.get(FOCALLEN)
             f_number = (
-                def_f_number
-                if header.get(APTDIA) is None
-                else round(header[FOCALLEN] / header[APTDIA], 2)
+                None
+                if header.get(APTDIA) is None or focal_len is None
+                else round(focal_len / header[APTDIA], 2)
             )
             header_type = self.header_type()
             extension = os.path.splitext(path)[1]

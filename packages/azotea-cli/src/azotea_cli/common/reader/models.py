@@ -8,18 +8,18 @@ from azotea_cli.common.types import BayerPattern, ImageType, HeaderType
 # type alias
 type IntArray2D = np.ndarray[tuple[int, int], np.dtype[np.uint16]]
 
-@dataclass(frozen=True)
+@dataclass
 class ImageMetadata:
     width: int
     height: int
-    make: str
-    model: str
-    exptime: float
+    make: str | None
+    model: str | None
+    exptime: float | None
     iso: int | None
     gain: float | None
     black_level: int | None
     bayer: BayerPattern
-    imagetyp: ImageType
+    imagetyp: ImageType | None
     timestamp: datetime | None
     focal_len: float | None
     f_number: float | None

@@ -36,7 +36,7 @@ from azotea_cli.operation.models import SkyStatsForm
 log = logging.getLogger(__name__.split(".")[-1])
 
 
-class SkyStatisticsUseCase:
+class ComputeSkyStatistics:
     BATCH_SIZE: int = 100
 
     def __init__(
@@ -57,7 +57,7 @@ class SkyStatisticsUseCase:
         self.images = images
         self.sky_stats = sky_stats
 
-    def one_pass(self, image_id: ObjId, path: str) -> SkyStatsForm:
+    def _one_pass(self, image_id: ObjId, path: str) -> SkyStatsForm:
         reader = self.factory.get_reader(path)
         raw_pixels = reader.read_pixels(path)
         r_channel = raw_pixels.r(self.section)
@@ -82,7 +82,7 @@ class SkyStatisticsUseCase:
         log.debug("black level B %d", raw_pixels.b_black())
         return stats
 
-    def compute_sky_statistics(self) -> None:
+    def execute(self) -> None:
         self.consent.check_raises()
         log.info("computing sky background statistics")
         observer_id = self.observer.get_default()
@@ -106,7 +106,7 @@ class SkyStatisticsUseCase:
                         n_selected,
                         perc,
                     )
-                    stats = self.one_pass(image_id, path)
+                    stats = self._one_pass(image_id, path)
                 except AzoteaError as e:
                     n_skipped += 1
                     log.warning("%s, skipping", e)

@@ -36,7 +36,7 @@ from azotea_cli.operation.models import ImageForm, RegisterForm
 log = logging.getLogger(__name__.split(".")[-1])
 
 
-class RegisterImagesUseCase:
+class RegisterImages:
     BATCH_SIZE: int = 100
 
     def __init__(
@@ -57,9 +57,9 @@ class RegisterImagesUseCase:
         self.factory = factory
         self.images = images
 
-    def one_pass(self, path: str) -> ImageForm:
+    def _one_pass(self, path: str) -> ImageForm:
         reader = self.factory.get_reader(path)
-        metadata = reader.read_metadata(path, self.optics_info.focal_len, self.optics_info.f_number)
+        metadata = reader.read_metadata(path)
         if metadata.timestamp is None:
             raise MissingTimestampError(os.path.basename(path))
         # this may trigger an exception as well
@@ -86,7 +86,7 @@ class RegisterImagesUseCase:
         )
         return image
 
-    def register_images(self, form: RegisterForm) -> None:
+    def execute(self, form: RegisterForm) -> None:
         self.consent.check_raises()
         log.info("starting registration process")
         self.session = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
@@ -110,7 +110,7 @@ class RegisterImagesUseCase:
                     log.info(
                         "registering %s [%d/%d] (%d%%)", os.path.basename(path), i, n_selected, perc
                     )
-                    image = self.one_pass(path)
+                    image = self._one_pass(path)
                 except (CameraMissingError, MissingTimestampError, CameraNotDefaultError) as e:
                     n_skipped += 1
                     log.warning("%s, skipping", e)

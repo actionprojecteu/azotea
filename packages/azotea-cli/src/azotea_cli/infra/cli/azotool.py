@@ -14,15 +14,14 @@ from argparse import ArgumentParser, Namespace
 # -------------------
 # Third party imports
 # -------------------
-
 from lica.cli import execute
 from lica.validators import vdate, vfile
 
 from azotea_cli import __version__
-from azotea_cli.common.errors import AzoteaError
-from azotea_cli.common.types import BayerPattern, HeaderType
-from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 from azotea_cli.common.display.adapters import StdoutDisplay
+from azotea_cli.common.errors import AzoteaError
+from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
+from azotea_cli.common.types import BayerPattern, HeaderType
 
 # --------------
 # local imports
@@ -45,15 +44,15 @@ from azotea_cli.provision.adapters import (
     SqaRoiRepo,
 )
 from azotea_cli.provision.use_cases import (
+    CreateCamera,
+    CreateCameraFromImage,
+    CreateLocation,
+    CreateRoi,
+    CreateRoiFromImage,
+    CreateVersionedObserver,
+    SaveDefaultOptics,
+    UpdateObserver,
     consent_view_and_agree,
-    create_camera,
-    create_camera_from_image,
-    create_location,
-    create_roi,
-    create_roi_from_image,
-    create_versioned_observer,
-    save_default_optics,
-    update_observer,
 )
 from azotea_cli.reports.adapters import (
     CsvExporterService,
@@ -349,7 +348,8 @@ def cli_location(args: Namespace) -> None:
         latitude=args.latitude,
         utc_offset=args.utc_offset,
     )
-    create_location(location, consent, form, args.default)
+    use_case = CreateLocation(location, consent)
+    use_case.execute(form, args.default)
 
 
 def cli_optics(args: Namespace) -> None:
@@ -359,7 +359,8 @@ def cli_optics(args: Namespace) -> None:
         focal_len=args.focal_length,
         f_number=args.f_number,
     )
-    save_default_optics(optics, consent, form)
+    use_case = SaveDefaultOptics(optics, consent)
+    use_case.execute(form)
 
 
 def cli_camera(args: Namespace) -> None:
@@ -371,7 +372,6 @@ def cli_camera(args: Namespace) -> None:
         # El resto de valores deberia ser tambien requerido
         if args.model is None:
             raise AzoteaError("Camera model is required in --as-given")
-
         form = CameraForm(
             model=args.model,
             bayer_pattern=args.bayer_pattern,
@@ -383,26 +383,28 @@ def cli_camera(args: Namespace) -> None:
             x_pixsize=args.x_pixsize,
             y_pixsize=args.y_pixsize,
         )
-        create_camera(camera, consent, form, args.default)
+        use_case = CreateCamera(camera, consent)
+        use_case.execute(form, args.default)
     else:
-        create_camera_from_image(camera, consent, optics, factory, args.from_image, args.default)
+        use_case = CreateCameraFromImage(camera, consent, optics, factory)
+        use_case.execute(args.from_image, args.default)
 
 
 def cli_roi(args: Namespace) -> None:
     roi = SqaRoiRepo(db)
     factory = ImageReaderFactoryImpl()
     consent = SqaConsentRepo(db)
-    optics = SqaOpticsRepo(db)
-
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
         if args.x1 is None:
             raise AzoteaError("Camera model is required in --as-given")
         form = RoiForm(x1=args.x1, y1=args.y1, x2=args.x2, y2=args.y2, comment=args.comment)
-        create_roi(roi, consent, form, args.default)
+        use_case = CreateRoi(roi, consent)
+        use_case.execute(form, args.default)
     else:
         form = RoiCenteredForm(width=args.width, height=args.height)
-        create_roi_from_image(roi, consent, optics, factory, args.from_image, form, args.default)
+        use_case = CreateRoiFromImage(roi, consent, factory)
+        use_case.execute(args.from_image, form, args.default)
 
 
 def cli_observer(args: Namespace) -> None:
@@ -415,9 +417,11 @@ def cli_observer(args: Namespace) -> None:
         acronym=args.acronym,
     )
     if args.fix:
-        update_observer(observer, consent, form)
+        use_case = UpdateObserver(observer, consent)
+        use_case.execute(form)
     else:
-        create_versioned_observer(observer, consent, form, args.default)
+        use_case = CreateVersionedObserver(observer, consent,)
+        use_case.execute( form, args.default)
 
 
 def cli_sky_export(args: Namespace) -> None:

@@ -22,7 +22,7 @@ from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 from azotea_cli.infra.sqlalchemy.database.adapters.decouple import DcplDatabase
 from azotea_cli.operation.adapters import SqaImagesRepo, SqaSkyBrightnessRepo
 from azotea_cli.operation.models import RegisterForm
-from azotea_cli.operation.use_cases import RegisterImagesUseCase, SkyStatisticsUseCase
+from azotea_cli.operation.use_cases import RegisterImages, ComputeSkyStatistics
 from azotea_cli.provision.adapters import (
     SqaCameraRepo,
     SqaConsentRepo,
@@ -100,7 +100,7 @@ def cli_batch(args: Namespace) -> None:
     images = SqaImagesRepo(db)
     sky_stats = SqaSkyBrightnessRepo(db)
     factory = ImageReaderFactoryImpl()
-    use_case1 = RegisterImagesUseCase(
+    use_case1 = RegisterImages(
         consent=consent,
         camera=camera,
         location=location,
@@ -109,7 +109,7 @@ def cli_batch(args: Namespace) -> None:
         factory=factory,
         images=images,
     )
-    use_case2 = SkyStatisticsUseCase(
+    use_case2 = ComputeSkyStatistics(
         consent=consent,
         camera=camera,
         observer=observer,
@@ -120,14 +120,14 @@ def cli_batch(args: Namespace) -> None:
     )
     form = RegisterForm(images_dir=args.images_dir, depth=args.depth)
     if args.only_load:
-        use_case1.register_images(form)
+        use_case1.execute(form)
     elif args.only_sky:
-        use_case2.compute_sky_statistics()
+        use_case2.execute()
     elif args.only_publish:
         raise NotImplementedError
     else:
-        use_case1.register_images(form)
-        use_case2.compute_sky_statistics()
+        use_case1.execute(form)
+        use_case2.execute()
 
 
 def cli_main(args: Namespace) -> None:

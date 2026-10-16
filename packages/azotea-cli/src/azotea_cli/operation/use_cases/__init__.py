@@ -1,4 +1,4 @@
-from .register import RegisterImagesUseCase
-from .statistics import SkyStatisticsUseCase
+from .register import RegisterImages
+from .statistics import ComputeSkyStatistics
 
-__all__ = ["RegisterImagesUseCase", "SkyStatisticsUseCase"]
+__all__ = ["RegisterImages", "ComputeSkyStatistics"]

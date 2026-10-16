@@ -49,6 +49,9 @@ anew verbose="":
     uv run azoschema --console --log-file azotea.log {{ verbose }} all --batch-size 25000
     #uv run azopopulate --console --trace --log-file azotea.log {{ verbose }} all --batch-size 25000
 
+# -------------------------
+# AZOTEA Database and tools
+# -------------------------
 
 exif-setup:
     #!/usr/bin/env bash

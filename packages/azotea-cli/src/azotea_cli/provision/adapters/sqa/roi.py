@@ -89,10 +89,11 @@ class SqaRoiRepo(RoiRepo):
                     return session.scalars(sql).one()
 
     def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> ObjId:
+        make = "" if metadata.make is None else metadata.make
         model = (
             metadata.model
-            if metadata.model.startswith(metadata.make)
-            else f"{metadata.make} {metadata.model}"
+            if metadata.model.startswith(make)
+            else f"{make} {metadata.model}"
         )
         with self.db.session() as session:
             try:

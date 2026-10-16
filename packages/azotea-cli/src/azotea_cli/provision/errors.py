@@ -69,3 +69,33 @@ class FNumberMissingError(AzoteaError):
     """default f-number not set"""
 
     pass
+
+
+class MissingCameraModelError(AzoteaError):
+    """missing camera model from metadata"""
+
+    pass
+
+
+class MissingExpTimeError(AzoteaError):
+    """missing exposure time from metadata"""
+
+    pass
+
+
+class MissingIsoOrGainError(AzoteaError):
+    """Missing ISO or CMS GAIN from metadata"""
+
+    pass
+
+
+class MissingBlackLevelError(AzoteaError):
+    """Missing ISO or CMS GAIN from metadata"""
+
+    pass
+
+
+class MissingDateObsError(AzoteaError):
+    """could not find date of observation in metadata"""
+
+    pass
