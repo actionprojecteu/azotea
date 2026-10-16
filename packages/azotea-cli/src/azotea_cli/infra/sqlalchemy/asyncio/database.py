@@ -9,6 +9,7 @@
 # -------------------
 
 import logging
+from typing import Protocol, AsyncContextManager
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -22,14 +23,32 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 # get the module logger
 log = logging.getLogger(__name__.split(".")[-1])
 
-database_url: str = decouple.config("DATABASE_URL")
-engine: AsyncEngine = create_async_engine(database_url, pool_pre_ping=True, connect_args={"check_same_thread": False})
-AsyncSessionFactory = async_sessionmaker(engine, autoflush=False, expire_on_commit=False)
+class Database(Protocol):
+    """application software use this interface as the dependency"""
+    def session(self) -> AsyncContextManager[AsyncSession]: ...
 
-@asynccontextmanager
-async def get_db_session() -> AsyncGenerator[AsyncSession]:
-    async with AsyncSessionFactory() as session:
-        yield session
+class DatabaseByEnvVar(Database):
+    """main entry point instatinates this class"""
+    def __init__(self, env_var: str = "DATABASE_URL") -> None:
+        self._env_var = env_var
+
+    def init(self) -> None:
+        url = decouple.config(self._env_var)
+        self._engine: AsyncEngine = create_async_engine(
+            url,
+            pool_pre_ping=True,
+            connect_args={"check_same_thread": False},
+        )
+        self._session_factory = async_sessionmaker(self._engine, autoflush=False, expire_on_commit=False)
+
+    @asynccontextmanager
+    async def session(self) -> AsyncGenerator[AsyncSession]:
+        async with self._session_factory() as _session:
+            yield _session
+
+    @property
+    def engine(self) -> AsyncEngine:
+        return self._engine
 
 def sqa_logging(debug: bool) -> None:
     if debug:
@@ -40,4 +59,4 @@ def sqa_logging(debug: bool) -> None:
         logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 
 
-__all__ = ["engine", "get_db_session", "sqa_logging"]
+__all__ = ["Database", "DatabaseByEnvVar", "sqa_logging"]

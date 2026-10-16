@@ -21,6 +21,7 @@ from azotea_cli import __version__
 from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import (
     Camera,
+    Database,
     Date,
     Image,
     Location,
@@ -28,7 +29,6 @@ from azotea_cli.infra.sqlalchemy import (
     Roi,
     SkyBrightness,
     Time,
-    get_db_session,
 )
 from azotea_cli.reports.models import SummaryRanged, SummaryTotals
 from azotea_cli.reports.ports import SummaryService
@@ -46,6 +46,8 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 class SqaSummaryService(SummaryService):
+    def __init__(self, db: Database) -> None:
+        self.db = db
 
     def _report_selector_totals(self, observer_id) -> Any:
         return (
@@ -103,12 +105,12 @@ class SqaSummaryService(SummaryService):
 
     def totals_by(self, observer_id: ObjId) -> Sequence[SummaryTotals]:
         query = self._report_selector_totals(observer_id)
-        with get_db_session() as session:
+        with self.db.session() as session:
             rows = session.execute(query).mappings()
             return [self._to_all_totals(dict(row)) for row in rows]
 
     def ranged_summary(self) -> Sequence[SummaryRanged]:
         query = self._report_selector_totals2()
-        with get_db_session() as session:
+        with self.db.session() as session:
             rows = session.execute(query).mappings()
             return [self._to_all_totals2(dict(row)) for row in rows]

@@ -19,7 +19,7 @@ from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 # --------------
 # local imports
 # -------------
-from azotea_cli.infra.sqlalchemy.noasync import engine
+from azotea_cli.infra.sqlalchemy.noasync import DatabaseByEnvVar
 from azotea_cli.operation.adapters import SqaImagesRepo, SqaSkyBrightnessRepo
 from azotea_cli.operation.models import RegisterForm
 from azotea_cli.operation.use_cases import RegisterImagesUseCase, SkyStatisticsUseCase
@@ -44,6 +44,8 @@ DESCRIPTION = "AZOTEA image processing tool"
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
+# create the database object
+db = DatabaseByEnvVar("DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
@@ -89,14 +91,14 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_batch(args: Namespace) -> None:
-    consent = SqaConsentRepo()
-    camera = SqaCameraRepo()
-    location = SqaLocationRepo()
-    observer = SqaObserverRepo()
-    optics = SqaOpticsRepo()
-    roi = SqaRoiRepo()
-    images = SqaImagesRepo()
-    sky_stats = SqaSkyBrightnessRepo()
+    consent = SqaConsentRepo(db)
+    camera = SqaCameraRepo(db)
+    location = SqaLocationRepo(db)
+    observer = SqaObserverRepo(db)
+    optics = SqaOpticsRepo(db)
+    roi = SqaRoiRepo(db)
+    images = SqaImagesRepo(db)
+    sky_stats = SqaSkyBrightnessRepo(db)
     factory = ImageReaderFactoryImpl()
     use_case1 = RegisterImagesUseCase(
         consent=consent,
@@ -130,10 +132,11 @@ def cli_batch(args: Namespace) -> None:
 
 def cli_main(args: Namespace) -> None:
     try:
+        db.init()
         args.func(args)
     except AzoteaError as e:
-        log.error(e)
-        engine.dispose()
+        log.critical(e)
+        db.engine.dispose()
 
 
 def main():

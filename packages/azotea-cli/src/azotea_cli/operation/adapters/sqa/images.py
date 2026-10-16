@@ -18,7 +18,7 @@ from azotea_cli.common.types import ObjId
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import Image, SkyBrightness, get_db_session
+from azotea_cli.infra.sqlalchemy import Image, SkyBrightness, Database
 
 # from ...errors import
 from ...ports import ImagesRepo
@@ -32,8 +32,11 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 class SqaImagesRepo(ImagesRepo):
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
     def get_stored_image_paths(self) -> list[str]:
-        with get_db_session() as session:
+        with self.db.session() as session:
             sql = select(Image.directory, Image.name)
             result = session.execute(sql).all()
             return [os.path.join(path[0], path[1]) for path in result]
@@ -68,7 +71,7 @@ class SqaImagesRepo(ImagesRepo):
         self,
         images: Sequence[ImageForm],
     ) -> None:
-        with get_db_session() as session:
+        with self.db.session() as session:
             for image in images:
                 sql =  select(Image).where(Image.hash == image.hash)
                 existing = session.scalars(sql).one_or_none()
@@ -90,7 +93,7 @@ class SqaImagesRepo(ImagesRepo):
     def _save_one_by_one(self, images: Sequence[ImageForm]) -> None:
         existing_images = list()
         for image in images:
-            with get_db_session() as session:
+            with self.db.session() as session:
                 with session.begin():
                     session.add(self._translate(image))
                     try:
@@ -103,7 +106,7 @@ class SqaImagesRepo(ImagesRepo):
 
 
     def save_images(self, images: Sequence[ImageForm]) -> None:
-        with get_db_session() as session:
+        with self.db.session() as session:
             try:
                 with session.begin():
                     for image in images:
@@ -119,12 +122,12 @@ class SqaImagesRepo(ImagesRepo):
             .where(SkyBrightness.image_id == Image.image_id)
             .exists(),
         )
-        with get_db_session() as session:
+        with self.db.session() as session:
             image_ids = session.scalars(sql).all()
         return image_ids
 
     def to_paths(self, image_ids: Sequence[ObjId]) -> Sequence[str]:
         sql = select(Image.directory, Image.name).where(Image.image_id.in_(image_ids))
-        with get_db_session() as session:
+        with self.db.session() as session:
             result = session.execute(sql).all()
         return [os.path.join(dir, name) for dir, name in result]

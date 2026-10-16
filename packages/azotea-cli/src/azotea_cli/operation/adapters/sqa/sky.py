@@ -17,10 +17,9 @@ from azotea_cli.common.types import ObjId
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import Image, SkyBrightness, get_db_session
-
-from azotea_cli.operation.ports import  SkyBrightnessRepo
+from azotea_cli.infra.sqlalchemy import Database, Image, SkyBrightness
 from azotea_cli.operation.models import SkyStatsForm
+from azotea_cli.operation.ports import SkyBrightnessRepo
 
 # -----------------------
 # Module global variables
@@ -30,6 +29,9 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 class SqaSkyBrightnessRepo(SkyBrightnessRepo):
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
     def _translate(self, stats: SkyStatsForm) -> SkyBrightness:
         return SkyBrightness(
             image_id=stats.image_id,
@@ -48,7 +50,7 @@ class SqaSkyBrightnessRepo(SkyBrightnessRepo):
     def _save_one_by_one(self, statistics: Sequence[SkyStatsForm]) -> None:
         for stats in statistics:
             try:
-                with get_db_session() as session:
+                with self.db.session() as session:
                     with session.begin():
                         session.add(self._translate(stats))
             except IntegrityError:
@@ -59,7 +61,7 @@ class SqaSkyBrightnessRepo(SkyBrightnessRepo):
                 )
 
     def save_statistics(self, statistics: Sequence[SkyStatsForm]) -> None:
-        with get_db_session() as session:
+        with self.db.session() as session:
             try:
                 with session.begin():
                     for stats in statistics:
@@ -77,6 +79,6 @@ class SqaSkyBrightnessRepo(SkyBrightnessRepo):
             .where(SkyBrightness.image_id == Image.image_id)
             .exists(),
         )
-        with get_db_session() as session:
+        with self.db.session() as session:
             image_ids = session.scalars(sql).all()
             return image_ids

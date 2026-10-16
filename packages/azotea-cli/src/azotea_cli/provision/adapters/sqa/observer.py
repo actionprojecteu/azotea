@@ -17,14 +17,14 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.types import FOREVER, ObjId, ValidState
-from azotea_cli.infra.sqlalchemy import Observer, get_db_session
+from azotea_cli.infra.sqlalchemy import Database, Observer
+from azotea_cli.provision.models import ObserverForm
+from azotea_cli.provision.ports import ObserverRepo
 
 from ...errors import (
     MissingDefaultObserverError,
     ObserverMissingError,
 )
-from azotea_cli.provision.ports import ObserverRepo
-from azotea_cli.provision.models import ObserverForm
 from . import config
 
 # -----------------------
@@ -40,23 +40,28 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 class SqaObserverRepo(ObserverRepo):
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
     def set_default(self, observer_id: ObjId) -> None:
-        with get_db_session() as session:
+        with self.db.session() as session:
             with session.begin():
                 log.info("saving default observer_id: %d", observer_id)
                 config.save(session, "observer", "observer", str(observer_id))
 
     def get_default(self) -> ObjId:
-        with get_db_session() as session:
+        with self.db.session() as session:
             observer_id = config.load(session, "observer", "observer")
             if observer_id is None:
                 raise MissingDefaultObserverError
             log.info("loading default observer_id: %s", observer_id)
             return int(observer_id)
 
-    def get_name(self, observer_id: ObjId) -> tuple[str,str]:
-        with get_db_session() as session:
-            sql = select(Observer.family_name, Observer.surname).where(Observer.observer_id == observer_id)
+    def get_name(self, observer_id: ObjId) -> tuple[str, str]:
+        with self.db.session() as session:
+            sql = select(Observer.family_name, Observer.surname).where(
+                Observer.observer_id == observer_id
+            )
             result = session.execute(sql).one_or_none()
             if result is None:
                 raise ObserverMissingError()
@@ -68,7 +73,7 @@ class SqaObserverRepo(ObserverRepo):
             Observer.surname == form.surname,
             Observer.valid_state == ValidState.CURRENT,
         )
-        with get_db_session() as session:
+        with self.db.session() as session:
             try:
                 with session.begin():
                     now = datetime.now(timezone.utc)
@@ -109,7 +114,9 @@ class SqaObserverRepo(ObserverRepo):
                             "create a new version with id %d of observer: %s", observer_id, form
                         )
                     else:
-                        log.warning("observer (%s, %s) already exists", form.surname, form.family_name)
+                        log.warning(
+                            "observer (%s, %s) already exists", form.surname, form.family_name
+                        )
                         observer_id = prev_obs.observer_id
                     return observer_id
             except IntegrityError as e:
@@ -122,7 +129,7 @@ class SqaObserverRepo(ObserverRepo):
             Observer.surname == form.surname,
             Observer.valid_state == ValidState.CURRENT,
         )
-        with get_db_session() as session:
+        with self.db.session() as session:
             with session.begin():
                 prev_obs = session.scalars(sql).one_or_none()
                 if prev_obs is None:

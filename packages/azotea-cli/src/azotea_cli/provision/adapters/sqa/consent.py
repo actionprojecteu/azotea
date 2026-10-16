@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 # Own dependecies
 # ---------------
 
-from azotea_cli.infra.sqlalchemy import get_db_session
+from azotea_cli.infra.sqlalchemy import Database
 from azotea_cli.provision.errors import ConsentNotAgreedError
 from azotea_cli.provision.ports import ConsentService
 from . import config
@@ -29,11 +29,14 @@ from . import config
 log = logging.getLogger(__name__.split(".")[-1])
 
 class SqaConsentRepo(ConsentService):
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
     def review(self) -> str:
         return text()
 
     def agree(self, agreed: bool) -> None:
-        with get_db_session() as session:
+        with self.db.session() as session:
             if agreed:
                 tstamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:SZ")
                 with session.begin():
@@ -43,11 +46,11 @@ class SqaConsentRepo(ConsentService):
                         log.info("consent form signed")
 
     def agreed(self) -> bool:
-        with get_db_session() as session:
+        with self.db.session() as session:
             return self._is_signed(session)
 
     def check_raises(self) -> None:
-        with get_db_session() as session:
+        with self.db.session() as session:
             if not self._is_signed(session):
                 raise ConsentNotAgreedError
 

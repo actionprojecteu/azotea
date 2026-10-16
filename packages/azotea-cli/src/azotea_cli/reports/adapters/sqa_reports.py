@@ -20,6 +20,7 @@ from azotea_cli import __version__
 from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import (
     Camera,
+    Database,
     Date,
     Image,
     Location,
@@ -27,7 +28,6 @@ from azotea_cli.infra.sqlalchemy import (
     Roi,
     SkyBrightness,
     Time,
-    get_db_session,
 )
 from azotea_cli.reports.models import ObservationReport
 from azotea_cli.reports.ports import ReportsService
@@ -45,6 +45,9 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 class SqaReportsService(ReportsService):
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
     def _get_observer_date_range(
         self, session: Session, observer_id: ObjId
     ) -> tuple[int | None, int | None]:
@@ -121,7 +124,7 @@ class SqaReportsService(ReportsService):
 
     def get_all_data_by(self, observer_id: ObjId) -> Sequence[ObservationReport]:
         query = self._report_selector(observer_id)
-        with get_db_session() as session:
+        with self.db.session() as session:
             rows = session.execute(query).mappings()
             return [self._to_all(dict(row)) for row in rows]
 
@@ -135,7 +138,7 @@ class SqaReportsService(ReportsService):
             .where(Image.date_id.between(min_date_id, max_date_id))
             .order_by(Image.date_id.desc(), Image.time_id.desc())
         )
-        with get_db_session() as session:
+        with self.db.session() as session:
             rows = session.execute(query).mappings()
             return [self._to_all(dict(row)) for row in rows]
 
@@ -145,12 +148,14 @@ class SqaReportsService(ReportsService):
             .where(SkyBrightness.published == False)  # noqa: E712
             .order_by(Image.date_id.desc(), Image.time_id.desc())
         )
-        with get_db_session() as session:
+        with self.db.session() as session:
             rows = session.execute(query).mappings()
             return [self._to_all(dict(row)) for row in rows]
 
-    def get_latest_night_data_by(self, observer_id: ObjId) -> tuple[Sequence[ObservationReport], datetime]:
-        with get_db_session() as session:
+    def get_latest_night_data_by(
+        self, observer_id: ObjId
+    ) -> tuple[Sequence[ObservationReport], datetime]:
+        with self.db.session() as session:
             _, max_date_id = self._get_observer_date_range(session, observer_id)
             if max_date_id is None:
                 raise RuntimeError("This should not happen (max_date_id)")
@@ -166,8 +171,10 @@ class SqaReportsService(ReportsService):
             max_date = datetime(year=max_year, month=max_month, day=max_day)
             return [self._to_all(dict(row)) for row in rows], max_date
 
-    def get_latest_month_data_by(self, observer_id: ObjId) -> tuple[Sequence[ObservationReport], datetime]:
-        with get_db_session() as session:
+    def get_latest_month_data_by(
+        self, observer_id: ObjId
+    ) -> tuple[Sequence[ObservationReport], datetime]:
+        with self.db.session() as session:
             _, max_date_id = self._get_observer_date_range(session, observer_id)
             if max_date_id is None:
                 raise RuntimeError("This should not happen (max_date_id)")

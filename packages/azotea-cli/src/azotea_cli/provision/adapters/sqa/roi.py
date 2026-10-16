@@ -7,23 +7,21 @@ import logging
 # ---------------------
 # Third party libraries
 # ---------------------
-#
-from lica.sqlalchemy.noasync.dbase import create_engine_sessionclass
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
+from azotea_cli.common.reader.models import ImageMetadata
+from azotea_cli.common.rect import Rect
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli.common.types import ObjId
-from azotea_cli.common.reader.models import ImageMetadata
-from azotea_cli.common.rect import Rect
-from azotea_cli.infra.sqlalchemy import get_db_session, Roi
-
+from azotea_cli.infra.sqlalchemy import Database, Roi
 from azotea_cli.provision.errors import MissingDefaultRoiError, RoiMissingError
-from azotea_cli.provision.ports import RoiRepo
 from azotea_cli.provision.models import RoiForm
+from azotea_cli.provision.ports import RoiRepo
+
 from . import config
 
 # -----------------------
@@ -39,14 +37,17 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 class SqaRoiRepo(RoiRepo):
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
     def set_default(self, roi_id: ObjId) -> None:
-        with get_db_session() as session:
+        with self.db.session() as session:
             with session.begin():
                 log.info("saving default roi_id: %d", roi_id)
                 config.save(session, "roi", "roi_id", str(roi_id))
 
     def get_default(self) -> ObjId:
-        with get_db_session() as session:
+        with self.db.session() as session:
             roi_id = config.load(session, "roi", "roi_id")
             if roi_id is None:
                 raise MissingDefaultRoiError
@@ -55,14 +56,14 @@ class SqaRoiRepo(RoiRepo):
 
     def get_as_rect(self, roi_id: ObjId) -> Rect:
         sql = select(Roi).where(Roi.roi_id == roi_id)
-        with get_db_session() as session:
+        with self.db.session() as session:
             roi = session.scalars(sql).one_or_none()
             if roi is None:
                 raise RoiMissingError(roi_id)
             return Rect(roi.x1, roi.y1, roi.x2, roi.y2)
 
     def create(self, form: RoiForm) -> ObjId:
-        with get_db_session() as session:
+        with self.db.session() as session:
             rect = None
             try:
                 with session.begin():
@@ -81,10 +82,11 @@ class SqaRoiRepo(RoiRepo):
                     return roi.roi_id
             except IntegrityError:
                 log.warning("roi %s already exists", rect)
-                sql = select(Roi.roi_id).where(Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2,Roi.y2 == rect.y2)
-                with get_db_session() as session:
+                sql = select(Roi.roi_id).where(
+                    Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2, Roi.y2 == rect.y2
+                )
+                with self.db.session() as session:
                     return session.scalars(sql).one()
-
 
     def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> ObjId:
         model = (
@@ -92,7 +94,7 @@ class SqaRoiRepo(RoiRepo):
             if metadata.model.startswith(metadata.make)
             else f"{metadata.make} {metadata.model}"
         )
-        with get_db_session() as session:
+        with self.db.session() as session:
             try:
                 with session.begin():
                     log.info("adding new roi from image '%s'", metadata)
@@ -111,6 +113,8 @@ class SqaRoiRepo(RoiRepo):
                     return roi.roi_id
             except IntegrityError:
                 log.warning("roi %s already exists", rect)
-                sql = select(Roi.roi_id).where(Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2,Roi.y2 == rect.y2)
-                with get_db_session() as session:
+                sql = select(Roi.roi_id).where(
+                    Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2, Roi.y2 == rect.y2
+                )
+                with self.db.session() as session:
                     return session.scalars(sql).one()

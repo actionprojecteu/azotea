@@ -10,20 +10,20 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from azotea_cli.common.types import ObjId
 from azotea_cli.common.reader.models import ImageMetadata
+from azotea_cli.common.types import ObjId
 
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import Camera, get_db_session
+from azotea_cli.infra.sqlalchemy import Camera, Database
+from azotea_cli.provision.models import CameraForm
+from azotea_cli.provision.ports import CameraRepo
 
 from ...errors import (
     CameraMissingError,
     MissingDefaultCameraError,
 )
-from azotea_cli.provision.ports import CameraRepo
-from azotea_cli.provision.models import CameraForm
 from . import config
 
 # -----------------------
@@ -39,14 +39,17 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 class SqaCameraRepo(CameraRepo):
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
     def set_default(self, camera_id: ObjId) -> None:
-        with get_db_session() as session:
+        with self.db.session() as session:
             with session.begin():
                 log.info("saving default camera_id: %d", camera_id)
                 config.save(session, "camera", "camera_id", str(camera_id))
 
     def get_default(self) -> ObjId:
-        with get_db_session() as session:
+        with self.db.session() as session:
             camera_id = config.load(session, "camera", "camera_id")
             if camera_id is None:
                 raise MissingDefaultCameraError()
@@ -54,7 +57,7 @@ class SqaCameraRepo(CameraRepo):
             return int(camera_id)
 
     def get_extension_by_id(self, camera_id: ObjId) -> str:
-        with get_db_session() as session:
+        with self.db.session() as session:
             sql = select(Camera.extension).where(Camera.camera_id == camera_id)
             extension = session.scalars(sql).one_or_none()
             if extension is None:
@@ -62,7 +65,7 @@ class SqaCameraRepo(CameraRepo):
             return extension
 
     def get_id_by_model(self, model: str) -> ObjId:
-        with get_db_session() as session:
+        with self.db.session() as session:
             sql = select(Camera.camera_id).where(Camera.model == model)
             camera_id = session.scalars(sql).one_or_none()
             if camera_id is None:
@@ -70,7 +73,7 @@ class SqaCameraRepo(CameraRepo):
             return camera_id
 
     def create(self, form: CameraForm) -> ObjId:
-        with get_db_session() as session:
+        with self.db.session() as session:
             try:
                 with session.begin():
                     log.info("adding new camera: %s", form)
@@ -91,9 +94,8 @@ class SqaCameraRepo(CameraRepo):
             except IntegrityError:
                 log.warning("camera %s already exists", form.model)
                 sql = select(Camera.camera_id).where(Camera.model == form.model)
-                with get_db_session() as session:
+                with self.db.session() as session:
                     return session.scalars(sql).one()
-
 
     def create_from_image(self, metadata: ImageMetadata) -> ObjId:
         model = (
@@ -101,7 +103,7 @@ class SqaCameraRepo(CameraRepo):
             if metadata.model.startswith(metadata.make)
             else f"{metadata.make} {metadata.model}"
         )
-        with get_db_session() as session:
+        with self.db.session() as session:
             try:
                 with session.begin():
                     log.info("adding new camera from metadata: %s", metadata)
@@ -120,5 +122,5 @@ class SqaCameraRepo(CameraRepo):
             except IntegrityError:
                 log.warning("camera %s already exists", model)
                 sql = select(Camera.camera_id).where(Camera.model == model)
-                with get_db_session() as session:
+                with self.db.session() as session:
                     return session.scalars(sql).one()

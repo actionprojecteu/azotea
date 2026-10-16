@@ -25,7 +25,8 @@ from sqlalchemy.orm import Session
 # local imports
 # -------------
 from azotea_cli import __version__
-from azotea_cli.infra.sqlalchemy import Config, Date, Model, Time, engine, get_db_session, sqa_logging
+from azotea_cli.infra.sqlalchemy.noasync import DatabaseByEnvVar
+from azotea_cli.infra.sqlalchemy import  Config, Date, Model, Time, sqa_logging
 
 from .util import parser as prs
 
@@ -41,6 +42,8 @@ DESCRIPTION = "AZOTEA Database initial schema generation tool"
 
 # get the module logger
 log = logging.getLogger(__name__.split(".")[-1])
+# create the database object
+db = DatabaseByEnvVar("DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
@@ -119,7 +122,7 @@ def cli_populate_date(args: Namespace) -> None:
     )
     for i, batch in enumerate(batched(date_objs, args.batch_size), start=1):
         log.info("Writing Date batch #%d (%d records)", i, len(batch))
-        with get_db_session() as session:
+        with db.session() as session:
             with session.begin():
                 for obj in batch:
                     session.add(obj)
@@ -141,7 +144,7 @@ def cli_populate_time(args: Namespace) -> None:
     )
     for i, batch in enumerate(batched(time_objs, args.batch_size), start=1):
         log.info("Writing Time batch #%d (%d records)", i, len(batch))
-        with get_db_session() as session:
+        with db.session() as session:
             with session.begin():
                 for obj in batch:
                     session.add(obj)
@@ -150,7 +153,7 @@ def cli_populate_time(args: Namespace) -> None:
 def cli_populate_config(args: Namespace) -> None:
     id = Config(section="database", property="uuid", value=str(uuid.uuid4()))
     version = Config(section="database", property="version", value="03")
-    with get_db_session() as session:
+    with db.session() as session:
         with session.begin():
             session.add(id)
             session.add(version)
@@ -182,11 +185,12 @@ def add_args(parser: ArgumentParser) -> None:
 
 def cli_main(args: Namespace) -> None:
     sqa_logging(args.verbose)
-    with engine.begin():
-        Model.metadata.drop_all(bind=engine)
-        Model.metadata.create_all(bind=engine)
+    db.init()
+    with db.engine.begin():
+        Model.metadata.drop_all(bind=db.engine)
+        Model.metadata.create_all(bind=db.engine)
         args.func(args)
-    engine.dispose()
+    db.engine.dispose()
 
 
 def main():

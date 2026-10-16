@@ -13,16 +13,15 @@ from sqlalchemy.exc import IntegrityError
 # ---------------
 # Own dependecies
 # ---------------
-
 from azotea_cli.common.types import ObjId
-from azotea_cli.infra.sqlalchemy import Location, get_db_session
+from azotea_cli.infra.sqlalchemy import Database, Location
+from azotea_cli.provision.models import LocationForm
+from azotea_cli.provision.ports import LocationRepo
 
 from ...errors import (
     LocationMissingError,
     MissingDefaultLocationError,
 )
-from azotea_cli.provision.ports import LocationRepo
-from azotea_cli.provision.models import LocationForm
 from . import config
 
 # -----------------------
@@ -38,14 +37,17 @@ log = logging.getLogger(__name__.split(".")[-1])
 
 
 class SqaLocationRepo(LocationRepo):
+    def __init__(self, db: Database) -> None:
+        self.db = db
+
     def set_default(self, location_id: ObjId):
-        with get_db_session() as session:
+        with self.db.session() as session:
             with session.begin():
                 log.info("saving default location_id: %d", location_id)
                 config.save(session, "location", "location_id", str(location_id))
 
     def get_default(self) -> ObjId:
-        with get_db_session() as session:
+        with self.db.session() as session:
             location_id = config.load(session, "location", "location_id")
             if location_id is None:
                 raise MissingDefaultLocationError
@@ -53,7 +55,7 @@ class SqaLocationRepo(LocationRepo):
             return int(location_id)
 
     def create(self, form: LocationForm) -> ObjId:
-        with get_db_session() as session:
+        with self.db.session() as session:
             try:
                 with session.begin():
                     log.info("adding new location: %s", form)
@@ -70,15 +72,17 @@ class SqaLocationRepo(LocationRepo):
                     return loc.location_id
             except IntegrityError:
                 log.warning("location (%s, %s) already exists", form.site_name, form.location)
-                sql = select(Location.location_id).where(Location.site_name == form.site_name, Location.location == form.location)
-                with get_db_session() as session:
+                sql = select(Location.location_id).where(
+                    Location.site_name == form.site_name, Location.location == form.location
+                )
+                with self.db.session() as session:
                     return session.scalars(sql).one()
 
     def update(self, form: LocationForm) -> None:
         sql = select(Location).where(
             Location.site_name == form.site_name, Location.location == form.location
         )
-        with get_db_session() as session:
+        with self.db.session() as session:
             with session.begin():
                 prev_loc = session.scalars(sql).one_or_none()
                 if prev_loc is None:

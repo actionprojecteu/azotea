@@ -8,12 +8,14 @@
 # System wide imports
 # -------------------
 
+import dbm
 import logging
 from argparse import ArgumentParser, Namespace
 
 # -------------------
 # Third party imports
 # -------------------
+
 from lica.cli import execute
 from lica.validators import vdate, vfile
 
@@ -26,7 +28,7 @@ from azotea_cli.common.display.adapters import StdoutDisplay
 # --------------
 # local imports
 # -------------
-from azotea_cli.infra.sqlalchemy.noasync import engine
+from azotea_cli.infra.sqlalchemy.noasync import DatabaseByEnvVar
 from azotea_cli.provision import (
     CameraForm,
     DefaultOpticsForm,
@@ -73,6 +75,8 @@ DESCRIPTION = "AZOTEA provision tool"
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
+# create the database object
+db = DatabaseByEnvVar("DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
@@ -331,14 +335,14 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_consent(args: Namespace) -> None:
-    consent = SqaConsentRepo()
+    consent = SqaConsentRepo(db)
     display = StdoutDisplay()
     consent_view_and_agree(consent, display, args.agree)
 
 
 def cli_location(args: Namespace) -> None:
-    location = SqaLocationRepo()
-    consent = SqaConsentRepo()
+    location = SqaLocationRepo(db)
+    consent = SqaConsentRepo(db)
     form = LocationForm(
         site_name=args.site_name,
         location=args.location,
@@ -350,8 +354,8 @@ def cli_location(args: Namespace) -> None:
 
 
 def cli_optics(args: Namespace) -> None:
-    optics = SqaOpticsRepo()
-    consent = SqaConsentRepo()
+    optics = SqaOpticsRepo(db)
+    consent = SqaConsentRepo(db)
     form = DefaultOpticsForm(
         focal_len=args.focal_length,
         f_number=args.f_number,
@@ -360,9 +364,9 @@ def cli_optics(args: Namespace) -> None:
 
 
 def cli_camera(args: Namespace) -> None:
-    camera = SqaCameraRepo()
-    consent = SqaConsentRepo()
-    optics = SqaOpticsRepo()
+    camera = SqaCameraRepo(db)
+    consent = SqaConsentRepo(db)
+    optics = SqaOpticsRepo(db)
     factory = ImageReaderFactoryImpl()
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
@@ -386,10 +390,10 @@ def cli_camera(args: Namespace) -> None:
 
 
 def cli_roi(args: Namespace) -> None:
-    roi = SqaRoiRepo()
+    roi = SqaRoiRepo(db)
     factory = ImageReaderFactoryImpl()
-    consent = SqaConsentRepo()
-    optics = SqaOpticsRepo()
+    consent = SqaConsentRepo(db)
+    optics = SqaOpticsRepo(db)
 
     if args.as_given:
         # El resto de valores deberia ser tambien requerido
@@ -403,8 +407,8 @@ def cli_roi(args: Namespace) -> None:
 
 
 def cli_observer(args: Namespace) -> None:
-    observer = SqaObserverRepo()
-    consent = SqaConsentRepo()
+    observer = SqaObserverRepo(db)
+    consent = SqaConsentRepo(db)
     form = ObserverForm(
         family_name=args.name,
         surname=args.surname,
@@ -418,9 +422,9 @@ def cli_observer(args: Namespace) -> None:
 
 
 def cli_sky_export(args: Namespace) -> None:
-    consent = SqaConsentRepo()
-    reporter = SqaReportsService()
-    observer = SqaObserverRepo()
+    consent = SqaConsentRepo(db)
+    reporter = SqaReportsService(db)
+    observer = SqaObserverRepo(db)
     exporter = CsvExporterService(args.csv_dir)
     use_case = GenerateReportsUseCase(consent, observer, reporter, exporter)
     if args.all:
@@ -438,18 +442,18 @@ def cli_sky_export(args: Namespace) -> None:
 
 
 def cli_sky_summary(args: Namespace) -> None:
-    consent = SqaConsentRepo()
-    observer = SqaObserverRepo()
-    summarizer = SqaSummaryService()
+    consent = SqaConsentRepo(db)
+    observer = SqaObserverRepo(db)
+    summarizer = SqaSummaryService(db)
     display = StdoutDisplay()
     use_case = GenerateSummaryUseCase(consent, observer, summarizer, display)
     use_case.show_sky_summary()
 
 
 def cli_img_summary(args: Namespace) -> None:
-    consent = SqaConsentRepo()
-    observer = SqaObserverRepo()
-    summarizer = SqaSummaryService()
+    consent = SqaConsentRepo(db)
+    observer = SqaObserverRepo(db)
+    summarizer = SqaSummaryService(db)
     display = StdoutDisplay()
     use_case = GenerateSummaryUseCase(consent, observer, summarizer, display)
     use_case.show_image_summary()
@@ -457,10 +461,11 @@ def cli_img_summary(args: Namespace) -> None:
 
 def cli_main(args: Namespace) -> None:
     try:
+        db.init()
         args.func(args)
     except AzoteaError as e:
-        log.error(e)
-        engine.dispose()
+        log.critical(e)
+        db.engine.dispose()
 
 
 def main():

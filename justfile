@@ -89,7 +89,7 @@ exif-sky log="" :
         fi
         uv run azotea --console  ${logfile} --trace batch --images-dir images --only-sky --depth 8
 
-exif-all: (anew) (exif-setup) (exif-register) (exif-sky)
+exif-all: (anew) (exif-setup) (exif-register) (exif-sky) (export-all)
 
 # =======================================================================
 
@@ -261,7 +261,7 @@ sharpcap-register log="": (fits-register "images/FITS/sharpcap" log)
 
 sharpcap-sky log="": (fits-sky "images/FITS/sharpcap" log)
 
-sharpcap-all: (anew) (fits-anew) (sharpcap-setup) (sharpcap-register) (sharpcap-sky)
+sharpcap-all: (anew) (fits-anew) (sharpcap-setup) (sharpcap-register) (sharpcap-sky)  (export-all)
 
 sharpcap-view log="": (fits-view "images/FITS/sharpcap" log)
 
@@ -292,7 +292,7 @@ capturafits-edit log="":
          --camera "ZWO ASI224 MC" --bayer-pattern RGGB  --bias 100 --image-type LIGHT
 
 
-capturafits-all: (anew) (fits-anew) (capturafits-setup) (capturafits-register) (capturafits-sky)
+capturafits-all: (anew) (fits-anew) (capturafits-setup) (capturafits-register) (capturafits-sky) (export-all)
 
 
 [private]
