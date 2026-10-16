@@ -30,7 +30,7 @@ from azotea_cli.common.types import BayerPattern, HeaderType, ImageType, ValidSt
 # ----------------
 # Own dependencies
 # ----------------
-from .noasync.metadata import Model, metadata
+from .database import Model, metadata
 from .view import view
 
 # -----------------------

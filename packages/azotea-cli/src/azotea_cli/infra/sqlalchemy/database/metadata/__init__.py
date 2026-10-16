@@ -14,7 +14,6 @@
 #
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.ext.asyncio import AsyncAttrs
 
 # -------------
 # local imports
@@ -31,5 +30,9 @@ metadata = MetaData(
     }
 )
 
-class Model(AsyncAttrs, DeclarativeBase):
+class Model(DeclarativeBase):
+    """The Base class all of our models must derive"""
+
     metadata = metadata
+
+__all__ = ["metadata", "Model"]

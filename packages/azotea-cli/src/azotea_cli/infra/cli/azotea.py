@@ -19,7 +19,7 @@ from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 # --------------
 # local imports
 # -------------
-from azotea_cli.infra.sqlalchemy.noasync import DatabaseByEnvVar
+from azotea_cli.infra.sqlalchemy.database.adapters.decouple import DcplDatabase
 from azotea_cli.operation.adapters import SqaImagesRepo, SqaSkyBrightnessRepo
 from azotea_cli.operation.models import RegisterForm
 from azotea_cli.operation.use_cases import RegisterImagesUseCase, SkyStatisticsUseCase
@@ -45,7 +45,7 @@ DESCRIPTION = "AZOTEA image processing tool"
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 # create the database object
-db = DatabaseByEnvVar("DATABASE_URL")
+db = DcplDatabase("DATABASE_URL")
 
 # -------------------
 # Auxiliary functions

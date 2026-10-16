@@ -25,7 +25,7 @@ from sqlalchemy.orm import Session
 # local imports
 # -------------
 from azotea_cli import __version__
-from azotea_cli.infra.sqlalchemy.noasync import DatabaseByEnvVar
+from azotea_cli.infra.sqlalchemy.database.adapters.decouple import DcplDatabase
 from azotea_cli.infra.sqlalchemy import  Config, Date, Model, Time, sqa_logging
 
 from .util import parser as prs
@@ -43,7 +43,7 @@ DESCRIPTION = "AZOTEA Database initial schema generation tool"
 # get the module logger
 log = logging.getLogger(__name__.split(".")[-1])
 # create the database object
-db = DatabaseByEnvVar("DATABASE_URL")
+db = DcplDatabase("DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
