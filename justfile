@@ -228,7 +228,7 @@ fits-sky dir log:
     uv run azotea --console --trace --verbose ${logfile} batch --images-dir ${dir} --only-sky --depth 8
 
 [private]
-fits-view dir log="":
+fits-view dir="images/FITS" log="":
     #!/usr/bin/env bash
     set -exuo pipefail
     log={{log}}
@@ -236,7 +236,7 @@ fits-view dir log="":
     if [ "${log}" != "" ]; then
         logfile="--log-file azotea.log"
     else
-         logfile=""
+        logfile=""
     fi
     uv run azofits --console --trace ${logfile} --images-dir ${dir} view
 
@@ -293,7 +293,7 @@ capturafits-edit log="":
     fi
     uv run azofits --console --trace ${logfile} --images-dir ${dir} creator --set capturafits
     uv run azofits --console --trace ${logfile} --images-dir ${dir} edit \
-         --camera "ZWO ASI224 MC" --bayer-pattern RGGB  --bias 100 --image-type LIGHT --gain 10
+         --camera "ZWO ASI224 MC" --bayer-pattern RGGB  --bias 100 --image-type LIGHT --gain 5
 
 capturafits-all: (anew) (fits-anew) (capturafits-edit) (capturafits-view) (capturafits-setup) (capturafits-register) (capturafits-sky) (export-all)  (sky-summary)
 
