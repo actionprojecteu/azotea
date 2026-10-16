@@ -20,6 +20,15 @@ Each image adquistion software has its own convention and idiosyncrasies, so `az
     - [Examples](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md#examples)
 * [Miscelanea](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md#miscelanea)
 
+# Instalation
+
+In the same **activated virtual environment**  where azotea-client is instaled;
+
+```bash
+pip install azotea-fits
+```
+
+Aster installation, type `azofits --help` to see the complete list of options.
 
 # AZOTEA FITS keywords
 
@@ -68,20 +77,13 @@ not to be confused  with the `EGAIN` keyword which specifies a "gain" (conversio
 
 # Usage
 
-The `azofits` executable has the same structure:
-
-```
-azofits  <options>
-```
-Type `azofits --help` to see the complete list of options.
-
 ## General behaviour
 
-* All FITS edition options are optional. However, if passed, they will take precedence over values already present in the appropiate FITS keyword and will be overwritten or created if they didn't exist.
+* All FITS edition options are optional. However, if passed, they will overwrite the existing FITS keyword or create a new one.
 * A `HISTORY` keyword will be added describing each keyword change.
 * Once the FITS image is edited and `SWMODIFY` (=`azofits`) is added, no further edition is possible (*Exception: --force option*)
 
-## generic options
+## Generic options
 ```bash
 AZOTEA FITS image pre-processor
 
@@ -107,9 +109,7 @@ options:
                         single FITS file path
 ```
 
-## generic options
-
-## software creator options
+## Software creator options
 
 For the time being `azofits` have special support for `SharpCap` and `CapturaFits` image producer software.
 More can be added on requests. It si important to set the proper keyword in place before editing.
