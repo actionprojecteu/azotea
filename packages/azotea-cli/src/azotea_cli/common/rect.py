@@ -1,4 +1,6 @@
 import re
+from typing import NamedTuple
+
 from azotea_cli.common.errors import AzoteaError
 
 class InvalidRectStringError(AzoteaError):
@@ -6,10 +8,9 @@ class InvalidRectStringError(AzoteaError):
     pass
 
 
-class Point:
-    def __init__(self, x: int, y: int) -> None:
-        self.x = x
-        self.y = y
+class Point(NamedTuple):
+    x: int
+    y: int
 
     def __mul__(self, rhs: int) -> "Point":
         return Point(self.x * rhs, self.y * rhs)
@@ -21,15 +22,13 @@ class Point:
     def zero(cls) -> "Point":
         return cls(0,0)
 
+PATTERN: re.Pattern[str] = re.compile(r"\[(\d+):(\d+),(\d+):(\d+)\]")
+class Rect(NamedTuple):
+    x1: int
+    y1: int
+    x2: int
+    y2: int
 
-class Rect:
-    PATTERN: re.Pattern[str] = re.compile(r"\[(\d+):(\d+),(\d+):(\d+)\]")
-
-    def __init__(self, x1: int, y1: int, x2: int, y2: int) -> None:
-        self.x1 = min(x1, x2)
-        self.y1 = min(y1, y2)
-        self.x2 = max(x1, x2)
-        self.y2 = max(y1, y2)
 
     @classmethod
     def from_points(cls, p1: Point, p2: Point) -> "Rect":
@@ -37,7 +36,7 @@ class Rect:
 
     @classmethod
     def from_string(cls, value: str) -> "Rect":
-        match = re.fullmatch(cls.PATTERN, value.strip())
+        match = re.fullmatch(PATTERN, value.strip())
         if match is None:
             raise InvalidRectStringError(f"{value!r}")
         x1, y1, x2, y2 = map(int, match.groups())
