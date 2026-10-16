@@ -4,7 +4,7 @@ from ..ports import ImageReader, ImageReaderFactory
 from .exif import ExifReader
 from .fits import FitsReader
 
-FITS_EXTENSIONS = ('*.fit',  '*.fits', '*.fts')
+FITS_EXTENSIONS = ('.fit',  '.fits', '.fts')
 
 def is_fits(path: str) -> bool:
     _, ext = os.path.splitext(path)

@@ -191,11 +191,11 @@ fits-setup dir image:
         --affiliation "Agrupación Astronómica de Alcafrán" --acronym AA-ACFN
     uv run azotool  --console location create --default --site-name Alcafrán --location Alcafrán \
         --longitude -2.7335649 --latitude 40.4966031 --utc-offset 1
-    uv run azotool --console camera create --default \
+    uv run azotool --console configure optics --focal-length 50 --f-number 3.5
+    uv run azotool --console --trace camera create --default \
         --from-image ${IMAGES}/${IMAGE}
-    uv run azotool  --console roi create --default --width 500 --height 400 \
+    uv run azotool  --console --trace roi create --default --width 500 --height 400 \
         --from-image ${IMAGES}/${IMAGE}
-    uv run azotool --console configure optics --focal-length 50 --f-number 3.5  # (8)
     #uv run azotool --console configure publishing --username foo --password bar --url http://localhost:8080
 
 [private]
@@ -209,7 +209,7 @@ fits-register dir log:
     else
          logfile=""
     fi
-    uv run azotea --console --trace --verbose ${logfile} batch -i ${dir} --only-load --depth 8
+    uv run azotea --console --trace --verbose ${logfile} batch --images-dir ${dir} --only-load --depth 8
 
 [private]
 fits-sky dir log:
@@ -222,7 +222,7 @@ fits-sky dir log:
     else
          logfile=""
     fi
-    uv run azotea --console --trace --verbose ${logfile} batch -i ${dir} --only-sky --depth 8
+    uv run azotea --console --trace --verbose ${logfile} batch --images-dir ${dir} --only-sky --depth 8
 
 [private]
 fits-view dir log="":
@@ -261,9 +261,10 @@ sharpcap-register log="": (fits-register "images/FITS/sharpcap" log)
 
 sharpcap-sky log="": (fits-sky "images/FITS/sharpcap" log)
 
-sharpcap-all: (anew) (fits-anew) (sharpcap-setup) (sharpcap-register) (sharpcap-sky)  (export-all) (sky-summary)
-
 sharpcap-view log="": (fits-view "images/FITS/sharpcap" log)
+
+sharpcap-all: (anew) (fits-anew) (sharpcap-edit) (sharpcap-view) (sharpcap-setup) (sharpcap-register) (sharpcap-sky)  (export-all) (sky-summary)
+
 
 # ===================================
 # FITS / CAPTURAFITS IMAGE PROCESSING
@@ -289,10 +290,9 @@ capturafits-edit log="":
     fi
     uv run azofits --console --trace ${logfile} --images-dir ${dir} creator --set capturafits
     uv run azofits --console --trace ${logfile} --images-dir ${dir} edit \
-         --camera "ZWO ASI224 MC" --bayer-pattern RGGB  --bias 100 --image-type LIGHT
+         --camera "ZWO ASI224 MC" --bayer-pattern RGGB  --bias 100 --image-type LIGHT --gain 10
 
-
-capturafits-all: (anew) (fits-anew) (capturafits-setup) (capturafits-register) (capturafits-sky) (export-all)  (sky-summary)
+capturafits-all: (anew) (fits-anew) (capturafits-edit) (capturafits-view) (capturafits-setup) (capturafits-register) (capturafits-sky) (export-all)  (sky-summary)
 
 
 [private]

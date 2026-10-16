@@ -41,3 +41,6 @@ class MissingImageError(AzoteaError):
     """Image path does not exists"""
 
     pass
+
+class MissingMandatorFitsError(AzoteaError):
+    """Missing mandatory keywords in FITS image"""
