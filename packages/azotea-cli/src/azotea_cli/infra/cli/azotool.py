@@ -59,7 +59,15 @@ from azotea_cli.reports.adapters import (
     SqaReportsService,
     SqaSummaryService,
 )
-from azotea_cli.reports.use_cases import GenerateReportsUseCase, GenerateSummaryUseCase
+from azotea_cli.reports.use_cases import (
+    GenerateAllReport,
+    GenerateLatestMonthReport,
+    GenerateLatestNightReport,
+    GenerateReportByDates,
+    GenerateUnpublishedReport,
+    ShowImageSummary,
+    ShowSkySummary,
+)
 
 # ----------------
 # Module constants
@@ -420,8 +428,11 @@ def cli_observer(args: Namespace) -> None:
         use_case = UpdateObserver(observer, consent)
         use_case.execute(form)
     else:
-        use_case = CreateVersionedObserver(observer, consent,)
-        use_case.execute( form, args.default)
+        use_case = CreateVersionedObserver(
+            observer,
+            consent,
+        )
+        use_case.execute(form, args.default)
 
 
 def cli_sky_export(args: Namespace) -> None:
@@ -429,17 +440,21 @@ def cli_sky_export(args: Namespace) -> None:
     reporter = SqaReportsService(db)
     observer = SqaObserverRepo(db)
     exporter = CsvExporterService(args.csv_dir)
-    use_case = GenerateReportsUseCase(consent, observer, reporter, exporter)
     if args.all:
-        use_case.generate_report_all()
+        use_case = GenerateAllReport(consent, observer, reporter, exporter)
+        use_case.execute()
     elif args.unpublished:
-        use_case.generate_report_unpublished()
+        use_case = GenerateUnpublishedReport(consent, observer, reporter, exporter)
+        use_case.execute()
     elif args.range:
-        use_case.generate_report_by_date_range(args.from_date, args.to_date)
+        use_case = GenerateReportByDates(consent, observer, reporter, exporter)
+        use_case.execute(args.from_date, args.to_date)
     elif args.latest_night:
-        use_case.generate_report_latest_night()
+        use_case = GenerateLatestNightReport(consent, observer, reporter, exporter)
+        use_case.execute()
     elif args.latest_month:
-        use_case.generate_report_latest_month()
+        use_case = GenerateLatestMonthReport(consent, observer, reporter, exporter)
+        use_case.execute()
     else:
         pass
 
@@ -449,8 +464,8 @@ def cli_sky_summary(args: Namespace) -> None:
     observer = SqaObserverRepo(db)
     summarizer = SqaSummaryService(db)
     display = StdoutDisplay()
-    use_case = GenerateSummaryUseCase(consent, observer, summarizer, display)
-    use_case.show_sky_summary()
+    use_case = ShowSkySummary(consent, observer, summarizer, display)
+    use_case.execute()
 
 
 def cli_img_summary(args: Namespace) -> None:
@@ -458,8 +473,8 @@ def cli_img_summary(args: Namespace) -> None:
     observer = SqaObserverRepo(db)
     summarizer = SqaSummaryService(db)
     display = StdoutDisplay()
-    use_case = GenerateSummaryUseCase(consent, observer, summarizer, display)
-    use_case.show_image_summary()
+    use_case = ShowImageSummary(consent, observer, summarizer, display)
+    use_case.execute()
 
 
 def cli_main(args: Namespace) -> None:
