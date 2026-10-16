@@ -163,7 +163,7 @@ def cli_sw_creator(args: Namespace) -> None:
 
 def cli_view(args: Namespace) -> None:
     factory = EditorFactoryImpl()
-    display = StdoutDisplay()
+    display = StdoutDisplay(table_fmt="presto")
     if args.images_dir:
         scan = ScanForm(images_dir=args.images_dir, depth=args.dir_depth)
         batch_show_fits_metadata(scan, factory, display)

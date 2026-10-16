@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Sequence
 from itertools import batched
 
@@ -5,23 +6,63 @@ from tabulate import tabulate
 
 from ..ports import DisplayService, TabularData
 
+# get the root logger
+log = logging.getLogger(__name__.split(".")[-1])
+
+
 class StdoutDisplay(DisplayService):
-    def __init__(self, tablefmt: str = "grid", page_size: int | None = None) -> None:
-        self.tablefmt = tablefmt
+    FORMATS = {
+        "simple": "-",
+        "grid": "=",
+        "fancy_grid": "═",
+        "outline": "=",
+        "presto": "-",
+        "plain": " ",
+        "psql": "-",
+    }
+
+    def __init__(self, table_fmt: str = "simple", page_size: int | None = None) -> None:
+        self.table_fmt = table_fmt
         self.page_size = page_size
 
     def show(self, text: str) -> None:
         print(text)
 
-    def show_tabular(self, table: TabularData, keys: Sequence[str] | None = None) -> None:
+    def _title(self, output: str, title: str) -> tuple[str | None, str]:
+        char = self.FORMATS.get(self.table_fmt)
+        if char is None:
+            return None, output
+        lines = output.splitlines()
+        first_line = lines[0]
+        width = max(len(line) for line in lines)
+        if self.table_fmt in ("grid", "fancy_grid", "outline", "psql"):
+            first_line = lines[0]
+            lines = lines[1:]
+            title = f" {title} ".center(width - 2, char)
+            title = f"{first_line[0]}{title}{first_line[-1]}"
+        else:
+            title = f" {title} ".center(width, char)
+        return title, "\n".join(lines)
+
+    def _print(
+        self, table: TabularData, keys: Sequence[str] | None = None, title: str | None = None
+    ) -> None:
+        output = tabulate(table, headers=keys or "keys", tablefmt=self.table_fmt)
+        if title is not None:
+            new_title, output = self._title(output, title)
+            title = new_title if new_title is not None else title
+            print(title)
+        print(output)
+
+    def show_tabular(
+        self, table: TabularData, keys: Sequence[str] | None = None, title: str | None = None
+    ) -> None:
         if self.page_size is None:
-            print(tabulate(table, headers=keys or "keys", tablefmt=self.tablefmt))
+            self._print(table, keys, title)
         else:
             for page in batched(table, self.page_size):
-                 print(tabulate(page, headers=keys or "keys", tablefmt=self.tablefmt))
-                 input("Press Enter to continue [Ctrl-C to abort] ...")
-
-
+                self._print(page, keys, title)
+                input("Press Enter to continue [Ctrl-C to abort] ...")
 
 
 __all__ = ["StdoutDisplay"]

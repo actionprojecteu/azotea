@@ -1,4 +1,5 @@
 import logging
+import os
 
 from astropy.io import fits
 from azotea_cli.common.display.ports import DisplayService
@@ -15,10 +16,14 @@ def show_fits_metadata(path: str, factory: EditorFactory, display: DisplayServic
     editor = factory.get_editor(path)
     with fits.open(path) as hdul:
         data = editor.read.keywords(hdul[0].header)
-        display.show_tabular(data, keys=("Field", "Keyword", "Value"))
+        display.show_tabular(
+            data, keys=("Field", "Keyword", "Value"), title=os.path.basename(path)
+        )
 
 
-def batch_show_fits_metadata(scan: ScanForm, factory: EditorFactory, display: DisplayService) -> None:
+def batch_show_fits_metadata(
+    scan: ScanForm, factory: EditorFactory, display: DisplayService
+) -> None:
     paths = scan_images(scan.images_dir, scan.depth, EXTENSIONS)
     for path in paths:
         show_fits_metadata(path, factory, display)
