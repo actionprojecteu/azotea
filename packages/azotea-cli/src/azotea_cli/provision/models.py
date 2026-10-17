@@ -8,10 +8,10 @@
 # ----------------
 from dataclasses import dataclass
 
-# ----------------
-# Own dependencies
-# ----------------
-from azotea_cli.common.types import BayerPattern, HeaderType
+# ---------------------
+# Third party libraries
+# ---------------------
+from lica_raw import BayerPattern, HeaderType
 
 
 @dataclass(frozen=True)

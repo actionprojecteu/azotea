@@ -8,12 +8,11 @@
 # ----------------
 from dataclasses import dataclass
 from datetime import datetime
+from lica_raw import ImageType
 
 # ----------------
 # Own dependencies
 # ----------------
-from azotea_cli.common.types import ImageType
-
 
 @dataclass(frozen=True)
 class ObservationReport:

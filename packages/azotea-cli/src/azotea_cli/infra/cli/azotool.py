@@ -17,14 +17,15 @@ from lica_cli import execute
 from lica_cli.validate import vdate, vfile
 from lica_tables.adapters.tabulate import StdoutDisplay
 from lica_sqa.adapters.decouple import DcplDatabase
+from lica_raw import BayerPattern, HeaderType
+from lica_raw.adapters import ImageReaderFactoryImpl
+
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
-from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
-from azotea_cli.common.types import BayerPattern, HeaderType
 from azotea_cli.provision import (
     CameraForm,
     DefaultOpticsForm,

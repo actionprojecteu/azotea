@@ -23,10 +23,11 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
+from lica_raw import BayerPattern, HeaderType, ImageType
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.common.types import BayerPattern, HeaderType, ImageType, ValidState
+from .types import ValidState
 
 from lica_sqa import Model, metadata, view
 

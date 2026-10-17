@@ -62,30 +62,18 @@ name = "azotea-cli"
 version = "0.1.0"
 source = { editable = "packages/azotea-cli" }
 dependencies = [
-    { name = "alembic" },
-    { name = "astropy" },
-    { name = "exifread" },
     { name = "lica-cli" },
+    { name = "lica-raw", extra = ["exif", "fits"] },
     { name = "lica-sqa", extra = ["decouple"] },
     { name = "lica-tables", extra = ["tabulate"] },
-    { name = "rawpy" },
-    { name = "sqlalchemy" },
-    { name = "tabulate" },
-    { name = "types-tabulate" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "alembic", specifier = ">=1.20" },
-    { name = "astropy", specifier = ">=8.0" },
-    { name = "exifread", specifier = ">=3.5" },
     { name = "lica-cli", git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-cli" },
+    { name = "lica-raw", extras = ["exif", "fits"], git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-raw" },
     { name = "lica-sqa", extras = ["decouple"], git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-sqa" },
     { name = "lica-tables", extras = ["tabulate"], git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-tables" },
-    { name = "rawpy", specifier = ">=0.27" },
-    { name = "sqlalchemy", specifier = ">=2.0" },
-    { name = "tabulate", specifier = ">=0.10" },
-    { name = "types-tabulate", specifier = ">=0.10" },
 ]
 
 [[package]]
@@ -135,7 +123,7 @@ wheels = [
 [[package]]
 name = "lica-cli"
 version = "0.1.0"
-source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-cli#34c06753277ad04b5789f66250626c83c81ac592" }
+source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-cli#1588ce7be46c7e226bfc7a7940fc8a95976b1d67" }
 dependencies = [
     { name = "lica-log" },
 ]
@@ -143,13 +131,31 @@ dependencies = [
 [[package]]
 name = "lica-log"
 version = "0.1.0"
-source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-log#34c06753277ad04b5789f66250626c83c81ac592" }
+source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-log#1588ce7be46c7e226bfc7a7940fc8a95976b1d67" }
+
+[[package]]
+name = "lica-raw"
+version = "0.1.0"
+source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-raw#1588ce7be46c7e226bfc7a7940fc8a95976b1d67" }
+dependencies = [
+    { name = "numpy" },
+]
+
+[package.optional-dependencies]
+exif = [
+    { name = "exifread" },
+    { name = "rawpy" },
+]
+fits = [
+    { name = "astropy" },
+]
 
 [[package]]
 name = "lica-sqa"
 version = "0.1.0"
-source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-sqa#34c06753277ad04b5789f66250626c83c81ac592" }
+source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-sqa#1588ce7be46c7e226bfc7a7940fc8a95976b1d67" }
 dependencies = [
+    { name = "alembic" },
     { name = "sqlalchemy" },
 ]
 
@@ -161,11 +167,12 @@ decouple = [
 [[package]]
 name = "lica-tables"
 version = "0.1.0"
-source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-tables#34c06753277ad04b5789f66250626c83c81ac592" }
+source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-tables#1588ce7be46c7e226bfc7a7940fc8a95976b1d67" }
 
 [package.optional-dependencies]
 tabulate = [
     { name = "tabulate" },
+    { name = "types-tabulate" },
 ]
 
 [[package]]

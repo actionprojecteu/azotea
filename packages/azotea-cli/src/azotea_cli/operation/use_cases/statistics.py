@@ -14,6 +14,7 @@ from itertools import batched
 # Third party libraries
 # ---------------------
 import numpy as np
+from lica_raw import ImageReaderFactory
 
 # ---------------
 # Own dependecies
@@ -24,7 +25,6 @@ from azotea_cli.common.errors import AzoteaError
 # Own dependecies
 # ---------------
 from azotea_cli.common.types import ObjId
-from azotea_cli.common.reader import ImageReaderFactory
 from azotea_cli.provision.ports import (
     CameraRepo,
     ConsentService,

@@ -14,13 +14,14 @@ from argparse import ArgumentParser, Namespace
 # ---------------------
 from lica_cli import execute
 from lica_sqa.adapters.decouple import DcplDatabase
+from lica_raw.adapters import ImageReaderFactoryImpl
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
-from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
+
 from azotea_cli.operation.adapters import SqaImagesRepo, SqaSkyBrightnessRepo
 from azotea_cli.operation.models import RegisterForm
 from azotea_cli.operation.use_cases import ComputeSkyStatistics, RegisterImages

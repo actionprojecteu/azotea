@@ -11,10 +11,14 @@ import os
 from datetime import datetime, timezone
 from itertools import batched
 
+# ---------------------
+# Third party libraries
+# ---------------------
+from lica_raw import ImageReaderFactory
+
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.common.reader import ImageReaderFactory
 from azotea_cli.provision.errors import CameraMissingError
 from azotea_cli.provision.ports import (
     CameraRepo,

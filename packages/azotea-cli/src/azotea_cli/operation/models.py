@@ -9,11 +9,15 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+# ---------------------
+# Third party libraries
+# ---------------------
+from lica_raw import ImageType
+
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.common.types import ImageType, ObjId
-
+from azotea_cli.common.types import ObjId
 
 @dataclass(frozen=True)
 class RegisterForm:

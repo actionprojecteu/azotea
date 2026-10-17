@@ -8,12 +8,16 @@
 # ----------------
 from typing import Protocol
 
+# ---------------------
+# Third party libraries
+# ---------------------
+from lica_raw import ImageMetadata
+from lica_raw import Rect
+
 # ----------------
 # Own dependencies
 # ----------------
 from azotea_cli.common.types import ObjId
-from azotea_cli.common.reader.models import ImageMetadata
-from azotea_cli.common.rect import Rect
 
 from .models import (
     CameraForm,

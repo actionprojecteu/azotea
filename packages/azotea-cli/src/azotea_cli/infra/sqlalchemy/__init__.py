@@ -3,6 +3,7 @@
 #
 # See the LICENSE file for details
 # ----------------------------------------------------------------------
+from .types import ValidState
 from .models import (
     Camera,
     Config,
@@ -18,6 +19,7 @@ from .models import (
 #from .database import sqa_logging, Database, Model
 
 __all__ = [
+    "ValidState",
     "Camera",
     "Config",
     "Date",
