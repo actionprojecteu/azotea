@@ -1,9 +1,23 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# Standard library
+# ----------------
 import os
 from datetime import datetime, timezone
 
+# ---------------------
+# Third party libraries
+# ---------------------
 from astropy.io import fits
 from astropy.io.fits import HDUList
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.rect import Point, Rect
 from azotea_cli.common.types import BayerIndex, BayerPattern, HeaderType
 

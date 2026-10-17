@@ -1,6 +1,17 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import logging
 import os
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.display.ports import DisplayService
 from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.common.reader.ports import ImageReaderFactory

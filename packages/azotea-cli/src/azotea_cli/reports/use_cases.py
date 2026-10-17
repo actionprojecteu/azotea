@@ -1,6 +1,17 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import logging
 from datetime import datetime
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.display.ports import DisplayService
 from azotea_cli.provision.ports import (
     ConsentService,
@@ -181,6 +192,7 @@ class ShowImageSummary:
         observer_id = self.observer.get_default()
         data = self.summarizer.totals_by(observer_id)
         self.display.show_tabular(data)
+
 
 class ShowSkySummary:
     def __init__(

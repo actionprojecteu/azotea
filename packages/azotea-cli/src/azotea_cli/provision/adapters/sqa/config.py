@@ -1,7 +1,8 @@
-# ------------------
-# standard libraries
-# ------------------
-
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
 # ---------------------
 # Third party libraries
 # ---------------------
@@ -12,7 +13,6 @@ from sqlalchemy.orm import Session
 # ---------------
 # Own dependecies
 # ---------------
-#
 from azotea_cli.infra.sqlalchemy import Config
 
 def load(session: Session, section: str, property: str) -> str | None:

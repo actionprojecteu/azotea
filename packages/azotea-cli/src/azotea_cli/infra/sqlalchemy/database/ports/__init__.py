@@ -3,16 +3,15 @@
 #
 # See the LICENSE file for details
 # ----------------------------------------------------------------------
-
-# --------------------
-# System wide imports
-# -------------------
-from typing import  ContextManager, Protocol
-from sqlalchemy.orm import Session
+# ----------------
+# standard library
+# ----------------
+from typing import ContextManager, Protocol
 
 # ---------------------
 # Third party libraries
 # ---------------------
+from sqlalchemy.orm import Session
 
 
 class Database(Protocol):

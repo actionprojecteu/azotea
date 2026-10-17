@@ -1,11 +1,22 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# Standard library
+# ----------------
 import re
 from typing import NamedTuple
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.errors import AzoteaError
+
 
 class InvalidRectStringError(AzoteaError):
     """Rectangle string incorrectly formatted"""
-    pass
 
 
 class Point(NamedTuple):
@@ -20,15 +31,17 @@ class Point(NamedTuple):
 
     @classmethod
     def zero(cls) -> "Point":
-        return cls(0,0)
+        return cls(0, 0)
+
 
 PATTERN: re.Pattern[str] = re.compile(r"\[(\d+):(\d+),(\d+):(\d+)\]")
+
+
 class Rect(NamedTuple):
     x1: int
     y1: int
     x2: int
     y2: int
-
 
     @classmethod
     def from_points(cls, p1: Point, p2: Point) -> "Rect":

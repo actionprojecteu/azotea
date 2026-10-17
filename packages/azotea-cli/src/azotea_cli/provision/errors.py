@@ -1,101 +1,70 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
 from azotea_cli.common.errors import AzoteaError
-
-# ------------------
-# Package exceptions
-# ------------------
 
 
 class ConsentNotAgreedError(AzoteaError):
     """Consent form was not signed or was declined"""
 
-    pass
-
 
 class LocationMissingError(AzoteaError):
     """Location does not exists"""
-
-    pass
 
 
 class MissingDefaultLocationError(AzoteaError):
     """Default location is not set"""
 
-    pass
-
 
 class ObserverMissingError(AzoteaError):
     """Observer does not exists"""
-
-    pass
 
 
 class MissingDefaultObserverError(AzoteaError):
     """Default observer is not set"""
 
-    pass
-
 
 class CameraMissingError(AzoteaError):
     """Camera does not exists"""
-
-    pass
 
 
 class MissingDefaultCameraError(AzoteaError):
     """Default camera is not set"""
 
-    pass
-
 
 class RoiMissingError(AzoteaError):
     """Roi does not exists"""
-
-    pass
 
 
 class MissingDefaultRoiError(AzoteaError):
     """Default roi is not set"""
 
-    pass
-
 
 class FocalLenMissingError(AzoteaError):
-    """default focal length not set"""
-
-    pass
+    """Default focal length not set"""
 
 
 class FNumberMissingError(AzoteaError):
-    """default f-number not set"""
-
-    pass
+    """Default f-number not set"""
 
 
 class MissingCameraModelError(AzoteaError):
-    """missing camera model from metadata"""
-
-    pass
+    """Missing camera model from metadata"""
 
 
 class MissingExpTimeError(AzoteaError):
-    """missing exposure time from metadata"""
-
-    pass
+    """Missing exposure time from metadata"""
 
 
 class MissingIsoOrGainError(AzoteaError):
-    """Missing ISO or CMS GAIN from metadata"""
-
-    pass
+    """Missing ISO or CMS gain from metadata"""
 
 
 class MissingBlackLevelError(AzoteaError):
-    """Missing ISO or CMS GAIN from metadata"""
-
-    pass
+    """Missing black level from metadata"""
 
 
 class MissingDateObsError(AzoteaError):
     """could not find date of observation in metadata"""
-
-    pass

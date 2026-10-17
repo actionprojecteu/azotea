@@ -1,46 +1,34 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.errors import AzoteaError
 
 
-class MissingCameraModelError(AzoteaError):
-    """missing camera moedel from metadata"""
-
-    pass
-
-
 class UnsupportedCFAError(AzoteaError):
-    """unsupported Color Filter Array type"""
-
-    pass
+    """Unsupported Color Filter Array type"""
 
 
 class ReadMetadataError(AzoteaError):
-    """could not read EXIF metadata"""
-
-    pass
-
-
-class MissingDateObsError(AzoteaError):
-    """could not find date of observation in metadata"""
-
-    pass
+    """Could not read EXIF metadata"""
 
 
 class UnknownDateTimeFormatError(AzoteaError):
     """unknown observation date format string"""
 
-    pass
-
 
 class OutOfBoundsError(AzoteaError):
     """out of bounds rectangle"""
-
-    pass
 
 
 class MissingImageError(AzoteaError):
     """Image path does not exists"""
 
-    pass
 
 class MissingMandatorFitsError(AzoteaError):
     """Missing mandatory keywords in FITS image"""

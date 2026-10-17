@@ -3,26 +3,27 @@
 #
 # See the LICENSE file for details
 # ----------------------------------------------------------------------
-#
+# ----------------
+# standard library
+# ----------------
 import logging
 from argparse import ArgumentParser, Namespace
 
-# -------------------
-# Third party imports
-# -------------------
+# ---------------------
+# Third party libraries
+# ---------------------
 from lica.cli import execute
 
+# ---------------
+# Own dependecies
+# ---------------
 from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
-
-# --------------
-# local imports
-# -------------
 from azotea_cli.infra.sqlalchemy.database.adapters.decouple import DcplDatabase
 from azotea_cli.operation.adapters import SqaImagesRepo, SqaSkyBrightnessRepo
 from azotea_cli.operation.models import RegisterForm
-from azotea_cli.operation.use_cases import RegisterImages, ComputeSkyStatistics
+from azotea_cli.operation.use_cases import ComputeSkyStatistics, RegisterImages
 from azotea_cli.provision.adapters import (
     SqaCameraRepo,
     SqaConsentRepo,

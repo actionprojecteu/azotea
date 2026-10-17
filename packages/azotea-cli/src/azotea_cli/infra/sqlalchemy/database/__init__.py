@@ -1,3 +1,11 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import logging
 from .ports import Database
 from .metadata import Model, metadata

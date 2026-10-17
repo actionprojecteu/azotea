@@ -2,9 +2,10 @@
 # View recipe from https://github.com/sqlalchemy/sqlalchemy/wiki/Views
 # (updated for 2.0.38)
 # --------------------------------------------------------------------
-
+# ---------------------
+# Third party libraries
+# ---------------------
 import sqlalchemy
-
 from sqlalchemy.ext import compiler
 from sqlalchemy.schema import DDLElement
 
@@ -57,7 +58,6 @@ def view(name, metadata, selectable):
         CreateView(name, selectable).execute_if(callable_=view_doesnt_exist),
     )
     sqlalchemy.event.listen(
-        metadata, "before_drop", DropView(
-            name).execute_if(callable_=view_exists)
+        metadata, "before_drop", DropView(name).execute_if(callable_=view_exists)
     )
     return t

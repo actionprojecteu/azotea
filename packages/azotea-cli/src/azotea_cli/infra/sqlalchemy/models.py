@@ -1,13 +1,11 @@
 # ----------------------------------------------------------------------
-# Copyright (c) 2024 Rafael Gonzalez.
+# Copyright (c) 2026 Rafael Gonzalez.
 #
 # See the LICENSE file for details
 # ----------------------------------------------------------------------
-
-# --------------------
-# System wide imports
-# -------------------
-
+# ----------------
+# standard library
+# ----------------
 from datetime import datetime
 
 # ---------------------
@@ -25,11 +23,11 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
+# ---------------
+# Own dependecies
+# ---------------
 from azotea_cli.common.types import BayerPattern, HeaderType, ImageType, ValidState
 
-# ----------------
-# Own dependencies
-# ----------------
 from .database import Model, metadata
 from .view import view
 

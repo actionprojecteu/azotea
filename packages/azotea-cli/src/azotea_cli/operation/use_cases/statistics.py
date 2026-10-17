@@ -1,7 +1,11 @@
-# ------------------
-# standard libraries
-# ------------------
-
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import logging
 import os
 from itertools import batched
@@ -11,6 +15,9 @@ from itertools import batched
 # ---------------------
 import numpy as np
 
+# ---------------
+# Own dependecies
+# ---------------
 from azotea_cli.common.errors import AzoteaError
 
 # ---------------

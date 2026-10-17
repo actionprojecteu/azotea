@@ -1,3 +1,11 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# Standard library
+# ----------------
 from dataclasses import Field
 from typing import Protocol, Any, ClassVar, TypeVar
 from collections.abc import Sequence, Mapping

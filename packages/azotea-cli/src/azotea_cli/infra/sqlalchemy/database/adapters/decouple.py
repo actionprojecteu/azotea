@@ -3,11 +3,9 @@
 #
 # See the LICENSE file for details
 # ----------------------------------------------------------------------
-
-# --------------------
-# System wide imports
-# -------------------
-
+# ----------------
+# standard library
+# ----------------
 from collections.abc import Generator
 from contextlib import contextmanager
 
@@ -16,6 +14,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
+# ---------------
+# Own dependecies
+# ---------------
 from ..ports import Database
 
 class DcplDatabase(Database):

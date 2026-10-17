@@ -3,29 +3,26 @@
 #
 # See the LICENSE file for details
 # ----------------------------------------------------------------------
-
-# --------------------
-# System wide imports
-# -------------------
-
+# ----------------
+# standard library
+# ----------------
 import logging
 from argparse import ArgumentParser, Namespace
 
-# -------------------
-# Third party imports
-# -------------------
+# ---------------------
+# Third party libraries
+# ---------------------
 from lica.cli import execute
 from lica.validators import vdate, vfile
 
+# ---------------
+# Own dependecies
+# ---------------
 from azotea_cli import __version__
 from azotea_cli.common.display.adapters import StdoutDisplay
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 from azotea_cli.common.types import BayerPattern, HeaderType
-
-# --------------
-# local imports
-# -------------
 from azotea_cli.infra.sqlalchemy.database.adapters.decouple import DcplDatabase
 from azotea_cli.provision import (
     CameraForm,

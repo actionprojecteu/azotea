@@ -1,20 +1,32 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# Standard library
+# ----------------
 import logging
 import os
 from datetime import datetime, timezone
 from fractions import Fraction
 from typing import Any, Mapping
 
+# ---------------------
+# Third party libraries
+# ---------------------
 import exifread
 import numpy as np
 import rawpy
 from rawpy._rawpy import RawPy
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.rect import Point, Rect
 from azotea_cli.common.types import BayerIndex, BayerPattern, HeaderType
 
 from ..errors import (
-    MissingCameraModelError,
-    MissingDateObsError,
     MissingImageError,
     OutOfBoundsError,
     ReadMetadataError,

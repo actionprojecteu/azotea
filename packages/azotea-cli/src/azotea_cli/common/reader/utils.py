@@ -1,6 +1,17 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# Standard library
+# ----------------
 import os
 import re
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.types import ImageType
 
 

@@ -1,3 +1,8 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
 from .sqa.camera import SqaCameraRepo
 from .sqa.consent import SqaConsentRepo
 from .sqa.location import SqaLocationRepo

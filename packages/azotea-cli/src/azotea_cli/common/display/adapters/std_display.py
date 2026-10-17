@@ -1,9 +1,23 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# Standard library
+# ----------------
 import logging
 from collections.abc import Sequence
 from itertools import batched
 
+# ---------------------
+# Third party libraries
+# ---------------------
 from tabulate import tabulate
 
+# ----------------
+# Own dependencies
+# ----------------
 from ..ports import DisplayService, TabularData
 
 # get the root logger

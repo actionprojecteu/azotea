@@ -1,6 +1,5 @@
 * Es posible que no haya que hacer flip al bayer pattern del sharpcap porque la media del canal R salen menor que la del canal B
 * probar azotea con la BD de Hilera y ver como funciona alembic
-* limpiar las excpeciones no usadas del reader
 * formato bonito de las cabeceras
 * fork a lica-ng woerkspace: lica-logging, lica-cli, lica-rawimage
 * lica-log debe incluir el enum de log levels y formato personalizado de lineas de log

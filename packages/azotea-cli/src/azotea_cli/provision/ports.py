@@ -1,5 +1,16 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 from typing import Protocol
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.types import ObjId
 from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.common.rect import Rect
@@ -12,10 +23,6 @@ from .models import (
     ObserverForm,
     RoiForm,
 )
-
-# ----------
-# ports
-# ----------
 
 
 class ConsentService(Protocol):
@@ -42,7 +49,7 @@ class ObserverRepo(Protocol):
     def update(self, form: ObserverForm) -> None: ...
     def set_default(self, observer_id: ObjId) -> None: ...
     def get_default(self) -> ObjId: ...
-    def get_name(self, observer_id: ObjId) -> tuple[str,str]: ...
+    def get_name(self, observer_id: ObjId) -> tuple[str, str]: ...
 
 
 class CameraRepo(Protocol):
@@ -50,7 +57,7 @@ class CameraRepo(Protocol):
     def create_from_image(self, metadata: ImageMetadata) -> ObjId: ...
     def set_default(self, camera_id: ObjId) -> None: ...
     def get_default(self) -> ObjId: ...
-    def get_extension_by_id(self, camera_id: ObjId)-> str: ...
+    def get_extension_by_id(self, camera_id: ObjId) -> str: ...
     def get_id_by_model(self, model: str) -> ObjId: ...
 
 

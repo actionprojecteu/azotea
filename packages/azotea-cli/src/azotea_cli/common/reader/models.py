@@ -1,8 +1,19 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# Standard library
+# ----------------
 from dataclasses import dataclass
 from datetime import datetime
 
 import numpy as np
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.types import BayerPattern, ImageType, HeaderType
 
 # type alias

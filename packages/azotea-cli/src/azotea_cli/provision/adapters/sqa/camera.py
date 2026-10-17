@@ -1,7 +1,11 @@
-# ------------------
-# standard libraries
-# ------------------
-
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import logging
 
 # ---------------------
@@ -10,15 +14,14 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from azotea_cli.common.reader.models import ImageMetadata
-from azotea_cli.common.types import ObjId
-
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli.infra.sqlalchemy import Camera, Database
 from azotea_cli.provision.models import CameraForm
 from azotea_cli.provision.ports import CameraRepo
+from azotea_cli.common.reader.models import ImageMetadata
+from azotea_cli.common.types import ObjId
 
 from ...errors import (
     CameraMissingError,
@@ -99,11 +102,7 @@ class SqaCameraRepo(CameraRepo):
 
     def create_from_image(self, metadata: ImageMetadata) -> ObjId:
         make = "" if metadata.make is None else metadata.make
-        model = (
-            metadata.model
-            if metadata.model.startswith(make)
-            else f"{make} {metadata.model}"
-        )
+        model = metadata.model if metadata.model.startswith(make) else f"{make} {metadata.model}"
         with self.db.session() as session:
             try:
                 with session.begin():

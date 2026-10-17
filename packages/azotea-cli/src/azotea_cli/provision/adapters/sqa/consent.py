@@ -1,7 +1,11 @@
-# ------------------
-# standard libraries
-# ------------------
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
 #
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import importlib.resources as resources
 import logging
 from datetime import datetime, timezone
@@ -11,14 +15,13 @@ from datetime import datetime, timezone
 # ---------------------
 from sqlalchemy.orm import Session
 
-
 # ---------------
 # Own dependecies
 # ---------------
-
 from azotea_cli.infra.sqlalchemy import Database
 from azotea_cli.provision.errors import ConsentNotAgreedError
 from azotea_cli.provision.ports import ConsentService
+
 from . import config
 
 # -----------------------
@@ -27,6 +30,7 @@ from . import config
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
+
 
 class SqaConsentRepo(ConsentService):
     def __init__(self, db: Database) -> None:

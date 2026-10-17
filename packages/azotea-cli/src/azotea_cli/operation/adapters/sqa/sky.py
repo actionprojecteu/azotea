@@ -1,7 +1,11 @@
-# ------------------
-# standard libraries
-# ------------------
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
 #
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import logging
 import os
 from collections.abc import Sequence
@@ -12,11 +16,10 @@ from collections.abc import Sequence
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from azotea_cli.common.types import ObjId
-
 # ---------------
 # Own dependecies
 # ---------------
+from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import Database, Image, SkyBrightness
 from azotea_cli.operation.models import SkyStatsForm
 from azotea_cli.operation.ports import SkyBrightnessRepo

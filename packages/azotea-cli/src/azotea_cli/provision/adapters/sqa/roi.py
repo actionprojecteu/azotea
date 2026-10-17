@@ -1,7 +1,11 @@
-# ------------------
-# standard libraries
-# ------------------
-
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import logging
 
 # ---------------------
@@ -10,12 +14,11 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.common.rect import Rect
-
-# ---------------
-# Own dependecies
-# ---------------
 from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import Database, Roi
 from azotea_cli.provision.errors import MissingDefaultRoiError, RoiMissingError
@@ -90,11 +93,7 @@ class SqaRoiRepo(RoiRepo):
 
     def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> ObjId:
         make = "" if metadata.make is None else metadata.make
-        model = (
-            metadata.model
-            if metadata.model.startswith(make)
-            else f"{make} {metadata.model}"
-        )
+        model = metadata.model if metadata.model.startswith(make) else f"{make} {metadata.model}"
         with self.db.session() as session:
             try:
                 with session.begin():

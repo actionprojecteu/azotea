@@ -1,24 +1,14 @@
 # ----------------------------------------------------------------------
-# Copyright (c) 2024 Rafael Gonzalez.
+# Copyright (c) 2026 Rafael Gonzalez.
 #
 # See the LICENSE file for details
 # ----------------------------------------------------------------------
-
-# --------------------
-# System wide imports
-# -------------------
-
 # ---------------------
 # Third party libraries
 # ---------------------
-#
 from sqlalchemy import MetaData
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs
-
-# -------------
-# local imports
-# -------------
+from sqlalchemy.orm import DeclarativeBase
 
 metadata = MetaData(
     # For the different artifacts (indexes, constraints, etc.)
@@ -31,6 +21,8 @@ metadata = MetaData(
     }
 )
 
+
 class AsyncModel(AsyncAttrs, DeclarativeBase):
     """The Base class all of our async models must derive for lazy model loading"""
+
     metadata = metadata

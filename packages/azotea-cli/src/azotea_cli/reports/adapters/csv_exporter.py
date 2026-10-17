@@ -1,16 +1,17 @@
-# ------------------
-# standard libraries
-# ------------------
-
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import csv
 import logging
 import os
 from collections.abc import Sequence
 from dataclasses import asdict
 
-# ---------------------
-# Third party libraries
-# ---------------------
 # ---------------
 # Own dependecies
 # ---------------

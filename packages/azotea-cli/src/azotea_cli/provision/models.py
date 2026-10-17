@@ -1,5 +1,16 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 from dataclasses import dataclass
 
+# ----------------
+# Own dependencies
+# ----------------
 from azotea_cli.common.types import BayerPattern, HeaderType
 
 
@@ -58,7 +69,7 @@ class CameraForm:
     y_pixsize: float
 
     def __str__(self) -> str:
-         return f"{self.model}"
+        return f"{self.model}"
 
 
 @dataclass(frozen=True)

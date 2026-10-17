@@ -1,5 +1,16 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# Standard library
+# ----------------
 import os
 
+# ----------------
+# Own dependencies
+# ----------------
 from ..ports import ImageReader, ImageReaderFactory
 from .exif import ExifReader
 from .fits import FitsReader

@@ -1,40 +1,39 @@
 # ----------------------------------------------------------------------
-# Copyright (c) 2024 Rafael Gonzalez.
+# Copyright (c) 2026 Rafael Gonzalez.
 #
 # See the LICENSE file for details
 # ----------------------------------------------------------------------
-
-# --------------------
-# System wide imports
-# -------------------
-
+# ----------------
+# standard library
+# ----------------
 import logging
 import uuid
 from argparse import ArgumentParser, Namespace
 from datetime import datetime, timedelta
 from itertools import batched
 
+# ---------------------
+# Third party libraries
+# ---------------------
 from lica.cli import execute
+from lica.validators import vdate
 
-# ------------------
-# SQLAlchemy imports
-# -------------------
-from sqlalchemy.orm import Session
-
-# --------------
-# local imports
-# -------------
+# ---------------
+# Own dependecies
+# ---------------
 from azotea_cli import __version__
 from azotea_cli.infra.sqlalchemy.database.adapters.decouple import DcplDatabase
 from azotea_cli.infra.sqlalchemy import  Config, Date, Model, Time, sqa_logging
-
-from .util import parser as prs
 
 # ----------------
 # Module constants
 # ----------------
 
 DESCRIPTION = "AZOTEA Database initial schema generation tool"
+
+START_DATE = datetime(year=2000, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+END_DATE = datetime(year=2050, month=12, day=31, hour=23, minute=59, second=59, microsecond=99999)
+
 
 # -----------------------
 # Module global variables
@@ -48,6 +47,55 @@ db = DcplDatabase("DATABASE_URL")
 # -------------------
 # Auxiliary functions
 # -------------------
+
+def since() -> ArgumentParser:
+    parser = ArgumentParser(add_help=False)
+    parser.add_argument(
+        "-s",
+        "--since",
+        type=vdate,
+        default=START_DATE,
+        metavar="<YYYY-MM-DD>",
+        help="Start date for Date dimension (default %(default)s)",
+    )
+    return parser
+
+def until() -> ArgumentParser:
+    parser = ArgumentParser(add_help=False)
+    parser.add_argument(
+        "-u",
+        "--until",
+        type=vdate,
+        default=END_DATE,
+        metavar="<YYYY-MM-DD>",
+        help="End date for Date dimension (default %(default)s)",
+    )
+    return parser
+
+
+def seconds() -> ArgumentParser:
+    parser = ArgumentParser(add_help=False)
+    parser.add_argument(
+        "-e",
+        "--seconds",
+        type=int,
+        choices=[i for i in range(1, 61)],
+        default=1,
+        help="Default seconds resolution (default %(default)s)",
+    )
+    return parser
+
+
+def batch() -> ArgumentParser:
+    parser = ArgumentParser(add_help=False)
+    parser.add_argument(
+        "-b",
+        "--batch-size",
+        type=int,
+        default=10000,
+        help="Date/Time database transaction batch size (default %(default)s)",
+    )
+    return parser
 
 
 def julian_day(date: datetime) -> float:
@@ -168,16 +216,16 @@ def cli_populate_all(args: Namespace) -> None:
 def add_args(parser: ArgumentParser) -> None:
     subparser = parser.add_subparsers(dest="command", required=True)
     p = subparser.add_parser(
-        "date", parents=[prs.since(), prs.until(), prs.batch()], help="Load initial Date values"
+        "date", parents=[since(), until(), batch()], help="Load initial Date values"
     )
     p.set_defaults(func=cli_populate_date)
     p = subparser.add_parser(
-        "time", parents=[prs.seconds(), prs.batch()], help="Load initial Time values"
+        "time", parents=[seconds(), batch()], help="Load initial Time values"
     )
     p.set_defaults(func=cli_populate_time)
     p = subparser.add_parser(
         "all",
-        parents=[prs.since(), prs.until(), prs.seconds(), prs.batch()],
+        parents=[since(), until(), seconds(), batch()],
         help="Load all initial values",
     )
     p.set_defaults(func=cli_populate_all)

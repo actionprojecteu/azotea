@@ -1,15 +1,16 @@
-# ------------------
-# standard libraries
-# ------------------
-
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import logging
 import os
 from datetime import datetime, timezone
 from itertools import batched
 
-# ---------------------
-# Third party libraries
-# ---------------------
 # ---------------
 # Own dependecies
 # ---------------

@@ -1,34 +1,32 @@
-# ------------------
-# standard libraries
-# ------------------
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 
 import logging
 from collections.abc import Mapping, Sequence
-from datetime import datetime
 from typing import Any
 
 # ---------------------
 # Third party libraries
 # ---------------------
-from astropy.units import count
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
 
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli import __version__
 from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import (
-    Camera,
     Database,
     Date,
     Image,
-    Location,
     Observer,
     Roi,
     SkyBrightness,
-    Time,
 )
 from azotea_cli.reports.models import SummaryRanged, SummaryTotals
 from azotea_cli.reports.ports import SummaryService
