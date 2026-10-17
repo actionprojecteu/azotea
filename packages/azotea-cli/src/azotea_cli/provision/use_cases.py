@@ -9,10 +9,11 @@
 import logging
 import os
 
+from lica_tables import DisplayService
 # ----------------
 # Own dependencies
 # ----------------
-from azotea_cli.common.display.ports import DisplayService
+# from azotea_cli.common.display.ports import DisplayService
 from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.common.reader.ports import ImageReaderFactory
 from azotea_cli.common.rect import Point, Rect

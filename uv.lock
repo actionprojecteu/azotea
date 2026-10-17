@@ -71,6 +71,7 @@ dependencies = [
     { name = "exifread" },
     { name = "lica", extra = ["sqlalchemy"] },
     { name = "lica-cli" },
+    { name = "lica-tables" },
     { name = "rawpy" },
     { name = "sqlalchemy" },
     { name = "tabulate" },
@@ -84,6 +85,7 @@ requires-dist = [
     { name = "exifread", specifier = ">=3.5" },
     { name = "lica", extras = ["sqlalchemy"], specifier = ">=3.0" },
     { name = "lica-cli", git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-cli" },
+    { name = "lica-tables", editable = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-tables" },
     { name = "rawpy", specifier = ">=0.27" },
     { name = "sqlalchemy", specifier = ">=2.0" },
     { name = "tabulate", specifier = ">=0.10" },
@@ -163,6 +165,17 @@ dependencies = [
 name = "lica-log"
 version = "0.1.0"
 source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-log#98787ff9d050b842b24ef82d93c998aa3cdb7a62" }
+
+[[package]]
+name = "lica-tables"
+version = "0.1.0"
+source = { editable = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-tables" }
+dependencies = [
+    { name = "tabulate" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "tabulate" }]
 
 [[package]]
 name = "mako"

@@ -15,12 +15,12 @@ from argparse import ArgumentParser, Namespace
 
 from lica_cli import execute
 from lica_cli.validate import vdate, vfile
+from lica_tables.adapters.tabulate import StdoutDisplay
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli import __version__
-from azotea_cli.common.display.adapters import StdoutDisplay
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.reader.adapters import ImageReaderFactoryImpl
 from azotea_cli.common.types import BayerPattern, HeaderType

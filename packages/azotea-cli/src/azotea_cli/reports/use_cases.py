@@ -9,10 +9,12 @@
 import logging
 from datetime import datetime
 
+from lica_tables import DisplayService
+
 # ----------------
 # Own dependencies
 # ----------------
-from azotea_cli.common.display.ports import DisplayService
+#from azotea_cli.common.display.ports import DisplayService
 from azotea_cli.provision.ports import (
     ConsentService,
     ObserverRepo,

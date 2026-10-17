@@ -2,7 +2,7 @@ import logging
 import os
 
 from astropy.io import fits
-from azotea_cli.common.display.ports import DisplayService
+from lica_tables import DisplayService
 from azotea_cli.common.filesystem import scan_images
 
 from .models import EXTENSIONS, FitsForm, ScanForm

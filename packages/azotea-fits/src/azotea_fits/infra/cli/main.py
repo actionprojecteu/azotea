@@ -7,10 +7,10 @@
 import logging
 from argparse import ArgumentParser, Namespace
 
+from lica_tables.adapters.tabulate import StdoutDisplay
 # --------------
 # local imports
 # -------------
-from azotea_cli.common.display.adapters.std_display import StdoutDisplay
 from azotea_cli.common.types import BayerPattern, ImageType
 
 # -------------------

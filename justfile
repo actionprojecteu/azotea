@@ -103,29 +103,29 @@ exif-all: (anew) (exif-setup) (exif-register) (exif-sky) (export-all) (sky-summa
 # --------------------------------
 
 consent agree="":
-    uv run azotool --console --verbose consent view {{agree}}
+    uv run azotool --console --log-level debug consent view {{agree}}
 
 location1:
-    uv run azotool --console --verbose location create \
+    uv run azotool --console --log-level debug location create \
         --site-name "Prado de la burra" --location Alcafran
 location2:
-    uv run azotool --console --verbose location create \
+    uv run azotool --console --log-level debug location create \
         --site-name "Prado de la burra" --location Alcafran --longitude -3.5 --latitude 40.5
 
 observer1:
-        uv run azotool --console --verbose observer create \
+        uv run azotool --console --log-level debug observer create \
             --name Vieja --surname "del Visillo"  --acronym AAAFN --affiliation "Agrupacion Astronómica de Alcafran"
 observer2:
-        uv run azotool --console --verbose observer create \
+        uv run azotool --console --log-level debug observer create \
             --name Vieja --surname "del Visillo"  --acronym AAACFN --affiliation "Agrupacion Astronómica de Alcafran"
 observer3:
-        uv run azotool --console --verbose observer create \
+        uv run azotool --console --log-level debug observer create \
             --name Vieja --surname "del Visillo"  --acronym AAAFN --affiliation "Agrupacion Astronómica de Alcafran" --fix
 optics:
     uv run azotool --console configure optics --focal-length 50 --f-number 3.5
 
 camera1:
-   uv run azotool --console --verbose  camera create --default --as-given \
+   uv run azotool --console --log-level debug  camera create --default --as-given \
        --model "Canon EOS 400D DIGITAL" --extension .CR2 --header-type EXIF \
        --bayer-pattern GBRG --width 5344 --height 3516 --bias 2048
 
@@ -214,7 +214,7 @@ fits-register dir log:
     else
          logfile=""
     fi
-    uv run azotea --console --trace --verbose ${logfile} batch --images-dir ${dir} --only-load --depth 8
+    uv run azotea --console --trace --log-level debug ${logfile} batch --images-dir ${dir} --only-load --depth 8
 
 [private]
 fits-sky dir log:
@@ -227,7 +227,7 @@ fits-sky dir log:
     else
          logfile=""
     fi
-    uv run azotea --console --trace --verbose ${logfile} batch --images-dir ${dir} --only-sky --depth 8
+    uv run azotea --console --trace --log-level debug ${logfile} batch --images-dir ${dir} --only-sky --depth 8
 
 [private]
 fits-view dir="images/FITS" log="":
