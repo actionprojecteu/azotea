@@ -16,8 +16,8 @@ from azotea_cli.common.types import BayerPattern, ImageType
 # -------------------
 # Third party imports
 # -------------------
-from lica.cli import execute
-from lica.validators import vdate, vdir, vfile
+from lica_cli import execute
+from lica_cli.validate import vdate, vdir, vfile
 
 from azotea_fits import __version__
 from azotea_fits.adapters.factory import EditorFactoryImpl
@@ -186,4 +186,5 @@ def main():
         name=__name__,
         version=__version__,
         description=DESCRIPTION,
+        log_fmt="%(asctime)s [%(levelname)-8s] %(message)s",
     )

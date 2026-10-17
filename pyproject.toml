@@ -13,8 +13,8 @@ members = [
 [tool.uv.sources]
 azotea-cli = { workspace = true }
 azotea-fits = { workspace = true }
-lica-log = { path = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-log" }
-lica-cli = { path = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-cli" }
+lica-log = { git = "https://github.com/guaix-ucm/lica-ng.git", subdirectory = "packages/lica-log" }
+lica-cli = { git = "https://github.com/guaix-ucm/lica-ng.git", subdirectory = "packages/lica-cli" }
 
 [build-system]
 requires = ["uv_build>=0.13.1,<0.14"]

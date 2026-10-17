@@ -12,7 +12,7 @@ from argparse import ArgumentParser, Namespace
 # ---------------------
 # Third party libraries
 # ---------------------
-from lica.cli import execute
+from lica_cli import execute
 
 # ---------------
 # Own dependecies
@@ -148,4 +148,5 @@ def main():
         name=__name__,
         version=__version__,
         description=DESCRIPTION,
+        log_fmt="%(asctime)s [%(levelname)-8s] %(message)s",
     )

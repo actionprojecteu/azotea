@@ -83,7 +83,7 @@ requires-dist = [
     { name = "astropy", specifier = ">=8.0" },
     { name = "exifread", specifier = ">=3.5" },
     { name = "lica", extras = ["sqlalchemy"], specifier = ">=3.0" },
-    { name = "lica-cli", directory = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-cli" },
+    { name = "lica-cli", git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-cli" },
     { name = "rawpy", specifier = ">=0.27" },
     { name = "sqlalchemy", specifier = ">=2.0" },
     { name = "tabulate", specifier = ">=0.10" },
@@ -154,18 +154,15 @@ sqlalchemy = [
 [[package]]
 name = "lica-cli"
 version = "0.1.0"
-source = { directory = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-cli" }
+source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-cli#98787ff9d050b842b24ef82d93c998aa3cdb7a62" }
 dependencies = [
     { name = "lica-log" },
 ]
 
-[package.metadata]
-requires-dist = [{ name = "lica-log", editable = "../../guaix/lica-ng/packages/lica-log" }]
-
 [[package]]
 name = "lica-log"
 version = "0.1.0"
-source = { editable = "../../guaix/lica-ng/packages/lica-log" }
+source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-log#98787ff9d050b842b24ef82d93c998aa3cdb7a62" }
 
 [[package]]
 name = "mako"

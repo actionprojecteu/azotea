@@ -16,8 +16,8 @@ from itertools import batched
 # Third party libraries
 # ---------------------
 #from lica.cli import execute
-from lica.validators import vdate
 from lica_cli import execute
+from lica_cli.validate import vdate
 from lica_log import LogLevel
 
 # ---------------
