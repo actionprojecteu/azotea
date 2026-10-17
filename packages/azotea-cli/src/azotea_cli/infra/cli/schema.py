@@ -15,8 +15,10 @@ from itertools import batched
 # ---------------------
 # Third party libraries
 # ---------------------
-from lica.cli import execute
+#from lica.cli import execute
 from lica.validators import vdate
+from lica_cli import execute
+from lica_log import LogLevel
 
 # ---------------
 # Own dependecies
@@ -232,7 +234,8 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_main(args: Namespace) -> None:
-    sqa_logging(args.verbose)
+    if args.log_level == LogLevel.DEBUG:
+        sqa_logging(True)
     db.init()
     with db.engine.begin():
         Model.metadata.drop_all(bind=db.engine)
@@ -249,6 +252,7 @@ def main():
         name=__name__,
         version=__version__,
         description=DESCRIPTION,
+        log_fmt="%(asctime)s [%(levelname)-8s] %(message)s"
     )
 
 

@@ -70,6 +70,7 @@ dependencies = [
     { name = "astropy" },
     { name = "exifread" },
     { name = "lica", extra = ["sqlalchemy"] },
+    { name = "lica-cli" },
     { name = "rawpy" },
     { name = "sqlalchemy" },
     { name = "tabulate" },
@@ -82,6 +83,7 @@ requires-dist = [
     { name = "astropy", specifier = ">=8.0" },
     { name = "exifread", specifier = ">=3.5" },
     { name = "lica", extras = ["sqlalchemy"], specifier = ">=3.0" },
+    { name = "lica-cli", directory = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-cli" },
     { name = "rawpy", specifier = ">=0.27" },
     { name = "sqlalchemy", specifier = ">=2.0" },
     { name = "tabulate", specifier = ">=0.10" },
@@ -148,6 +150,22 @@ wheels = [
 sqlalchemy = [
     { name = "sqlalchemy" },
 ]
+
+[[package]]
+name = "lica-cli"
+version = "0.1.0"
+source = { directory = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-cli" }
+dependencies = [
+    { name = "lica-log" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "lica-log", editable = "../../guaix/lica-ng/packages/lica-log" }]
+
+[[package]]
+name = "lica-log"
+version = "0.1.0"
+source = { editable = "../../guaix/lica-ng/packages/lica-log" }
 
 [[package]]
 name = "mako"
