@@ -1,3 +1,11 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 import logging
 
 from astropy.io import fits

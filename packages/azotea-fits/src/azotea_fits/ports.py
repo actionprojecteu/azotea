@@ -1,3 +1,11 @@
+# ----------------------------------------------------------------------
+# Copyright (c) 2026 Rafael Gonzalez.
+#
+# See the LICENSE file for details
+# ----------------------------------------------------------------------
+# ----------------
+# standard library
+# ----------------
 from collections.abc import MutableSequence, Sequence
 from dataclasses import dataclass
 from datetime import datetime
