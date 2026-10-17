@@ -8,10 +8,14 @@
 # ----------------
 import logging
 
+# ---------------------
+# Third party libraries
+# ---------------------
+from lica_sqa import Database
+
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import Database
 from azotea_cli.provision.errors import FNumberMissingError, FocalLenMissingError
 from azotea_cli.provision.models import DefaultOptics, DefaultOpticsForm
 from azotea_cli.provision.ports import OpticsRepo

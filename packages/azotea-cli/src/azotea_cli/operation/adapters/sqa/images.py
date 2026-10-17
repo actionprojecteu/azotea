@@ -16,12 +16,13 @@ from datetime import datetime
 # ---------------------
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from lica_sqa import Database
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli.common.types import ObjId
-from azotea_cli.infra.sqlalchemy import Image, SkyBrightness, Database
+from azotea_cli.infra.sqlalchemy import Image, SkyBrightness
 
 # from ...errors import
 from ...ports import ImagesRepo

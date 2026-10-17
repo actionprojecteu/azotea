@@ -28,8 +28,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 # ---------------
 from azotea_cli.common.types import BayerPattern, HeaderType, ImageType, ValidState
 
-from .database import Model, metadata
-from .view import view
+from lica_sqa import Model, metadata, view
 
 # -----------------------
 # Database Enums mappsing

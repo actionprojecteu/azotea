@@ -19,13 +19,14 @@ from itertools import batched
 from lica_cli import execute
 from lica_cli.validate import vdate
 from lica_log import LogLevel
+from lica_sqa import Model
+from lica_sqa.adapters.decouple import DcplDatabase
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli import __version__
-from azotea_cli.infra.sqlalchemy.database.adapters.decouple import DcplDatabase
-from azotea_cli.infra.sqlalchemy import  Config, Date, Model, Time, sqa_logging
+from azotea_cli.infra.sqlalchemy import  Config, Date, Time
 
 # ----------------
 # Module constants
@@ -234,6 +235,7 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_main(args: Namespace) -> None:
+
     if args.log_level == LogLevel.DEBUG:
         sqa_logging(True)
     db.init()

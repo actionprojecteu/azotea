@@ -15,13 +15,13 @@ from typing import Any
 # Third party libraries
 # ---------------------
 from sqlalchemy import func, select
+from lica_sqa import Database
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import (
-    Database,
     Date,
     Image,
     Observer,

@@ -13,11 +13,12 @@ import logging
 # ---------------------
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from lica_sqa import Database
 
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import Camera, Database
+from azotea_cli.infra.sqlalchemy import Camera
 from azotea_cli.provision.models import CameraForm
 from azotea_cli.provision.ports import CameraRepo
 from azotea_cli.common.reader.models import ImageMetadata

@@ -15,12 +15,13 @@ from collections.abc import Sequence
 # ---------------------
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from lica_sqa import Database
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli.common.types import ObjId
-from azotea_cli.infra.sqlalchemy import Database, Image, SkyBrightness
+from azotea_cli.infra.sqlalchemy import Image, SkyBrightness
 from azotea_cli.operation.models import SkyStatsForm
 from azotea_cli.operation.ports import SkyBrightnessRepo
 

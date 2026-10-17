@@ -13,6 +13,7 @@ import logging
 # ---------------------
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from lica_sqa import Database
 
 # ----------------
 # Own dependencies
@@ -20,7 +21,7 @@ from sqlalchemy.exc import IntegrityError
 from azotea_cli.common.reader.models import ImageMetadata
 from azotea_cli.common.rect import Rect
 from azotea_cli.common.types import ObjId
-from azotea_cli.infra.sqlalchemy import Database, Roi
+from azotea_cli.infra.sqlalchemy import Roi
 from azotea_cli.provision.errors import MissingDefaultRoiError, RoiMissingError
 from azotea_cli.provision.models import RoiForm
 from azotea_cli.provision.ports import RoiRepo

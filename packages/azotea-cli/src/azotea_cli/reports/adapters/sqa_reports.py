@@ -17,6 +17,7 @@ from typing import Any
 # ---------------------
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
+from lica_sqa import Database
 
 # ---------------
 # Own dependecies
@@ -25,7 +26,6 @@ from azotea_cli import __version__
 from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import (
     Camera,
-    Database,
     Date,
     Image,
     Location,

@@ -14,13 +14,14 @@ from datetime import datetime, timezone
 # ---------------------
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from lica_sqa import Database
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli.common.errors import AzoteaError
 from azotea_cli.common.types import FOREVER, ObjId, ValidState
-from azotea_cli.infra.sqlalchemy import Database, Observer
+from azotea_cli.infra.sqlalchemy import Observer
 from azotea_cli.provision.models import ObserverForm
 from azotea_cli.provision.ports import ObserverRepo
 

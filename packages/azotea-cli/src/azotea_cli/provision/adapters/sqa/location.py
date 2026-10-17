@@ -13,12 +13,13 @@ import logging
 # ---------------------
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from lica_sqa import Database
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli.common.types import ObjId
-from azotea_cli.infra.sqlalchemy import Database, Location
+from azotea_cli.infra.sqlalchemy import Location
 from azotea_cli.provision.models import LocationForm
 from azotea_cli.provision.ports import LocationRepo
 

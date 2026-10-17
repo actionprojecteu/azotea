@@ -14,11 +14,11 @@ from datetime import datetime, timezone
 # Third party libraries
 # ---------------------
 from sqlalchemy.orm import Session
+from lica_sqa import Database
 
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.infra.sqlalchemy import Database
 from azotea_cli.provision.errors import ConsentNotAgreedError
 from azotea_cli.provision.ports import ConsentService
 
