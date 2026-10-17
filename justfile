@@ -31,7 +31,8 @@ build pkg="":
          uv build --all-packages
     fi
 
-
+version pkg version:
+    uv version --package {{pkg}} {{version}}
 # Backup .env to storage unit
 env-bak drive=def_drive: (check_mnt drive) (env-backup join(drive, "env", project))
 

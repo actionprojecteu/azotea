@@ -37,12 +37,15 @@ azotea = "azotea_cli.infra.cli.azotea:main"
 # provision and reporting utility
 azotool = "azotea_cli.infra.cli.azotool:main"
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/azotea_cli"]
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14"]
+build-backend = "uv_build"
 
 # -----------
 # Other stuff
