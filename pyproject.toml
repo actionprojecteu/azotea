@@ -17,5 +17,4 @@ azotea-fits = { workspace = true }
 [dependency-groups]
 dev = [
     "pytest",
-    "mypy",
 ]
