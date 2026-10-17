@@ -19,16 +19,17 @@ default:
 init:
     uv sync
 
-# Install tools globally
-tools:
-    uv tool install twine
-    uv tool install ruff
 
 # Build the package
-build:
-    rm -fr dist/*
-    uv build
-
+build pkg="":
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    pkg={{pkg}}
+    if [ "${pkg}" != "" ]; then
+         uv build --package ${pkg}
+    else
+         uv build --all-packages
+    fi
 
 
 # Backup .env to storage unit
