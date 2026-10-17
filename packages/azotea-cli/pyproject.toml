@@ -1,5 +1,5 @@
 [project]
-name = "azotea-client"
+name = "azotea-cli"
 version = "0.1.0"
 description = "AZOTEA command line interface"
 readme = "README.md"

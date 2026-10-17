@@ -15,14 +15,14 @@ Each image adquistion software has its own convention and idiosyncrasies, so `az
 
 # Table of Contents
 
-* [AZOTEA FITS keywords](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md#azoteaa-fits-keywords)
-* [Usage](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md#usage)
-    - [Examples](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md#examples)
-* [Miscelanea](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md#miscelanea)
+* [AZOTEA FITS keywords](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#azoteaa-fits-keywords)
+* [Usage](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#usage)
+    - [Examples](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#examples)
+* [Miscelanea](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#miscelanea)
 
 # Instalation
 
-In the same **activated virtual environment**  where azotea-client is instaled;
+In the same **activated virtual environment**  where azotea-cli is instaled;
 
 ```bash
 pip install azotea-fits
@@ -38,15 +38,15 @@ Aster installation, type `azofits --help` to see the complete list of options.
 |`SWMODIFY`|       | Image editing sofware (always `azofits`).
 |`BAYERPAT`|       | Camera Bayer pattern (`RGGB`, `BGGR`, `GRBG`, `GBRG`).
 |`INSTRUME`|       | Camera model (i.e. `ZWO ASI178MC`).
-|`DATE-OBS`|       | Date time in ISO 8601 format | See [Note 1](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md#note-1).
+|`DATE-OBS`|       | Date time in ISO 8601 format | See [Note 1](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#note-1).
 |`ÈXPTIME` | sec.  | Exposure time.
 |`PEDESTAL`| ADUs  | Global electronic bias. Same for all channels.
 |`FOCALLEN`| mm.   | Focal length.
 |`APTDIA`  | mm.   | Aperture diameter.
 |`XPIXSZ`  | um.   | Horizontal pixel size.
 |`YPIXSZ`  | um.   | Vertical pixel size.
-|`LOG-GAIN`| 0.1 dB| Logaritmic gain. | See [Note 2](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md#note-2).
-|`IMAGETYP`|       | Image type | See [Note 3](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md#note-3).
+|`LOG-GAIN`| 0.1 dB| Logaritmic gain. | See [Note 2](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#note-2).
+|`IMAGETYP`|       | Image type | See [Note 3](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#note-3).
 
 ## Note 1:
 `azofits` allows both `YYYY-MM-DDTHH:MM:SS` or `YYYY-MM-DDTHH:MM:SS.fffff`  with up to 6 seconds decimals.

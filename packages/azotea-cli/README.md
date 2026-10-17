@@ -7,27 +7,27 @@ The AZOTEA toolset comprises:
 * `azotea`. RGB images sky background reduction tool. Can be used in GUI interactive mode and also in automated batch
 reduction pipelines. Accepts both FITS and DSLR EXIF raw images.
 * `azotool`. Command line utility to configure `azotea` for batch processing.
-* [`azofits`](https://github.com/actionprojecteu/azotea-client/blob/main/azofits.md). FITS files keyword preprocessing for `azotea`
-* [`azoplot`](https://github.com/actionprojecteu/azotea-client/blob/main/azoplot.md). Graphics tool to preview RAW images decomposed in R, G1, G2, B channels.
+* [`azofits`](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md). FITS files keyword preprocessing for `azotea`
+* [`azoplot`](https://github.com/actionprojecteu/azotea-cli/blob/main/azoplot.md). Graphics tool to preview RAW images decomposed in R, G1, G2, B channels.
 
 # Table of Contents
 
-* [Command line structure](https://github.com/actionprojecteu/azotea-client#command-line-structure)
-* [Installation](https://github.com/actionprojecteu/azotea-client#installation)
-* [Configuration](https://github.com/actionprojecteu/azotea-client#configuration)
-  - [Configuration by command line](https://github.com/actionprojecteu/azotea-client#configuration-by-command-line)
-* [Batch mode](https://github.com/actionprojecteu/azotea-client#batch-mode)
-  - [Image processing](https://github.com/actionprojecteu/azotea-client#image-processing)
-  - [Summaries](https://github.com/actionprojecteu/azotea-client#summaries)
-  - [CSV file generation](https://github.com/actionprojecteu/azotea-client#csv-file-generation)
-  - [Automation issues](https://github.com/actionprojecteu/azotea-client#automation-issues)
-    - [Log file & console output](https://github.com/actionprojecteu/azotea-client#log-file--console-output)
-    - [Exit codes](https://github.com/actionprojecteu/azotea-client#exit-codes)
-* [FITS Support](https://github.com/actionprojecteu/azotea-client#fits-support)
-* [GUI mode](https://github.com/actionprojecteu/azotea-client#configuration)
-  - [Launch the program in GUI mode](https://github.com/actionprojecteu/azotea-client#launch-the-program-in-gui-mode)
-  - [Image processing in GUI mode](https://github.com/actionprojecteu/azotea-client#image-processing-in-gui-mode)
-  - [Screenshots](https://github.com/actionprojecteu/azotea-client#screenshots)
+* [Command line structure](https://github.com/actionprojecteu/azotea-cli#command-line-structure)
+* [Installation](https://github.com/actionprojecteu/azotea-cli#installation)
+* [Configuration](https://github.com/actionprojecteu/azotea-cli#configuration)
+  - [Configuration by command line](https://github.com/actionprojecteu/azotea-cli#configuration-by-command-line)
+* [Batch mode](https://github.com/actionprojecteu/azotea-cli#batch-mode)
+  - [Image processing](https://github.com/actionprojecteu/azotea-cli#image-processing)
+  - [Summaries](https://github.com/actionprojecteu/azotea-cli#summaries)
+  - [CSV file generation](https://github.com/actionprojecteu/azotea-cli#csv-file-generation)
+  - [Automation issues](https://github.com/actionprojecteu/azotea-cli#automation-issues)
+    - [Log file & console output](https://github.com/actionprojecteu/azotea-cli#log-file--console-output)
+    - [Exit codes](https://github.com/actionprojecteu/azotea-cli#exit-codes)
+* [FITS Support](https://github.com/actionprojecteu/azotea-cli#fits-support)
+* [GUI mode](https://github.com/actionprojecteu/azotea-cli#configuration)
+  - [Launch the program in GUI mode](https://github.com/actionprojecteu/azotea-cli#launch-the-program-in-gui-mode)
+  - [Image processing in GUI mode](https://github.com/actionprojecteu/azotea-cli#image-processing-in-gui-mode)
+  - [Screenshots](https://github.com/actionprojecteu/azotea-cli#screenshots)
 
 
 # Command line structure
@@ -64,16 +64,16 @@ mkdir -p ${AZOTEA_HOME}/log    # (2)
 mkdir -p ${AZOTEA_HOME}/csv    # (2)
 . ${AZOTEA_HOME}/bin/activate  # (3)
 pip install -U pip             # (4)
-pip install git+https://github.com/actionprojecteu/azotea-client.git@main # (5)
+pip install git+https://github.com/actionprojecteu/azotea-cli.git@main # (5)
 ```
 
 * (1) creates a Python virtual environment under `${AZOTEA_HOME}`.
 * (2) creates additional subdirectiores under this virtual environment for log files and camera images. Please note that in this example, these directories are placed under `${AZOTEA_HOME}` for convenience, but they can be placed elsewhere.
 * (3) activates the virtual environment (**please note the starting dot**) so that all needed python packages are installed there and not system wide.
 * (4) updates `pip` (recommended).
-* (5) installs the software from [its GitHub repository](https://github.com/actionprojecteu/azotea-client). We download and install the main branch.
+* (5) installs the software from [its GitHub repository](https://github.com/actionprojecteu/azotea-cli). We download and install the main branch.
 
-There is an error showing `Building wheel for azotea-client (setup.py) ... error` but it seems ok.
+There is an error showing `Building wheel for azotea-cli (setup.py) ... error` but it seems ok.
 
 Verify it by executing any of these:
 

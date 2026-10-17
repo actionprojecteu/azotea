@@ -11,7 +11,7 @@ members = [
 ]
 
 [tool.uv.sources]
-azotea-client = { workspace = true }
+azotea-cli = { workspace = true }
 azotea-fits = { workspace = true }
 
 [dependency-groups]
