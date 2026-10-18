@@ -32,9 +32,6 @@ azofits = "azotea_fits.infra.cli.main:main"
 requires = ["uv_build>=0.13.1,<0.14"]
 build-backend = "uv_build"
 
-[tool.uv.build-backend]
-module-name = "azotea_fits"
-
 # -----------
 # Other stuff
 # -----------
