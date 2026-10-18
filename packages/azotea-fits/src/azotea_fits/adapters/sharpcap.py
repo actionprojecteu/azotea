@@ -12,7 +12,7 @@ import re
 from collections.abc import MutableSequence
 
 from astropy.io.fits import Header
-from azotea_cli.common.reader.adapters.fits import (
+from lica_raw.adapters.fits import (
     BAYERPAT,
     DATE_OBS,
     INSTRUME,

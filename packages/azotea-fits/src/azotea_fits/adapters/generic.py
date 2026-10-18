@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Any
 
 from astropy.io.fits import Header
-from azotea_cli.common.reader.adapters.fits import (
+from lica_raw.adapters.fits import (
     APTDIA,
     BAYERPAT,
     COMMENT,
@@ -29,7 +29,7 @@ from azotea_cli.common.reader.adapters.fits import (
     XPIXSIZE,
     YPIXSIZE,
 )
-from azotea_cli.common.types import BayerPattern, ImageType
+from lica_raw import BayerPattern, ImageType
 
 from ..models import SWCREATOR, FitsData, FitsKeyword
 from ..ports import MetadataFix, MetadataInsert, MetadataLookup

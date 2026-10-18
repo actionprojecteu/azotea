@@ -3,34 +3,34 @@
 #
 # See the LICENSE file for details
 # ----------------------------------------------------------------------
-#
 import logging
+import sys
 from argparse import ArgumentParser, Namespace
-
-from lica_tables.adapters.tabulate import StdoutDisplay
-# --------------
-# local imports
-# -------------
-from azotea_cli.common.types import BayerPattern, ImageType
 
 # -------------------
 # Third party imports
 # -------------------
-from lica_cli import execute
+from lica_cli import parse_args, run_cli
 from lica_cli.validate import vdate, vdir, vfile
+from lica_log.adapters.default import DefaultLogger
+from lica_raw import BayerPattern, ImageType
+from lica_tables.adapters.tabulate import StdoutDisplay
 
+# --------------
+# local imports
+# -------------
 from azotea_fits import __version__
 from azotea_fits.adapters.factory import EditorFactoryImpl
 from azotea_fits.enums import SwCreator
 from azotea_fits.errors import AzoteaFitsError
 from azotea_fits.models import FitsForm, ScanForm
 from azotea_fits.use_cases import (
-    edit_fits,
     batch_edit_fits,
-    show_fits_metadata,
-    batch_show_fits_metadata,
-    set_software_creator,
     batch_set_software_creator,
+    batch_show_fits_metadata,
+    edit_fits,
+    set_software_creator,
+    show_fits_metadata,
 )
 
 # ----------------
@@ -180,11 +180,8 @@ def cli_main(args: Namespace) -> None:
 
 def main():
     """main entry point specified by pyproject.toml"""
-    execute(
-        main_func=cli_main,
-        add_args_func=add_args,
-        name=__name__,
-        version=__version__,
-        description=DESCRIPTION,
-        log_fmt="%(asctime)s [%(levelname)-8s] %(message)s",
-    )
+    args = parse_args(add_args, __name__, __version__, DESCRIPTION)
+    logger = DefaultLogger(args)
+
+    return_code = run_cli(cli_main, args, __name__, __version__, logger)
+    sys.exit(return_code)

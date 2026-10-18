@@ -12,7 +12,7 @@ from collections.abc import MutableSequence
 from datetime import datetime
 
 from astropy.io.fits import Header
-from azotea_cli.common.reader.adapters.fits import (
+from lica_raw.adapters.fits import (
     DATE_OBS,
     EXPTIME,
 )

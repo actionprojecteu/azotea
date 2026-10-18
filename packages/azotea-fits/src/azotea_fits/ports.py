@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Protocol
 
 from astropy.io.fits import Header
-from azotea_cli.common.types import BayerPattern, ImageType
+from lica_raw import BayerPattern, ImageType
 
 from .models import FitsKeyword
 

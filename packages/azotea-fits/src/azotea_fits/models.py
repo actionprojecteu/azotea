@@ -9,7 +9,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from azotea_cli.common.reader.adapters.fits import (
+from lica_raw.adapters.fits import (
     APTDIA,
     BAYERPAT,
     DATE_OBS,
@@ -22,9 +22,8 @@ from azotea_cli.common.reader.adapters.fits import (
     XPIXSIZE,
     YPIXSIZE,
 )
-from azotea_cli.common.types import BayerPattern, ImageType
+from lica_raw import BayerPattern, ImageType
 
-from .enums import SwCreator
 
 SWCREATOR = "SWCREATE"
 EXTENSIONS = (".fit", ".fits", ".fts")  # case-insensitive
