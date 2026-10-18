@@ -21,7 +21,7 @@ from lica_cli import parse_args, run_cli
 from lica_cli.validate import vdate
 from lica_log.adapters.default import DefaultLogger
 from lica_log import LogLevel
-from lica_sqa import Model
+from lica_sqa import Model, sqa_logging
 from lica_sqa.adapters.decouple import DcplDatabase
 
 # ---------------
