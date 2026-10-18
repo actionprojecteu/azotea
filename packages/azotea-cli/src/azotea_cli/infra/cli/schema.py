@@ -6,6 +6,7 @@
 # ----------------
 # standard library
 # ----------------
+import sys
 import logging
 import uuid
 from argparse import ArgumentParser, Namespace
@@ -16,8 +17,9 @@ from itertools import batched
 # Third party libraries
 # ---------------------
 #from lica.cli import execute
-from lica_cli import execute
+from lica_cli import parse_args, run_cli
 from lica_cli.validate import vdate
+from lica_log.adapters.default import DefaultLogger
 from lica_log import LogLevel
 from lica_sqa import Model
 from lica_sqa.adapters.decouple import DcplDatabase
@@ -247,15 +249,12 @@ def cli_main(args: Namespace) -> None:
 
 
 def main():
-    """The main entry point specified by pyproject.toml"""
-    execute(
-        main_func=cli_main,
-        add_args_func=add_args,
-        name=__name__,
-        version=__version__,
-        description=DESCRIPTION,
-        log_fmt="%(asctime)s [%(levelname)-8s] %(message)s"
-    )
+    """main entry point specified by pyproject.toml"""
+    args = parse_args(add_args, __name__, __version__, DESCRIPTION)
+    logger = DefaultLogger(args)
+
+    return_code = run_cli(cli_main, args, __name__, __version__, logger)
+    sys.exit(return_code)
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ log = logging.getLogger(__name__.split(".")[-1])
 class EditorFactoryImpl(EditorFactory):
     def get_editor(self, path: str) -> Editor:
         with fits.open(path) as hdul:
-            header = hdul[0].header
+            header = hdul[0].header  # pyright: ignore[reportAttributeAccessIssue]
             swcreator = header.get(SWCREATOR)
             try:
                 swcreator = SwCreator(swcreator.lower())

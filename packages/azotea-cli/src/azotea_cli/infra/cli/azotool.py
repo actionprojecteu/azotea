@@ -6,6 +6,7 @@
 # ----------------
 # standard library
 # ----------------
+import sys
 import logging
 from argparse import ArgumentParser, Namespace
 
@@ -13,8 +14,9 @@ from argparse import ArgumentParser, Namespace
 # Third party libraries
 # ---------------------
 
-from lica_cli import execute
+from lica_cli import parse_args, run_cli
 from lica_cli.validate import vdate, vfile
+from lica_log.adapters.default import DefaultLogger
 from lica_tables.adapters.tabulate import StdoutDisplay
 from lica_sqa.adapters.decouple import DcplDatabase
 from lica_raw import BayerPattern, HeaderType
@@ -487,11 +489,8 @@ def cli_main(args: Namespace) -> None:
 
 def main():
     """main entry point specified by pyproject.toml"""
-    execute(
-        main_func=cli_main,
-        add_args_func=add_args,
-        name=__name__,
-        version=__version__,
-        description="Database import",
-        log_fmt="%(asctime)s [%(levelname)-8s] %(message)s"
-    )
+    args = parse_args(add_args, __name__, __version__, DESCRIPTION)
+    logger = DefaultLogger(args)
+
+    return_code = run_cli(cli_main, args, __name__, __version__, logger)
+    sys.exit(return_code)
