@@ -68,6 +68,20 @@ anew verbose="":
     set -exuo pipefail
     rm -fr azotea.db
     uv run azoschema --console --trace {{ verbose }} all --batch-size 25000
+    #uv run alembic revision -m "baseline schema"
+    #uv run alembic stamp head
+
+# setup a new alembic tree in a project 
+alembic-setup package="cd packages/azotea-cli":
+    #!/usr/bin/env bash
+    package={{package}}
+    set -exuo pipefail
+    cd ${package}
+    uv run alembic init alembic
+
+    #uv run alembic revision --autogenerate -m "initial schema"
+    #uv run alembic upgrade head
+
 
 # -------------------------
 # AZOTEA Database and tools
