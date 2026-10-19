@@ -51,11 +51,11 @@ class SqaObserverRepo(ObserverRepo):
         with self.db.session() as session:
             with session.begin():
                 log.info("saving default observer_id: %d", observer_id)
-                config.save(session, "observer", "observer", str(observer_id))
+                config.save(session, "observer", "observer_id", str(observer_id))
 
     def get_default(self) -> ObjId:
         with self.db.session() as session:
-            observer_id = config.load(session, "observer", "observer")
+            observer_id = config.load(session, "observer", "observer_id")
             if observer_id is None:
                 raise MissingDefaultObserverError
             log.info("loading default observer_id: %s", observer_id)

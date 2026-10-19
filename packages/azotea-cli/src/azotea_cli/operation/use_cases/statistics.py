@@ -14,7 +14,7 @@ from itertools import batched
 # Third party libraries
 # ---------------------
 import numpy as np
-from lica_raw import ImageReaderFactory
+from lica_raw import ImageReaderFactory, MissingImageError
 
 # ---------------
 # Own dependecies
@@ -114,7 +114,7 @@ class ComputeSkyStatistics:
                         perc,
                     )
                     stats = self._one_pass(image_id, path)
-                except AzoteaError as e:
+                except (AzoteaError, MissingImageError) as e:
                     n_skipped += 1
                     log.warning("%s, skipping", e)
                     continue
