@@ -70,9 +70,9 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "lica-cli", git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-cli" },
-    { name = "lica-raw", extras = ["exif", "fits"], git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-raw" },
-    { name = "lica-sqa", extras = ["decouple"], git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-sqa" },
+    { name = "lica-cli" },
+    { name = "lica-raw", extras = ["exif", "fits"] },
+    { name = "lica-sqa", extras = ["decouple"] },
     { name = "lica-tables", extras = ["tabulate"], git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-tables" },
 ]
 
@@ -123,22 +123,34 @@ wheels = [
 [[package]]
 name = "lica-cli"
 version = "0.1.0"
-source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-cli#96300e78356373cfa420a30cd8f8b3a3ef703bda" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "lica-log" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b2/b3/3e31ac3e6243e397ef66f7101f60fc8301cda2b950a2e7e1f3c666b978a7/lica_cli-0.1.0.tar.gz", hash = "sha256:62ed3886a6d5f68a4ed181db85bdca239f3ddc5e74c475ec249b9c5802f1b67a", size = 6070, upload-time = "2026-10-19T11:53:07.2Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a8/c7/fd91ca918a820f8ae4b00bfe3ced53f273d82030def20dccb1c12a8049e2/lica_cli-0.1.0-py3-none-any.whl", hash = "sha256:7365b779fab0edda4c21bf890937426dea78563382803fc07fcf6de28d0b9bde", size = 8098, upload-time = "2026-10-19T11:53:06.034Z" },
 ]
 
 [[package]]
 name = "lica-log"
 version = "0.1.0"
-source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-log#96300e78356373cfa420a30cd8f8b3a3ef703bda" }
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/69/2c/f656ad4911ac4da90263f187d96a6ab9cc4dce5f71c39d392e9d98e9602c/lica_log-0.1.0.tar.gz", hash = "sha256:a4172a3cf9590c801a6629ff91c514eed9ac8a4ddc7acb75816afcf797c39f98", size = 5517, upload-time = "2026-10-19T11:52:56.111Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/76/1a/9fa5430bdcf6b9dcbf311c7ad131c39e3f07409592b8cc39cdf1242e755f/lica_log-0.1.0-py3-none-any.whl", hash = "sha256:5227f62cafdf95f7dd8057a318a9b9579c1dd9e9605e9e2d7583a74b5f132e77", size = 10399, upload-time = "2026-10-19T11:52:54.963Z" },
+]
 
 [[package]]
 name = "lica-raw"
-version = "0.1.0"
-source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-raw#96300e78356373cfa420a30cd8f8b3a3ef703bda" }
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2f/f5/d712913e5fcabe5be9a0f0bae527651c0b1847fb539fb32d7b97c605f2a5/lica_raw-0.1.1.tar.gz", hash = "sha256:26f1bf53daca98e33d63ac66ff162292ce1cc9341276145aa0ea3cb790742c45", size = 12100, upload-time = "2026-10-19T11:53:16.091Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/71/aa/ae80ca2c5fcb465300beee17c3f83f7310416272e07e23d32e27375f64d5/lica_raw-0.1.1-py3-none-any.whl", hash = "sha256:eabf04b7fb1c60f587cdb2994a405d7272e60646bb931f4f8f593a8777118e7c", size = 16293, upload-time = "2026-10-19T11:53:14.852Z" },
 ]
 
 [package.optional-dependencies]
@@ -153,10 +165,14 @@ fits = [
 [[package]]
 name = "lica-sqa"
 version = "0.1.0"
-source = { git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-sqa#96300e78356373cfa420a30cd8f8b3a3ef703bda" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "alembic" },
     { name = "sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/4d/d20030459ee949a2406516c34dd2792316d74afe79a07c7f5db6b926f030/lica_sqa-0.1.0.tar.gz", hash = "sha256:a9abecca572a1b5a587520db513753be2c50f8cd90ff951c8fb0b5e94ef6ff45", size = 6844, upload-time = "2026-10-19T11:53:23.607Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/49/51/889726e5212d1ac2b2dc4f0634065776803ccd5272dc244c1e87f20733a3/lica_sqa-0.1.0-py3-none-any.whl", hash = "sha256:349ca90ede8bc758adb403ed22ffac022465cda219edf661949457d5d0728547", size = 10129, upload-time = "2026-10-19T11:53:22.2Z" },
 ]
 
 [package.optional-dependencies]

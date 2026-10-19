@@ -13,14 +13,9 @@ members = [
 [tool.uv.sources]
 azotea-cli = { workspace = true }
 azotea-fits = { workspace = true }
-lica-log = { git = "https://github.com/guaix-ucm/lica-ng.git", subdirectory = "packages/lica-log" }
-lica-cli = { git = "https://github.com/guaix-ucm/lica-ng.git", subdirectory = "packages/lica-cli" }
+
 lica-tables = { git = "https://github.com/guaix-ucm/lica-ng.git", subdirectory = "packages/lica-tables" }
-lica-sqa = { git = "https://github.com/guaix-ucm/lica-ng.git", subdirectory = "packages/lica-sqa"  }
 #lica-raw = { path = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-raw", editable = true  }
-lica-raw = { git = "https://github.com/guaix-ucm/lica-ng.git", subdirectory = "packages/lica-raw"  }
-
-
 
 [build-system]
 requires = ["uv_build>=0.13.1,<0.14"]
