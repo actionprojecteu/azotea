@@ -43,7 +43,7 @@ class SqaOpticsRepo(OpticsRepo):
         with self.db.session() as session:
             with session.begin():
                 if form.focal_len is not None:
-                    config.save(session, "optics", "focal_len", str(form.focal_len))
+                    config.save(session, "optics", "focal_length", str(form.focal_len))
                 if form.f_number is not None:
                     config.save(session, "optics", "f_number", str(form.f_number))
         log.info("saved default optics %s", form)
@@ -51,7 +51,7 @@ class SqaOpticsRepo(OpticsRepo):
     def load(self) -> DefaultOptics:
         with self.db.session() as session:
             with session.begin():
-                focal_len = config.load(session, "optics", "focal_len")
+                focal_len = config.load(session, "optics", "focal_length")
                 if focal_len is None:
                     raise FocalLenMissingError()
                 f_number = config.load(session, "optics", "f_number")
