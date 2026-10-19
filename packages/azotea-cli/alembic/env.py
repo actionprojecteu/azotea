@@ -1,5 +1,5 @@
 from logging.config import fileConfig
-
+from pathlib import  Path
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -17,6 +17,9 @@ config = context.config
 # manually added
 database_url =  decouple.config("DATABASE_URL")
 if database_url:
+    prefix, suffix = database_url.split("://")
+    base_dir = Path(__file__).resolve().parent.parent.parent.parent
+    database_url = f"{prefix}:///{base_dir}{suffix}"
     config.set_main_option("sqlalchemy.url", database_url)  # pyright: ignore[reportArgumentType]
 
 

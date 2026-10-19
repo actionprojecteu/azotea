@@ -62,6 +62,15 @@ publish pkg:
 # AZOTEA Database and tools
 # -------------------------
 
+# setup a new alembic tree in a project
+alembic-anew package="packages/azotea-cli":
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    package={{package}}
+    pushd "${package}"
+    uv run alembic init alembic
+    popd
+
 # Starts a new SQLite database export migration cycle
 anew package="packages/azotea-cli" verbose="":
     #!/usr/bin/env bash
@@ -70,17 +79,11 @@ anew package="packages/azotea-cli" verbose="":
     rm -fr azotea.db
     uv run azoschema --console --trace {{ verbose }} all --batch-size 25000
     pushd "${package}"
-    uv run alembic stamp head
+    #uv run alembic stamp head
+    #uv run alembic upgrade head
+    uv run alembic stamp --purge head
     popd
 
-# setup a new alembic tree in a project
-alembic-setup package="packages/azotea-cli":
-    #!/usr/bin/env bash
-    set -exuo pipefail
-    package={{package}}
-    pushd "${package}"
-    uv run alembic init alembic
-    popd
 
 # migrate a pre-existing azotea database to SQLAlchemy
 alembic-old-db package="packages/azotea-cli" baseline="2d90c82cffb2":
@@ -111,6 +114,16 @@ alembic-upgrade package="packages/azotea-cli" revision="head":
     pushd "${package}"
     uv run alembic upgrade "${revision}"
     popd
+
+purge package="packages/azotea-cli":
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    package="{{package}}"
+    pushd "${package}"
+    uv run alembic stamp --purge head
+    popd
+
+
 
 # -------------------------
 # AZOTEA Database and tools
