@@ -7,18 +7,20 @@
 # standard library
 # ----------------
 class AzoteaFitsError(Exception):
-    """FITS error"""
+    """AzoteaFitsError"""
 
-    pass
+    def __str__(self):
+        msg = self.__doc__
+        return f"{msg}: {self.args[0]}." if self.args else f"{msg}."
 
 
 class UnknownSoftwareCreatorError(AzoteaFitsError):
     """Unknown FITS software creator"""
 
-    pass
-
 
 class MissingFitsFileError(AzoteaFitsError):
     """Unknown FITS software creator"""
 
-    pass
+
+class ReadMetadataError(AzoteaFitsError):
+    """Could not read image metadata"""
