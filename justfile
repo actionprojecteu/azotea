@@ -16,28 +16,47 @@ local_env := join(justfile_dir(), ".env")
 default:
     just --list
 
+# --------------------
+# Workspace management
+# --------------------
+
+# install additional tools
+tools:
+    uv tool install uv-publish
+
+# Creates virtual env
 init:
     uv sync
 
+# sets the packahe version and modifies pyproject.toml
+version pkg version:
+    uv version --package {{pkg}} {{version}}
+
 
 # Build the package
-build pkg="":
+build pkg:
     #!/usr/bin/env bash
     set -exuo pipefail
     pkg={{pkg}}
-    if [ "${pkg}" != "" ]; then
-         uv build --package ${pkg}
-    else
-         uv build --all-packages
-    fi
+    rm -fr dist/${pkg}/*
+    uv build --package "${pkg}" --out-dir dist/${pkg}
 
-version pkg version:
-    uv version --package {{pkg}} {{version}}
-# Backup .env to storage unit
-env-bak drive=def_drive: (check_mnt drive) (env-backup join(drive, "env", project))
+test-publish pkg:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    pkg={{pkg}}
+    module="${pkg//-/_}"
+    uvx uv-publish --repository testpypi --verbose "dist/${pkg}/*"
+    uv run --index "https://test.pypi.org/simple/" --with ${pkg} --no-project python -c "from ${module} import __version__; print(__version__)"
 
-# Restore .env from storage unit
-env-rst drive=def_drive: (check_mnt drive) (env-restore join(drive, "env", project))
+publish pkg:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    pkg={{pkg}}
+    module="${pkg//-/_}"
+    uvx uv-publish ${pkg} --verbose "dist/${pkg}/*"
+    uv run --with ${pkg} --no-project python -c "from ${module} import __version__; print(__version__)"
+
 
 # -------------------------
 # AZOTEA Database and tools
