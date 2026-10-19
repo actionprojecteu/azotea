@@ -63,25 +63,54 @@ publish pkg:
 # -------------------------
 
 # Starts a new SQLite database export migration cycle
-anew verbose="":
+anew package="packages/azotea-cli" verbose="":
     #!/usr/bin/env bash
     set -exuo pipefail
+    package={{package}}
     rm -fr azotea.db
     uv run azoschema --console --trace {{ verbose }} all --batch-size 25000
-    #uv run alembic revision -m "baseline schema"
-    #uv run alembic stamp head
+    pushd "${package}"
+    uv run alembic stamp head
+    popd
 
-# setup a new alembic tree in a project 
-alembic-setup package="cd packages/azotea-cli":
+# setup a new alembic tree in a project
+alembic-setup package="packages/azotea-cli":
     #!/usr/bin/env bash
-    package={{package}}
     set -exuo pipefail
-    cd ${package}
+    package={{package}}
+    pushd "${package}"
     uv run alembic init alembic
+    popd
 
-    #uv run alembic revision --autogenerate -m "initial schema"
-    #uv run alembic upgrade head
+# migrate a pre-existing azotea database to SQLAlchemy
+alembic-old-db package="packages/azotea-cli" baseline="2d90c82cffb2":
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    package="{{package}}"
+    baseline="{{baseline}}"
+    pushd "${package}"
+    uv run alembic stamp "${baseline}"
+    popd
 
+# compares python ORM with existing eschema and generate up/down scripts
+alembic-diff message package="packages/azotea-cli":
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    package="{{package}}"
+    message="{{message}}"
+    pushd "${package}"
+    uv run alembic revision --autogenerate -m "${message}"
+    popd
+
+# Apply pending Alembic migrations
+alembic-upgrade package="packages/azotea-cli" revision="head":
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    package="{{package}}"
+    revision="{{revision}}"
+    pushd "${package}"
+    uv run alembic upgrade "${revision}"
+    popd
 
 # -------------------------
 # AZOTEA Database and tools
