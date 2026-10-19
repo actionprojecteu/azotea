@@ -15,6 +15,7 @@ from itertools import batched
 # Third party libraries
 # ---------------------
 from lica_raw import ImageReaderFactory
+from lica_raw.errors import ReadMetadataError
 
 # ---------------
 # Own dependecies
@@ -116,7 +117,7 @@ class RegisterImages:
                         "registering %s [%d/%d] (%d%%)", os.path.basename(path), i, n_selected, perc
                     )
                     image = self._one_pass(path)
-                except (CameraMissingError, MissingTimestampError, CameraNotDefaultError) as e:
+                except (CameraMissingError, MissingTimestampError, CameraNotDefaultError, ReadMetadataError) as e:
                     n_skipped += 1
                     log.warning("%s, skipping", e)
                     continue
