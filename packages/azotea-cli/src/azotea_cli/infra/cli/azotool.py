@@ -6,22 +6,20 @@
 # ----------------
 # standard library
 # ----------------
-import sys
 import logging
+import sys
 from argparse import ArgumentParser, Namespace
 
 # ---------------------
 # Third party libraries
 # ---------------------
-
 from lica_cli import parse_args, run_cli
 from lica_cli.validate import vdate, vfile
 from lica_log.adapters.default import DefaultLogger
-from lica_tables.adapters.tabulate import StdoutDisplay
-from lica_sqa.adapters.decouple import DcplDatabase
 from lica_raw import BayerPattern, HeaderType
 from lica_raw.adapters import ImageReaderFactoryImpl
-
+from lica_sqa.adapters.decouple import DcplDatabase
+from lica_tables.adapters.tabulate import StdoutDisplay
 
 # ---------------
 # Own dependecies
@@ -187,53 +185,60 @@ def add_args(parser: ArgumentParser) -> None:
     subparser = parser_camera.add_subparsers(dest="subcommand")
 
     camcre = subparser.add_parser("create", help="Create a new camera in the database")
-    camcre.set_defaults(func=cli_camera)
-
     camcre.add_argument(
         "--default", action="store_true", help="Set this camera as the default camera"
     )
-    group = camcre.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "--from-image",
+
+    subparser = camcre.add_subparsers(dest="subcommand")
+
+    camera_from_image = subparser.add_parser(
+        "from-image",
+        help="set camera metadata from image",
+    )
+    camera_given_by = subparser.add_parser(
+        "given-by",
+        help="set camera metadata by CLI arguments",
+    )
+    camera_from_image.add_argument(
+        "image",
         type=vfile,
-        default=None,
         action="store",
-        metavar="<image file path>",
-        help="create camera by inspecting an image",
+        metavar="<FILE>",
+        help="image to examine",
     )
-    group.add_argument(
-        "--as-given", action="store_true", help="create camera by adding further parameters"
+    camera_from_image.set_defaults(func=cli_camera_from_image)
+    camera_given_by.add_argument(
+        "--model", type=str, required=True, help="Camera Model (taken from EXIF data)"
     )
-    # additional argumnets with the --as-given option
-    camcre.add_argument(
-        "--model", type=str, default=None, help="Camera Model (taken from EXIF data)"
-    )
-    camcre.add_argument(
+    camera_given_by.add_argument(
         "--bias",
         type=int,
         default=None,
         help="default bias, to be replicated in all channels if we cannot read ir from EXIF",
     )
-    camcre.add_argument(
+    camera_given_by.add_argument(
         "--extension",
         type=str,
-        default=None,
+        required=True,
         help="File extension produced by a camera (i.e. .NEF)",
     )
-    camcre.add_argument(
-        "--header-type", choices=HeaderType, default=None, help="Either 'EXIF' or 'FITS'"
+    camera_given_by.add_argument(
+        "--header-type", choices=HeaderType, required=True, help="Either 'EXIF' or 'FITS'"
     )
-    camcre.add_argument(
-        "--bayer-pattern", choices=BayerPattern, default=None, help="Bayer pattern grid"
+    camera_given_by.add_argument(
+        "--bayer-pattern", choices=BayerPattern, required=True, help="Bayer pattern grid"
     )
-    camcre.add_argument(
-        "--width", type=int, default=None, help="Number of raw columns, with no debayering"
+    camera_given_by.add_argument(
+        "--width", type=int, required=True, help="Number of raw columns, with no debayering"
     )
-    camcre.add_argument(
-        "--height", type=int, default=None, help="Number of raw rows, with no debayering"
+    camera_given_by.add_argument(
+        "--height", type=int, required=True, help="Number of raw rows, with no debayering"
     )
-    camcre.add_argument("--x-pixsize", type=float, default=None, help="Pixel width in um.")
-    camcre.add_argument("--y-pixsize", type=float, default=None, help="Pixel height in um.")
+    camera_given_by.add_argument("--x-pixsize", type=float, default=None, help="Pixel width in um.")
+    camera_given_by.add_argument(
+        "--y-pixsize", type=float, default=None, help="Pixel height in um."
+    )
+    camera_given_by.set_defaults(func=cli_camera_given_by)
 
     camswi = subparser.add_parser(
         "switch", help="Switch default camera to an existing model in the database"
@@ -250,30 +255,37 @@ def add_args(parser: ArgumentParser) -> None:
     subparser = parser_roi.add_subparsers(dest="subcommand")
 
     roicre = subparser.add_parser("create", help="Create a new region of interest in the database")
-    roicre.set_defaults(func=cli_roi)
-
-    group = roicre.add_mutually_exclusive_group(required=True)
     roicre.add_argument("--default", action="store_true", help="Set this ROI as the default ROI")
-    group.add_argument(
-        "--from-image",
-        type=str,
-        default=None,
+    subparser = roicre.add_subparsers(dest="subcommand")
+    roi_from_image = subparser.add_parser(
+        "from-image",
+        help="set auto centered ROI from (width, heigh) & image",
+    )
+    roi_given_by = subparser.add_parser(
+        "given-by",
+        help="set camera metadata by CLI arguments",
+    )
+    roi_from_image.add_argument(
+        "image",
+        type=vfile,
         action="store",
-        metavar="<image file path>",
-        help="create camera by inspecting an image",
+        metavar="<FILE>",
+        help="image to examine",
     )
-    group.add_argument(
-        "--as-given", action="store_true", help="create camera by adding further parameters"
+    roi_from_image.set_defaults(func=cli_roi_from_image)
+    roi_from_image.add_argument(
+        "--width", type=int, required=True, help="Width of central rectangle"
     )
-    # additional argumnets with the --from-image option
-    roicre.add_argument("--width", type=int, default=None, help="Width of central rectangle")
-    roicre.add_argument("--height", type=int, default=None, help="height of central rectangle")
+    roi_from_image.add_argument(
+        "--height", type=int, required=True, help="height of central rectangle"
+    )
     # additional argumnets with the --as-given option
-    roicre.add_argument("--x1", type=int, default=None, help="Starting pixel column")
-    roicre.add_argument("--y1", type=int, default=None, help="Starting pixel row")
-    roicre.add_argument("--x2", type=int, default=None, help="Ending pixel column")
-    roicre.add_argument("--y2", type=int, default=None, help="Ending pixel row")
-    roicre.add_argument("--comment", type=str, default=None, help="Additional region comment")
+    roi_given_by.add_argument("--x1", type=int, required=True, help="Starting pixel column")
+    roi_given_by.add_argument("--y1", type=int, required=True, help="Starting pixel row")
+    roi_given_by.add_argument("--x2", type=int, required=True, help="Ending pixel column")
+    roi_given_by.add_argument("--y2", type=int, required=True, help="Ending pixel row")
+    roi_given_by.add_argument("--comment", type=str, default=None, help="Additional region comment")
+    roi_given_by.set_defaults(func=cli_roi_given_by)
 
     # ------------------------------------------
     # Create second level parsers for 'sky'
@@ -372,48 +384,51 @@ def cli_optics(args: Namespace) -> None:
     use_case.execute(form)
 
 
-def cli_camera(args: Namespace) -> None:
+def cli_camera_given_by(args: Namespace) -> None:
+    log.debug(args)
+    camera = SqaCameraRepo(db)
+    consent = SqaConsentRepo(db)
+
+    form = CameraForm(
+        model=args.model,
+        bayer_pattern=args.bayer_pattern,
+        header_type=args.header_type,
+        extension=args.extension,
+        width=args.width,
+        height=args.height,
+        bias=args.bias,
+        x_pixsize=args.x_pixsize,
+        y_pixsize=args.y_pixsize,
+    )
+    use_case = CreateCamera(camera, consent)
+    use_case.execute(form, args.default)
+
+
+def cli_camera_from_image(args: Namespace) -> None:
+    log.debug(args)
     camera = SqaCameraRepo(db)
     consent = SqaConsentRepo(db)
     optics = SqaOpticsRepo(db)
     factory = ImageReaderFactoryImpl()
-    if args.as_given:
-        # El resto de valores deberia ser tambien requerido
-        if args.model is None:
-            raise AzoteaError("Camera model is required in --as-given")
-        form = CameraForm(
-            model=args.model,
-            bayer_pattern=args.bayer_pattern,
-            header_type=args.header_type,
-            extension=args.extension,
-            width=args.width,
-            height=args.height,
-            bias=args.bias,
-            x_pixsize=args.x_pixsize,
-            y_pixsize=args.y_pixsize,
-        )
-        use_case = CreateCamera(camera, consent)
-        use_case.execute(form, args.default)
-    else:
-        use_case = CreateCameraFromImage(camera, consent, optics, factory)
-        use_case.execute(args.from_image, args.default)
+    use_case = CreateCameraFromImage(camera, consent, optics, factory)
+    use_case.execute(args.image, args.default)
 
 
-def cli_roi(args: Namespace) -> None:
+def cli_roi_given_by(args: Namespace) -> None:
+    roi = SqaRoiRepo(db)
+    consent = SqaConsentRepo(db)
+    form = RoiForm(x1=args.x1, y1=args.y1, x2=args.x2, y2=args.y2, comment=args.comment)
+    use_case = CreateRoi(roi, consent)
+    use_case.execute(form, args.default)
+
+
+def cli_roi_from_image(args: Namespace) -> None:
     roi = SqaRoiRepo(db)
     factory = ImageReaderFactoryImpl()
     consent = SqaConsentRepo(db)
-    if args.as_given:
-        # El resto de valores deberia ser tambien requerido
-        if args.x1 is None:
-            raise AzoteaError("Camera model is required in --as-given")
-        form = RoiForm(x1=args.x1, y1=args.y1, x2=args.x2, y2=args.y2, comment=args.comment)
-        use_case = CreateRoi(roi, consent)
-        use_case.execute(form, args.default)
-    else:
-        form = RoiCenteredForm(width=args.width, height=args.height)
-        use_case = CreateRoiFromImage(roi, consent, factory)
-        use_case.execute(args.from_image, form, args.default)
+    form = RoiCenteredForm(width=args.width, height=args.height)
+    use_case = CreateRoiFromImage(roi, consent, factory)
+    use_case.execute(args.image, form, args.default)
 
 
 def cli_observer(args: Namespace) -> None:
