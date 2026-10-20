@@ -67,10 +67,10 @@ class ComputeSkyStatistics:
     def _one_pass(self, image_id: ObjId, path: str) -> SkyStatsForm:
         reader = self.factory.get_reader(path)
         raw_pixels = reader.read_pixels(path)
-        r_channel = raw_pixels.r(self.section)
-        gr_channel = raw_pixels.gr(self.section)
-        gb_channel = raw_pixels.gb(self.section)
-        b_channel = raw_pixels.b(self.section)
+        r_channel = raw_pixels.red(self.section)
+        gr_channel = raw_pixels.greenr(self.section)
+        gb_channel = raw_pixels.greenb(self.section)
+        b_channel = raw_pixels.blue(self.section)
         stats = SkyStatsForm(
             image_id=image_id,
             roi_id=self.roi_id,
@@ -83,10 +83,10 @@ class ComputeSkyStatistics:
             aver_signal_B=np.mean(b_channel),
             vari_signal_B=np.var(b_channel),
         )
-        log.debug("black level R %d", raw_pixels.r_black())
-        log.debug("black level Gr %d", raw_pixels.gr_black())
-        log.debug("black level Gb %d", raw_pixels.gb_black())
-        log.debug("black level B %d", raw_pixels.b_black())
+        log.debug("black level R %d", raw_pixels.red_black_level())
+        log.debug("black level Gr %d", raw_pixels.greenr_black_level())
+        log.debug("black level Gb %d", raw_pixels.greenb_black_level())
+        log.debug("black level B %d", raw_pixels.blue_black_level())
         return stats
 
     def execute(self) -> None:

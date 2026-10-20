@@ -70,9 +70,9 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "lica-cli" },
-    { name = "lica-raw", extras = ["exif", "fits"] },
-    { name = "lica-sqa", extras = ["decouple"] },
+    { name = "lica-cli", specifier = ">=0.1" },
+    { name = "lica-raw", extras = ["exif", "fits"], specifier = ">=0.2" },
+    { name = "lica-sqa", extras = ["decouple"], specifier = ">=0.1" },
     { name = "lica-tables", extras = ["tabulate"], git = "https://github.com/guaix-ucm/lica-ng.git?subdirectory=packages%2Flica-tables" },
 ]
 
@@ -143,14 +143,14 @@ wheels = [
 
 [[package]]
 name = "lica-raw"
-version = "0.1.1"
+version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2f/f5/d712913e5fcabe5be9a0f0bae527651c0b1847fb539fb32d7b97c605f2a5/lica_raw-0.1.1.tar.gz", hash = "sha256:26f1bf53daca98e33d63ac66ff162292ce1cc9341276145aa0ea3cb790742c45", size = 12100, upload-time = "2026-10-19T11:53:16.091Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/f9/7b2af9461f6ee53a309e2b24fb5fc88d9a5ed55808e4bf65972019683d9f/lica_raw-0.2.1.tar.gz", hash = "sha256:44b8be52b9622e6df983663be4f7e17af7f459574d64918a0886b382609e02ae", size = 12128, upload-time = "2026-10-20T08:37:48.922Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/71/aa/ae80ca2c5fcb465300beee17c3f83f7310416272e07e23d32e27375f64d5/lica_raw-0.1.1-py3-none-any.whl", hash = "sha256:eabf04b7fb1c60f587cdb2994a405d7272e60646bb931f4f8f593a8777118e7c", size = 16293, upload-time = "2026-10-19T11:53:14.852Z" },
+    { url = "https://files.pythonhosted.org/packages/18/c4/7a269ad0898fc8d7432a0a5d4b029de49b2aef6c460fbcc82c74c1b42730/lica_raw-0.2.1-py3-none-any.whl", hash = "sha256:fb58299ee3e333d4f77b02937e6d49da792fb4207300a591956db5b519ea175d", size = 16296, upload-time = "2026-10-20T08:37:47.674Z" },
 ]
 
 [package.optional-dependencies]
