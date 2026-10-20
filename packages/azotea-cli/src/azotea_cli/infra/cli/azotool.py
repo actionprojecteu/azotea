@@ -14,7 +14,7 @@ from argparse import ArgumentParser, Namespace
 # Third party libraries
 # ---------------------
 from lica_cli import parse_args, run_cli
-from lica_cli.validate import vdate, vfile
+from lica_cli.validate import vdate, vfile, vnat
 from lica_log.adapters.default import DefaultLogger
 from lica_raw import BayerPattern, HeaderType
 from lica_raw.adapters import ImageReaderFactoryImpl
@@ -229,10 +229,10 @@ def add_args(parser: ArgumentParser) -> None:
         "--bayer-pattern", choices=BayerPattern, required=True, help="Bayer pattern grid"
     )
     camera_given_by.add_argument(
-        "--width", type=int, required=True, help="Number of raw columns, with no debayering"
+        "--width", type=vnat, required=True, help="Number of raw columns, with no debayering"
     )
     camera_given_by.add_argument(
-        "--height", type=int, required=True, help="Number of raw rows, with no debayering"
+        "--height", type=vnat, required=True, help="Number of raw rows, with no debayering"
     )
     camera_given_by.add_argument("--x-pixsize", type=float, default=None, help="Pixel width in um.")
     camera_given_by.add_argument(
@@ -274,10 +274,10 @@ def add_args(parser: ArgumentParser) -> None:
     )
     roi_from_image.set_defaults(func=cli_roi_from_image)
     roi_from_image.add_argument(
-        "--width", type=int, required=True, help="Width of central rectangle"
+        "--width", type=vnat, required=True, help="Width of central rectangle"
     )
     roi_from_image.add_argument(
-        "--height", type=int, required=True, help="height of central rectangle"
+        "--height", type=vnat, required=True, help="height of central rectangle"
     )
     # additional argumnets with the --as-given option
     roi_given_by.add_argument("--x1", type=int, required=True, help="Starting pixel column")
