@@ -14,13 +14,13 @@ from itertools import batched
 # ---------------------
 # Third party libraries
 # ---------------------
-from lica_raw import ImageReaderFactory
+from lica_raw import ImageReaderFactory, ImageMetadata, ImageType
 from lica_raw.errors import ReadMetadataError
 
 # ---------------
 # Own dependecies
 # ---------------
-from azotea_cli.provision.errors import CameraMissingError
+from azotea_cli.provision.errors import CameraMissingError, MissingCameraModelError
 from azotea_cli.provision.ports import (
     CameraRepo,
     ConsentService,
@@ -30,7 +30,7 @@ from azotea_cli.provision.ports import (
 )
 
 from azotea_cli.common.filesystem import hash_func, scan_images
-from azotea_cli.operation.errors import CameraNotDefaultError, MissingTimestampError
+from azotea_cli.operation.errors import CameraNotDefaultError, MissingTimestampError, MissingExptimeError
 from azotea_cli.operation.ports import ImagesRepo
 from azotea_cli.operation.models import ImageForm, RegisterForm
 
@@ -63,13 +63,23 @@ class RegisterImages:
         self.factory = factory
         self.images = images
 
+    def _validate(self, metadata: ImageMetadata, path: str) -> None:
+        if metadata.timestamp is None:
+            raise MissingTimestampError(os.path.basename(path))
+        if metadata.model is None:
+            raise MissingCameraModelError(os.path.basename(path))
+        if metadata.exptime is None:
+            raise MissingExptimeError(os.path.basename(path))
+        if metadata.imagetyp is None:
+            metadata.imagetyp = ImageType.LIGHT
+
+
+
     def _one_pass(self, path: str) -> ImageForm:
         reader = self.factory.get_reader(path)
         metadata = reader.read_metadata(path)
-        if metadata.timestamp is None:
-            raise MissingTimestampError(os.path.basename(path))
-        # this may trigger an exception as well
-        camera_id = self.camera.get_id_by_model(metadata.model)
+        self._validate(metadata, path)
+        camera_id = self.camera.get_id_by_model(metadata.model)  # pyright: ignore[reportArgumentType]
         if camera_id != self.camera_id:
             raise CameraNotDefaultError()
         # we compute the expensive hash function only after we make sur ethat the camera estsis
@@ -80,12 +90,12 @@ class RegisterImages:
             hash=hash,
             iso=metadata.iso,
             gain=metadata.gain,
-            exptime=metadata.exptime,
+            exptime=metadata.exptime,  # pyright: ignore[reportArgumentType]
             focal_length=metadata.focal_len,
             f_number=metadata.f_number,
-            imagetype=metadata.imagetyp,
+            imagetype=metadata.imagetyp,  # pyright: ignore[reportArgumentType]
             session=self.session,
-            date_obs=metadata.timestamp,
+            date_obs=metadata.timestamp,  # pyright: ignore[reportArgumentType]
             camera_id=self.camera_id,
             observer_id=self.observer_id,
             location_id=self.location_id,
