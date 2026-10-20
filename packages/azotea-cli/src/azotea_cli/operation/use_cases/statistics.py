@@ -66,27 +66,27 @@ class ComputeSkyStatistics:
 
     def _one_pass(self, image_id: ObjId, path: str) -> SkyStatsForm:
         reader = self.factory.get_reader(path)
-        raw_pixels = reader.read_pixels(path)
-        r_channel = raw_pixels.red(self.section)
-        gr_channel = raw_pixels.greenr(self.section)
-        gb_channel = raw_pixels.greenb(self.section)
-        b_channel = raw_pixels.blue(self.section)
-        stats = SkyStatsForm(
-            image_id=image_id,
-            roi_id=self.roi_id,
-            aver_signal_R=np.mean(r_channel),
-            vari_signal_R=np.var(r_channel),
-            aver_signal_G1=np.mean(gr_channel),
-            vari_signal_G1=np.var(gr_channel),
-            aver_signal_G2=np.mean(gb_channel),
-            vari_signal_G2=np.var(gb_channel),
-            aver_signal_B=np.mean(b_channel),
-            vari_signal_B=np.var(b_channel),
-        )
-        log.debug("black level R %d", raw_pixels.red_black_level())
-        log.debug("black level Gr %d", raw_pixels.greenr_black_level())
-        log.debug("black level Gb %d", raw_pixels.greenb_black_level())
-        log.debug("black level B %d", raw_pixels.blue_black_level())
+        with reader.read_pixels(path) as raw_pixels:
+            red = raw_pixels.red(self.section)
+            green_r = raw_pixels.greenr(self.section)
+            green_b = raw_pixels.greenb(self.section)
+            blue = raw_pixels.blue(self.section)
+            stats = SkyStatsForm(
+                image_id=image_id,
+                roi_id=self.roi_id,
+                aver_signal_R=np.mean(red),
+                vari_signal_R=np.var(red),
+                aver_signal_G1=np.mean(green_r),
+                vari_signal_G1=np.var(green_r),
+                aver_signal_G2=np.mean(green_b),
+                vari_signal_G2=np.var(green_b),
+                aver_signal_B=np.mean(blue),
+                vari_signal_B=np.var(blue),
+            )
+            log.debug("black level R %d", raw_pixels.red_black_level())
+            log.debug("black level Gr %d", raw_pixels.greenr_black_level())
+            log.debug("black level Gb %d", raw_pixels.greenb_black_level())
+            log.debug("black level B %d", raw_pixels.blue_black_level())
         return stats
 
     def execute(self) -> None:
