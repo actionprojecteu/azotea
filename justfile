@@ -80,9 +80,9 @@ exif-setup:
             --longitude -2.7335649 --latitude 40.4966031 --utc-offset 1
     uv run azotool --console --trace configure optics --focal-length 50 --f-number 3.5
     uv run azotool --console --trace camera create --default \
-        --from-image ${IMAGES}/2020_12_1200_02_329999.CR2
-    uv run azotool --console --trace roi create --default --width 500 --height 400 \
-            --from-image ${IMAGES}/2020_12_1200_02_329999.CR2
+        from-image ${IMAGES}/2020_12_1200_02_329999.CR2
+    uv run azotool --console --trace roi create --default from-image --width 500 --height 400 \
+             ${IMAGES}/2020_12_1200_02_329999.CR2
     #uv run azotool --console configure publishing --username foo --password bar --url http://localhost:8080
 
 
@@ -211,10 +211,8 @@ fits-setup dir image:
     uv run azotool  --console location create --default --site-name Alcafrán --location Alcafrán \
         --longitude -2.7335649 --latitude 40.4966031 --utc-offset 1
     uv run azotool --console configure optics --focal-length 50 --f-number 3.5
-    uv run azotool --console --trace camera create --default \
-        --from-image ${IMAGES}/${IMAGE}
-    uv run azotool  --console --trace roi create --default --width 500 --height 400 \
-        --from-image ${IMAGES}/${IMAGE}
+    uv run azotool --console --trace camera create --default from-image ${IMAGES}/${IMAGE}
+    uv run azotool  --console --trace roi create --default from-image --width 500 --height 400 ${IMAGES}/${IMAGE}
     #uv run azotool --console configure publishing --username foo --password bar --url http://localhost:8080
 
 [private]
