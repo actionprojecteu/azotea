@@ -62,6 +62,9 @@ publish pkg:
 # AZOTEA Database and tools
 # -------------------------
 
+ignacio:
+    cp azotea-ignacio-sin-medidas.db azotea.db
+
 # setup a new alembic tree in a project
 alembic-anew package="packages/azotea-cli":
     #!/usr/bin/env bash
@@ -84,15 +87,18 @@ anew package="packages/azotea-cli" verbose="":
     uv run alembic stamp --purge head
     popd
 
-
 # migrate a pre-existing azotea database to SQLAlchemy
 alembic-old-db package="packages/azotea-cli" baseline="2d90c82cffb2":
     #!/usr/bin/env bash
     set -exuo pipefail
     package="{{package}}"
     baseline="{{baseline}}"
-    pushd "${package}"
-    uv run alembic stamp "${baseline}"
+    pushd "{{package}}"
+    # Comprobación recomendada antes de tocar la base:
+    uv run alembic history
+    uv run alembic heads
+    uv run alembic stamp --purge "{{baseline}}"
+    uv run alembic upgrade head
     popd
 
 # compares python ORM with existing eschema and generate up/down scripts
