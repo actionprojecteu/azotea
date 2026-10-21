@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import NamedTuple
 
-from lica_raw import Rect
 
 class Bounds(NamedTuple):
     low: int | None
@@ -14,7 +13,10 @@ class ScanForm:
 
 @dataclass(frozen=True)
 class PlotForm:
-    section: Rect | None
+    x1: int | None
+    y1: int | None
+    width: int
+    height: int
     title: str | None
-    sigma: float
+    n_sigma: float
     bounds: Bounds | None

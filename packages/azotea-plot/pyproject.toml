@@ -19,9 +19,9 @@ classifiers = [
 ]
 
 dependencies = [
-    "lica-cli",
-    "lica-raw[fits,exif]",
-    "matplotlib",
+    "lica-cli >= 0.1",
+    "lica-raw[fits,exif] >= 0.2",
+    "matplotlib >= 3.11",
 ]
 
 [project.scripts]
