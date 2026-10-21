@@ -1,0 +1,40 @@
+[project]
+name = "azotea-plot"
+version = "0.1.0"
+description = "Plotting utility for AZOTEA images"
+readme = "README.md"
+requires-python = ">=3.12"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Rafael González", email = "rafael08@ucm.es"},
+    {name = "Jaime Zamorano", email = "jzamoran@ucm.es"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+
+dependencies = [
+    "lica-cli",
+    "lica-raw[fits,exif]",
+    "matplotlib",
+]
+
+[project.scripts]
+# The azofits program
+azoplot = "azotea_plot.infra.cli.main:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14"]
+build-backend = "uv_build"
+
+# -----------
+# Other stuff
+# -----------
+
+[tool.ruff]
+line-length = 100
