@@ -25,7 +25,8 @@ from lica_tables.adapters.tabulate import StdoutDisplay
 # Own dependecies
 # ---------------
 from azotea_cli import __version__
-from azotea_cli.common.errors import AzoteaError
+from azotea_cli.common.errors import AzoteaError, RepositoryError
+
 from azotea_cli.provision import (
     CameraForm,
     DefaultOpticsForm,
@@ -497,8 +498,12 @@ def cli_main(args: Namespace) -> None:
     try:
         db.init()
         args.func(args)
+    except RepositoryError as e:
+        log.critical(e)
+        StdoutDisplay().show(str(e))
     except AzoteaError as e:
         log.critical(e)
+    finally:
         db.engine.dispose()
 
 

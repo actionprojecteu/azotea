@@ -17,12 +17,14 @@ from lica_cli import parse_args, run_cli
 from lica_log.adapters.default import DefaultLogger
 from lica_sqa.adapters.decouple import DcplDatabase
 from lica_raw.adapters import ImageReaderFactoryImpl
+from lica_tables.adapters.tabulate import StdoutDisplay
 
 # ---------------
 # Own dependecies
 # ---------------
 from azotea_cli import __version__
-from azotea_cli.common.errors import AzoteaError
+from azotea_cli.common.errors import AzoteaError, RepositoryError
+
 
 from azotea_cli.operation.adapters import SqaImagesRepo, SqaSkyBrightnessRepo
 from azotea_cli.operation.models import RegisterForm
@@ -138,8 +140,12 @@ def cli_main(args: Namespace) -> None:
     try:
         db.init()
         args.func(args)
+    except RepositoryError as e:
+        log.critical(e)
+        StdoutDisplay().show(str(e))
     except AzoteaError as e:
         log.critical(e)
+    finally:
         db.engine.dispose()
 
 
