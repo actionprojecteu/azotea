@@ -14,7 +14,7 @@ members = [
 azotea-cli = { workspace = true }
 azotea-fits = { workspace = true }
 
-lica-tables = { git = "https://github.com/guaix-ucm/lica-ng.git", subdirectory = "packages/lica-tables" }
+#lica-tables = { git = "https://github.com/guaix-ucm/lica-ng.git", subdirectory = "packages/lica-tables" }
 #lica-raw = { path = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-raw", editable = true  }
 
 [build-system]
