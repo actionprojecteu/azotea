@@ -1,11 +1,12 @@
 from typing import Protocol
-from lica_raw import Rect
-from .models import RawImagePlotSet
+from collections.abc import Sequence
+
+from .models import ImagePlotSpec
 
 
 class PlotConfig(Protocol):
-    def apply(self): ...
+    def apply(self) -> None: ...
 
 
 class RawImagePlotter(Protocol):
-    def plot(self, section: Rect, data: RawImagePlotSet, config: PlotConfig): ...
+    def plot(self, data: Sequence[ImagePlotSpec], config: PlotConfig) -> None: ...

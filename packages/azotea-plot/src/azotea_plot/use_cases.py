@@ -14,7 +14,7 @@ from azotea_cli.common.filesystem import scan_images
 from lica_raw import ImageMetadata, ImageReaderFactory, Point, Rect
 
 from .models import PlotForm, ScanForm
-from .plotting.models import RawImagePlotItem, RawImagePlotSet
+from .plotting.models import ImagePlotSpec
 from .plotting.ports import PlotConfig, RawImagePlotter
 
 # get the root logger
@@ -50,20 +50,15 @@ def plot_image(
 
     with reader.read_pixels(path) as pixels:
         r = pixels.red(None)
-        r_sigma = np.std(r)
         gr = pixels.greenr(None)
-        gr_sigma = np.std(gr)
         b = pixels.blue(None)
-        b_sigma = np.std(b)
         gb = pixels.greenb(None)
-        gb_sigma = np.std(gb)
-        data = RawImagePlotSet(
-            red=RawImagePlotItem(channel=r, sigma=r_sigma * n_sigma),
-            green_r=RawImagePlotItem(channel=gr, sigma=gr_sigma * n_sigma),
-            green_b=RawImagePlotItem(channel=gb, sigma=gb_sigma * n_sigma),
-            blue=RawImagePlotItem(channel=b, sigma=b_sigma * n_sigma),
-        )
-        plotter.plot(section, data, config)
+        red = ImagePlotSpec(title="R", image=r, section=section, mean=np.mean(r), stddev=np.std(r),display_min=form.vmin, display_max=form.vmax)
+        green_r = ImagePlotSpec(title="Gr", image=gr, section=section, mean=np.mean(gr), stddev=np.std(gr),display_min=form.vmin, display_max=form.vmax)
+        blue = ImagePlotSpec(title="B", image=b, section=section, mean=np.mean(b), stddev=np.std(b),display_min=form.vmin, display_max=form.vmax)
+        green_b = ImagePlotSpec(title="Gb", image=gb, section=section, mean=np.mean(gb), stddev=np.std(gb),display_min=form.vmin, display_max=form.vmax)
+        data = (red, green_r, blue, green_b)
+        plotter.plot(data, config)
 
 
 def batch_plot_images(

@@ -1,12 +1,11 @@
 from typing import NamedTuple
-from lica_raw import IntArray2D
+from lica_raw import IntArray2D, Rect
 
-class RawImagePlotItem(NamedTuple):
-   channel: IntArray2D
-   sigma: float
-
-class RawImagePlotSet(NamedTuple):
-    red: RawImagePlotItem
-    green_r: RawImagePlotItem
-    blue: RawImagePlotItem
-    green_b: RawImagePlotItem
+class ImagePlotSpec(NamedTuple):
+    title: str
+    image: IntArray2D
+    section: Rect
+    mean: float
+    stddev: float
+    display_min: int | None
+    display_max: int | None

@@ -23,7 +23,7 @@ from lica_raw.adapters import ImageReaderFactoryImpl
 # -------------
 from azotea_plot import __version__
 from azotea_plot.errors import AzoteaPlotError
-from azotea_plot.models import Bounds, PlotForm, ScanForm
+from azotea_plot.models import PlotForm, ScanForm
 from azotea_plot.plotting.adapters.mock import MockPlotConfig, MockRawImagePlotter
 from azotea_plot.use_cases import batch_plot_images, plot_image
 
@@ -83,15 +83,14 @@ def add_args(parser: ArgumentParser) -> None:
 
 def cli_plot(args: Namespace) -> None:
     factory = ImageReaderFactoryImpl()
-    bounds = Bounds(low=args.vmin, high=args.vmax)
     form = PlotForm(
-        n_sigma=args.n_sigma,
         x1=args.x1,
         y1=args.y1,
         width=args.width,
         height=args.height,
-        bounds=bounds,
-        title=None,
+        n_sigma=args.n_sigma,
+        vmin=args.vmin,
+        vmax=args.vmax,
     )
     config = MockPlotConfig()
     plotter = MockRawImagePlotter()

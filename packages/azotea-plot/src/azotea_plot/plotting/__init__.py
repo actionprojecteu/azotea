@@ -1,4 +1,4 @@
 from .ports import PlotConfig, RawImagePlotter
-from .models import RawImagePlotSet, RawImagePlotItem
+from .models import ImagePlotSpec
 
-__all__ = ["PlotConfig", "RawImagePlotter", "RawImagePlotSet", "RawImagePlotItem"]
+__all__ = ["PlotConfig", "RawImagePlotter", "ImagePlotSpec"]
