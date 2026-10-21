@@ -374,6 +374,21 @@ capturafits-edit log="":
 capturafits-all: (anew) (fits-anew) (capturafits-edit) (capturafits-view) (capturafits-setup) (capturafits-register) (capturafits-sky) (export-all)  (sky-summary)
 
 
+# ===================================
+# FITS / CAPTURAFITS IMAGE PROCESSING
+# ===================================
+
+plot-exif:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    IMAGES=images/Carpeta1
+    uv run azoplot --console --trace stats \
+        --image-file ${IMAGES}/2020_12_1200_02_329999.CR2 \
+        --width 500 --height 400
+    uv run azoplot --console --trace stats \
+        --image-file ${IMAGES}/2020_12_1200_02_329999.CR2 \
+        --x1 60 --y1 50 --width 500 --height 400
+
 [private]
 check_mnt mnt:
     #!/usr/bin/env bash
