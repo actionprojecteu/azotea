@@ -28,6 +28,11 @@ init:
 version pkg version:
     uv version --package {{pkg}} {{version}}
 
+lock:
+    uv lock --upgrade
+
+sync:
+    uv lock --upgrade
 
 # Build the package
 build pkg:

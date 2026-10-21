@@ -115,8 +115,8 @@ class SqaCameraRepo(CameraRepo):
                         extension=metadata.extension,
                         header_type=metadata.header_type,
                         bayer_pattern=metadata.bayer,
-                        width=metadata.width,
-                        height=metadata.height,
+                        width=metadata.raw_width,
+                        height=metadata.raw_height,
                     )
                     session.add(cam)
                     session.flush()

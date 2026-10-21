@@ -10,7 +10,7 @@ import logging
 import os
 
 from lica_tables import DisplayService
-from lica_raw import ImageMetadata, ImageReaderFactory, Point, Rect
+from lica_raw import ImageMetadata, ImageReaderFactory, Point, Rect, autocenter
 # ----------------
 # Own dependencies
 # ----------------
@@ -176,11 +176,7 @@ class CreateRoiFromImage:
         self.consent.check_raises()
         reader = self.factory.get_reader(path)
         metadata = reader.read_metadata(path)
-        dim = Point(form.width, form.height) * 2  # to raw coordinates
-        raw_size = Point(metadata.width, metadata.height)
-        raw_screen = Rect.from_points(Point.zero(), raw_size)
-        rect = Rect.from_points(Point.zero(), dim).recenter_on(raw_screen)
-        rect = rect // 2  # to each plane coordinates
+        rect = autocenter(metadata.raw_width, metadata.raw_height, form.width, form.height)
         roi_id = self.roi.create_from_image(rect, metadata)
         if as_default:
             self.roi.set_default(roi_id)

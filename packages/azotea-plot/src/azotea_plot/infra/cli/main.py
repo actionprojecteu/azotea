@@ -15,7 +15,6 @@ from argparse import ArgumentParser, Namespace
 from lica_cli import parse_args, run_cli
 from lica_cli.validate import vdir, vfile
 from lica_log.adapters.default import DefaultLogger
-from lica_raw import Point, Rect
 from lica_raw.adapters import ImageReaderFactoryImpl
 
 # --------------
