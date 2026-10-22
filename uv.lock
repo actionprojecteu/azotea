@@ -83,15 +83,13 @@ version = "0.1.0"
 source = { editable = "packages/azotea-fits" }
 dependencies = [
     { name = "astropy" },
-    { name = "azotea-cli" },
     { name = "lica-tables" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "astropy", specifier = ">=8.0" },
-    { name = "azotea-cli", editable = "packages/azotea-cli" },
-    { name = "lica-tables", specifier = ">=0.1" },
+    { name = "lica-tables", specifier = ">=0.2" },
 ]
 
 [[package]]
@@ -456,11 +454,11 @@ decouple = [
 
 [[package]]
 name = "lica-tables"
-version = "0.1.0"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/25/18/10c4e33b7bb2df69fc9b4820b10810eebf78abc08ea0a24c6e60b9b39897/lica_tables-0.1.0.tar.gz", hash = "sha256:44a2e74df4b3f9f45f737bed4d429724b94a5cb61128d4716783f34c3c6cb5bd", size = 5478, upload-time = "2026-10-21T07:21:11.316Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/a2/ef7483948844964f233d0df2dc10517b146a4c02a1954171c3200df48656/lica_tables-0.2.0.tar.gz", hash = "sha256:5c3ee430f25077d54683785c2037ab303edcbe6ca1b96e74c80fa938a8f1e7db", size = 5496, upload-time = "2026-10-22T10:27:03.316Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c6/7b/3f07beeea93c4b93ce579381af23ca2ffd15216cffe3ef04ebf66a748114/lica_tables-0.1.0-py3-none-any.whl", hash = "sha256:d7a7606cf3a915a828d76730ce4ac33819073a7f9fef3f7ecd9d565f41afbe1b", size = 7020, upload-time = "2026-10-21T07:21:10.074Z" },
+    { url = "https://files.pythonhosted.org/packages/43/19/3fcda2f6bc3214135183b5310b58ccd87fe0f1ec67e26b7523da13f2a602/lica_tables-0.2.0-py3-none-any.whl", hash = "sha256:2fc65d96521386775634f66ca1716b01d539e9be36c23a8ec94af8b8d31bc326", size = 7037, upload-time = "2026-10-22T10:27:02.358Z" },
 ]
 
 [package.optional-dependencies]

@@ -8,14 +8,14 @@
 # ----------------
 import hashlib
 import os
-from pathlib import Path
 from collections.abc import Iterable
+from pathlib import Path
 
 
 def scan_non_empty_dirs(root_dir: str, depth: int | None = None):
     if os.path.basename(root_dir) == "":
         root_dir = root_dir[:-1]
-    dirs = set(dirpath for dirpath, dirs, files in os.walk(root_dir) if files)
+    dirs = {dirpath for dirpath, dirs, files in os.walk(root_dir) if files}
     dirs.add(root_dir)  # Add it for images just under the root_dir folder
     if depth is None:
         return list(dirs)
@@ -36,7 +36,7 @@ def scan_images(
     root = Path(root_dir).resolve()
     root_depth = len(root.parts)
     extensions = tuple(ext.lower() for ext in extensions)
-    images = list()
+    images = []
 
     for dir_path, _dir_names, file_names in os.walk(root):
         current = Path(dir_path)

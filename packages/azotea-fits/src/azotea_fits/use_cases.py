@@ -10,8 +10,8 @@ import logging
 import os
 
 from astropy.io import fits
-from lica_tables import DisplayService
 from azotea_cli.common.filesystem import scan_images
+from lica_tables import DisplayService
 
 from .models import EXTENSIONS, FitsForm, ScanForm
 from .ports import EditorFactory
@@ -23,10 +23,8 @@ log = logging.getLogger(__name__.split(".")[-1])
 def show_fits_metadata(path: str, factory: EditorFactory, display: DisplayService) -> None:
     editor = factory.get_editor(path)
     with fits.open(path) as hdul:
-        data = editor.read.keywords(hdul[0].header)
-        display.show_tabular(
-            data, keys=("Field", "Keyword", "Value"), title=os.path.basename(path)
-        )
+        data = editor.read.keywords(hdul[0].header)  # pyright: ignore[reportAttributeAccessIssue]
+        display.show_tabular(data, keys=("Field", "Keyword", "Value"), title=os.path.basename(path))
 
 
 def batch_show_fits_metadata(
@@ -40,8 +38,8 @@ def batch_show_fits_metadata(
 def set_software_creator(path: str, name: str, factory: EditorFactory) -> None:
     editor = factory.get_editor(path)
     with fits.open(path, mode="update") as hdul:
-        header = hdul[0].header
-        history = list()
+        header = hdul[0].header  # pyright: ignore[reportAttributeAccessIssue]
+        history = []
         editor.edit.sw_creator(header, name, history)
         editor.edit.add_history(header, history)
 
@@ -55,8 +53,8 @@ def batch_set_software_creator(scan: ScanForm, name: str, factory: EditorFactory
 def edit_fits(path: str, form: FitsForm, factory: EditorFactory) -> None:
     editor = factory.get_editor(path)
     with fits.open(path, mode="update") as hdul:
-        header = hdul[0].header
-        history = list()
+        header = hdul[0].header  # pyright: ignore[reportAttributeAccessIssue]
+        history = []
         log.info("-" * 57)
         editor.fix.camera(header, history)
         editor.fix.gain(header, history)
@@ -70,7 +68,7 @@ def edit_fits(path: str, form: FitsForm, factory: EditorFactory) -> None:
         editor.fix.exptime(header, history)
         editor.fix.date_obs(header, history)
         editor.fix.add_history(header, history)
-        history = list()
+        history = []
         editor.edit.camera(header, form.camera, history)
         editor.edit.gain(header, form.gain, history)
         editor.edit.xpixsize(header, form.x_pixsize, history)

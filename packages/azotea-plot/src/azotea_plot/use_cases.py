@@ -7,12 +7,11 @@
 # standard library
 # ----------------
 import logging
-import os
 
 import numpy as np
-from azotea_cli.common.filesystem import scan_images
-from lica_raw import ImageMetadata, ImageReaderFactory, Rect, autocenter
+from lica_raw import ImageReaderFactory, Rect, autocenter
 
+from .filesystem import scan_images
 from .models import PlotForm, ScanForm
 from .plotting.models import ImagePlotSpec
 from .plotting.ports import PlotConfig, RawImagePlotter

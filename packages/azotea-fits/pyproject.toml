@@ -19,9 +19,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "azotea-cli",
     "astropy >= 8.0",
-    "lica_tables >= 0.1",
+    "lica_tables >= 0.2",
 ]
 
 [project.scripts]
