@@ -12,7 +12,7 @@ from math import ceil, sqrt
 # ---------------------
 # Third party libraries
 # ---------------------
-from lica_raw import BayerIndex, Rect
+from lica_raw import BayerIndex
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -44,7 +44,8 @@ CONTOUR_CMAP = {
 EDGE_COLOR = {BayerIndex.R: "y", BayerIndex.Gr: "b", BayerIndex.Gb: "b", BayerIndex.B: "r"}
 
 # Load global style sheets
-#plt.style.use("azotea_plot.plotting.adapters.matplotlib.global")
+
+plt.style.use("azotea_plot.plotting.adapters.matplotlib.global")
 
 def plot_contour_cmap(channels):
     """Plot image color map of channels to display"""
@@ -67,21 +68,12 @@ def plot_layout(channels):
     return LAYOUT[len(channels)]
 
 
-def axes_reshape(axes, channels):
-    """Reshape Axes to be 2D arrays for 1x1 and 1x2 layout situations"""
-    if len(channels) == 1:
-        return np.array([axes]).reshape(-1, 1)
-    if len(channels) == 2:
-        return axes.reshape(-1, 2)
-    return axes
-
 def plot(axes: Axes, data: ImagePlotSpec) -> None:
     #img_cmap = plot_image_cmap(channels)[i]
     #edgecolor = plot_edge_color(channels)[i]
 
     axes.set_title(rf"{data.bayer.name} channel: {data.section} $\mu={data.mean:.2f}, \sigma={data.stddev:.2f}$")
     # we choose an statistical visualization or else the min max/data range
-
     vmax = data.mean + 3 * data.stddev if data.display_max is None else data.display_max
     vmin = data.mean - 1 * data.stddev if data.display_min is None else data.display_min
     #im = axes.imshow(data.image, cmap=img_cmap, vmin=vmin, vmax=vmax)

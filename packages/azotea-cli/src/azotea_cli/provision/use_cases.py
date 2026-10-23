@@ -10,7 +10,7 @@ import logging
 import os
 
 from lica_tables import DisplayService
-from lica_raw import ImageMetadata, ImageReaderFactory, Point, Rect, autocenter
+from lica_raw import ImageMetadata, ImageReaderFactory, autocenter
 # ----------------
 # Own dependencies
 # ----------------

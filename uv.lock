@@ -72,7 +72,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "lica-cli", specifier = ">=0.1" },
-    { name = "lica-raw", extras = ["exif", "fits"], editable = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-raw" },
+    { name = "lica-raw", extras = ["exif", "fits"], specifier = ">=0.4" },
     { name = "lica-sqa", extras = ["decouple"], specifier = ">=0.1" },
     { name = "lica-tables", extras = ["tabulate"], specifier = ">=0.2" },
 ]
@@ -105,7 +105,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "lica-cli", specifier = ">=0.1" },
-    { name = "lica-raw", extras = ["fits", "exif"], editable = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-raw" },
+    { name = "lica-raw", extras = ["fits", "exif"], specifier = ">=0.4" },
     { name = "matplotlib", specifier = ">=3.11" },
 ]
 
@@ -415,10 +415,14 @@ wheels = [
 
 [[package]]
 name = "lica-raw"
-version = "0.3.1"
-source = { editable = "/home/rafa/repos/own/guaix/lica-ng/packages/lica-raw" }
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a7/a5/92393df287af6f90574350e3cd2403b2715067daa87c571e5cb0da4f9e48/lica_raw-0.4.0.tar.gz", hash = "sha256:5df6620c071651f7df15410044d004edb0d8a22fc526397879c0bff707fc0f59", size = 12500, upload-time = "2026-10-23T07:57:21.065Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/55/3a57d6cf07827332715101eae021e7d87446a0a61928cbe6b781519117fe/lica_raw-0.4.0-py3-none-any.whl", hash = "sha256:d81fc5ff683f4526b1cc0f5a8aa02d0c361133e1f004810a2ab559544cb46c98", size = 16701, upload-time = "2026-10-23T07:57:19.832Z" },
 ]
 
 [package.optional-dependencies]
@@ -429,15 +433,6 @@ exif = [
 fits = [
     { name = "astropy" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "astropy", marker = "extra == 'fits'", specifier = ">=8.0" },
-    { name = "exifread", marker = "extra == 'exif'", specifier = ">=3.5" },
-    { name = "numpy", specifier = ">=2.5" },
-    { name = "rawpy", marker = "extra == 'exif'", specifier = ">=0.27" },
-]
-provides-extras = ["fits", "exif"]
 
 [[package]]
 name = "lica-sqa"
