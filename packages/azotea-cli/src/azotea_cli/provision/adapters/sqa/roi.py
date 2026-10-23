@@ -98,8 +98,8 @@ class SqaRoiRepo(RoiRepo):
             try:
                 with session.begin():
                     log.info("adding new roi from image '%s'", metadata)
-                    center = rect.central()
-                    comment = f"ROI for {model}, centered at P={center}, width={rect.width()}, height={rect.height()}"
+                    center = rect.central
+                    comment = f"ROI for {model}, centered at P={center}, width={rect.width}, height={rect.height}"
                     roi = Roi(
                         x1=rect.x1,
                         y1=rect.y1,

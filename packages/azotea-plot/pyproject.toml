@@ -20,7 +20,7 @@ classifiers = [
 
 dependencies = [
     "lica-cli >= 0.1",
-    "lica-raw[fits,exif] >= 0.3",
+    "lica-raw[fits,exif] >= 0.4",
     "matplotlib >= 3.11",
 ]
 

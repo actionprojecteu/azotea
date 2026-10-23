@@ -87,11 +87,10 @@ def plot(axes: Axes, data: ImagePlotSpec) -> None:
     #im = axes.imshow(data.image, cmap=img_cmap, vmin=vmin, vmax=vmax)
     im = axes.imshow(data.image, vmin=vmin, vmax=vmax)
     # Create the Rectangle patch for the standard ROI
-    width, height = data.section.dimensions()
     rect = patches.Rectangle(
-        data.section.origin(),
-        width,
-        height,
+        data.section.origin,
+        data.section.width,
+        data.section.height,
         linewidth=1,
         linestyle="--",
         edgecolor=EDGE_COLOR[data.bayer],

@@ -22,7 +22,7 @@ dependencies = [
   "lica_cli >= 0.1",
   "lica_tables[tabulate] >= 0.2",
   "lica_sqa[decouple] >= 0.1",
-  "lica_raw[exif,fits] >= 0.3"
+  "lica_raw[exif,fits] >= 0.4"
 ]
 
 [project.scripts]
