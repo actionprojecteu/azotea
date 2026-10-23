@@ -7,7 +7,6 @@
 # standard library
 # ----------------
 import logging
-import os
 from collections.abc import Sequence
 
 # ---------------------
@@ -38,8 +37,8 @@ class SqaSkyBrightnessRepo(SkyBrightnessRepo):
 
     def _translate(self, stats: SkyStatsForm) -> SkyBrightness:
         return SkyBrightness(
-            image_id=stats.image_id,
-            roi_id=stats.roi_id,
+            image_id=stats.image_id.id,
+            roi_id=stats.roi_id.id,
             aver_signal_R=stats.aver_signal_R,
             vari_signal_R=stats.vari_signal_R,
             aver_signal_G1=stats.aver_signal_G1,
@@ -78,11 +77,11 @@ class SqaSkyBrightnessRepo(SkyBrightnessRepo):
 
     def pending_processing_by(self, observer_id: ObjId) -> Sequence[ObjId]:
         sql = select(Image.image_id).where(
-            Image.observer_id == observer_id,
+            Image.observer_id == observer_id.id,
             ~select(SkyBrightness.image_id)
             .where(SkyBrightness.image_id == Image.image_id)
             .exists(),
         )
         with self.db.session() as session:
-            image_ids = session.scalars(sql).all()
+            image_ids = [ObjId(img_id) for img_id in session.scalars(sql)]
             return image_ids

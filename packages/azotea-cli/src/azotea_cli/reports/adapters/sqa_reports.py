@@ -57,11 +57,11 @@ class SqaReportsService(ReportsService):
         self, session: Session, observer_id: ObjId
     ) -> tuple[int | None, int | None]:
         query = select(func.min(Image.date_id), func.max(Image.date_id)).where(
-            Image.observer_id == observer_id
+            Image.observer_id == observer_id.id
         )
         return session.execute(query).one()
 
-    def _report_selector(self, observer_id) -> Any:
+    def _report_selector(self, observer_id: ObjId) -> Any:
         return (
             select(
                 Image.session.label("session"),
@@ -97,7 +97,7 @@ class SqaReportsService(ReportsService):
             .join(Location, Location.location_id == Image.location_id)
             .join(Observer, Observer.observer_id == Image.observer_id)
             .join(Roi, Roi.roi_id == SkyBrightness.roi_id)
-            .where(Image.observer_id == observer_id)
+            .where(Image.observer_id == observer_id.id)
         )
 
     def _to_all(self, x: Mapping[str, Any]) -> ObservationReport:

@@ -50,8 +50,8 @@ class SqaCameraRepo(CameraRepo):
     def set_default(self, camera_id: ObjId) -> None:
         with self.db.session() as session:
             with session.begin():
-                log.info("saving default camera_id: %d", camera_id)
-                config.save(session, "camera", "camera_id", str(camera_id))
+                log.info("saving default camera_id: %d", camera_id.id)
+                config.save(session, "camera", "camera_id", str(camera_id.id))
 
     def get_default(self) -> ObjId:
         with self.db.session() as session:
@@ -59,11 +59,11 @@ class SqaCameraRepo(CameraRepo):
             if camera_id is None:
                 raise MissingDefaultCameraError()
             log.info("loading default camera_id: %s", camera_id)
-            return int(camera_id)
+            return ObjId(int(camera_id))
 
     def get_extension_by_id(self, camera_id: ObjId) -> str:
         with self.db.session() as session:
-            sql = select(Camera.extension).where(Camera.camera_id == camera_id)
+            sql = select(Camera.extension).where(Camera.camera_id == camera_id.id)
             extension = session.scalars(sql).one_or_none()
             if extension is None:
                 raise CameraMissingError(camera_id)
@@ -75,7 +75,7 @@ class SqaCameraRepo(CameraRepo):
             camera_id = session.scalars(sql).one_or_none()
             if camera_id is None:
                 raise CameraMissingError(model)
-            return camera_id
+            return ObjId(camera_id)
 
     def create(self, form: CameraForm) -> ObjId:
         with self.db.session() as session:
@@ -95,12 +95,13 @@ class SqaCameraRepo(CameraRepo):
                     )
                     session.add(cam)
                     session.flush()
-                    return cam.camera_id
+                    return ObjId(cam.camera_id)
             except IntegrityError:
                 log.warning("camera %s already exists", form.model)
                 sql = select(Camera.camera_id).where(Camera.model == form.model)
                 with self.db.session() as session:
-                    return session.scalars(sql).one()
+                    cam_id = session.scalars(sql).one()
+                    return ObjId(cam_id)
 
     def create_from_image(self, metadata: ImageMetadata) -> ObjId:
         make = "" if metadata.make is None else metadata.make
@@ -120,9 +121,10 @@ class SqaCameraRepo(CameraRepo):
                     )
                     session.add(cam)
                     session.flush()
-                    return cam.camera_id
+                    return ObjId(cam.camera_id)
             except IntegrityError:
                 log.warning("camera %s already exists", model)
                 sql = select(Camera.camera_id).where(Camera.model == model)
                 with self.db.session() as session:
-                    return session.scalars(sql).one()
+                    cam_id = session.scalars(sql).one()
+                    return ObjId(cam_id)

@@ -46,8 +46,8 @@ class SqaRoiRepo(RoiRepo):
     def set_default(self, roi_id: ObjId) -> None:
         with self.db.session() as session:
             with session.begin():
-                log.info("saving default roi_id: %d", roi_id)
-                config.save(session, "roi", "roi_id", str(roi_id))
+                log.info("saving default roi_id: %d", roi_id.id)
+                config.save(session, "roi", "roi_id", str(roi_id.id))
 
     def get_default(self) -> ObjId:
         with self.db.session() as session:
@@ -55,10 +55,10 @@ class SqaRoiRepo(RoiRepo):
             if roi_id is None:
                 raise MissingDefaultRoiError
             log.info("loading default roi_id: %s", roi_id)
-            return int(roi_id)
+            return ObjId(int(roi_id))
 
     def get_as_rect(self, roi_id: ObjId) -> Rect:
-        sql = select(Roi).where(Roi.roi_id == roi_id)
+        sql = select(Roi).where(Roi.roi_id == roi_id.id)
         with self.db.session() as session:
             roi = session.scalars(sql).one_or_none()
             if roi is None:
@@ -81,14 +81,15 @@ class SqaRoiRepo(RoiRepo):
                     )
                     session.add(roi)
                     session.flush()
-                    return roi.roi_id
+                    return ObjId(roi.roi_id)
             except IntegrityError:
                 log.warning("roi %s already exists", rect)  # pyright: ignore[reportPossiblyUnboundVariable]
                 sql = select(Roi.roi_id).where(
                     Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2, Roi.y2 == rect.y2  # pyright: ignore[reportPossiblyUnboundVariable]
                 )
                 with self.db.session() as session:
-                    return session.scalars(sql).one()
+                    roi_id = session.scalars(sql).one()
+                    return ObjId(roi_id)
 
     def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> ObjId:
         make = "" if metadata.make is None else metadata.make
@@ -109,11 +110,12 @@ class SqaRoiRepo(RoiRepo):
                     )
                     session.add(roi)
                     session.flush()
-                    return roi.roi_id
+                    return ObjId(roi.roi_id)
             except IntegrityError:
                 log.warning("roi %s already exists", rect)
                 sql = select(Roi.roi_id).where(
                     Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2, Roi.y2 == rect.y2
                 )
                 with self.db.session() as session:
-                    return session.scalars(sql).one()
+                    roi_id = session.scalars(sql).one()
+                    return ObjId(roi_id)

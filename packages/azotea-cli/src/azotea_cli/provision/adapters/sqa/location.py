@@ -48,8 +48,8 @@ class SqaLocationRepo(LocationRepo):
     def set_default(self, location_id: ObjId):
         with self.db.session() as session:
             with session.begin():
-                log.info("saving default location_id: %d", location_id)
-                config.save(session, "location", "location_id", str(location_id))
+                log.info("saving default location_id: %d", location_id.id)
+                config.save(session, "location", "location_id", str(location_id.id))
 
     def get_default(self) -> ObjId:
         with self.db.session() as session:
@@ -57,7 +57,7 @@ class SqaLocationRepo(LocationRepo):
             if location_id is None:
                 raise MissingDefaultLocationError
             log.info("loading default location_id: %s", location_id)
-            return int(location_id)
+            return ObjId(int(location_id))
 
     def create(self, form: LocationForm) -> ObjId:
         with self.db.session() as session:
@@ -74,14 +74,15 @@ class SqaLocationRepo(LocationRepo):
                     )
                     session.add(loc)
                     session.flush()  # Ejecuta el INSERT y carga la PK en loc.id
-                    return loc.location_id
+                    return ObjId(loc.location_id)
             except IntegrityError:
                 log.warning("location (%s, %s) already exists", form.site_name, form.location)
                 sql = select(Location.location_id).where(
                     Location.site_name == form.site_name, Location.location == form.location
                 )
                 with self.db.session() as session:
-                    return session.scalars(sql).one()
+                    location_id = session.scalars(sql).one()
+                    return ObjId(location_id)
 
     def update(self, form: LocationForm) -> None:
         sql = select(Location).where(

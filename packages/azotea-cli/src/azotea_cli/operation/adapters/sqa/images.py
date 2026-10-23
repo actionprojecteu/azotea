@@ -64,9 +64,9 @@ class SqaImagesRepo(ImagesRepo):
             imagetype=image.imagetype,
             flagged=False,
             session=int(image.session),
-            camera_id=image.camera_id,
-            observer_id=image.observer_id,
-            location_id=image.location_id,
+            camera_id=image.camera_id.id,
+            observer_id=image.observer_id.id,
+            location_id=image.location_id.id,
             date_id=date_id,
             time_id=time_id,
         )
@@ -121,17 +121,18 @@ class SqaImagesRepo(ImagesRepo):
 
     def pending_processing_by(self, observer_id: ObjId) -> Sequence[ObjId]:
         sql = select(Image.image_id).where(
-            Image.observer_id == observer_id,
+            Image.observer_id == observer_id.id,
             ~select(SkyBrightness.image_id)
             .where(SkyBrightness.image_id == Image.image_id)
             .exists(),
         )
         with self.db.session() as session:
-            image_ids = session.scalars(sql).all()
+            image_ids = [ObjId(img_id) for img_id in session.scalars(sql)]
         return image_ids
 
     def to_paths(self, image_ids: Sequence[ObjId]) -> Sequence[str]:
-        sql = select(Image.directory, Image.name).where(Image.image_id.in_(image_ids))
+        image_ids2 = [obj.id for obj in image_ids]
+        sql = select(Image.directory, Image.name).where(Image.image_id.in_(image_ids2))
         with self.db.session() as session:
             result = session.execute(sql).all()
         return [os.path.join(dir, name) for dir, name in result]

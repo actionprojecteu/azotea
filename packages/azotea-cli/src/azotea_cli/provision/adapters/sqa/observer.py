@@ -50,8 +50,8 @@ class SqaObserverRepo(ObserverRepo):
     def set_default(self, observer_id: ObjId) -> None:
         with self.db.session() as session:
             with session.begin():
-                log.info("saving default observer_id: %d", observer_id)
-                config.save(session, "observer", "observer_id", str(observer_id))
+                log.info("saving default observer_id: %d", observer_id.id)
+                config.save(session, "observer", "observer_id", str(observer_id.id))
 
     def get_default(self) -> ObjId:
         with self.db.session() as session:
@@ -59,12 +59,12 @@ class SqaObserverRepo(ObserverRepo):
             if observer_id is None:
                 raise MissingDefaultObserverError
             log.info("loading default observer_id: %s", observer_id)
-            return int(observer_id)
+            return ObjId(int(observer_id))
 
     def get_name(self, observer_id: ObjId) -> tuple[str, str]:
         with self.db.session() as session:
             sql = select(Observer.family_name, Observer.surname).where(
-                Observer.observer_id == observer_id
+                Observer.observer_id == observer_id.id
             )
             result = session.execute(sql).one_or_none()
             if result is None:
@@ -122,7 +122,7 @@ class SqaObserverRepo(ObserverRepo):
                             "observer (%s, %s) already exists", form.surname, form.family_name
                         )
                         observer_id = prev_obs.observer_id
-                    return observer_id
+                    return ObjId(observer_id)
             except IntegrityError as e:
                 # this should never happen
                 raise AzoteaError(str(e))

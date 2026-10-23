@@ -58,7 +58,7 @@ class SqaSummaryService(SummaryService):
             )
             .select_from(Image)
             .join(Observer, Observer.observer_id == Image.observer_id)
-            .where(Image.observer_id == observer_id)
+            .where(Image.observer_id == observer_id.id)
             .group_by(Observer.observer_id, Image.imagetype, Image.flagged)
             .order_by(Observer.observer_id, "totals")
         )

@@ -7,9 +7,12 @@
 # Standard library
 # ----------------
 from datetime import datetime, timezone
+from typing import NamedTuple
 
-# For the time being ObjId is an alias
-type ObjId = int
+
+class ObjId(NamedTuple):
+    """Object Id as a new type"""
+    id: int
 
 # =========
 # Constants
