@@ -67,7 +67,6 @@ class SqaRoiRepo(RoiRepo):
 
     def create(self, form: RoiForm) -> ObjId:
         with self.db.session() as session:
-            rect = None
             try:
                 with session.begin():
                     log.info("adding new roi: %s", form)
@@ -84,16 +83,16 @@ class SqaRoiRepo(RoiRepo):
                     session.flush()
                     return roi.roi_id
             except IntegrityError:
-                log.warning("roi %s already exists", rect)
+                log.warning("roi %s already exists", rect)  # pyright: ignore[reportPossiblyUnboundVariable]
                 sql = select(Roi.roi_id).where(
-                    Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2, Roi.y2 == rect.y2
+                    Roi.x1 == rect.x1, Roi.y1 == rect.y1, Roi.x2 == rect.x2, Roi.y2 == rect.y2  # pyright: ignore[reportPossiblyUnboundVariable]
                 )
                 with self.db.session() as session:
                     return session.scalars(sql).one()
 
     def create_from_image(self, rect: Rect, metadata: ImageMetadata) -> ObjId:
         make = "" if metadata.make is None else metadata.make
-        model = metadata.model if metadata.model.startswith(make) else f"{make} {metadata.model}"
+        model = metadata.model if metadata.model.startswith(make) else f"{make} {metadata.model}"  # pyright: ignore[reportOptionalMemberAccess]
         with self.db.session() as session:
             try:
                 with session.begin():

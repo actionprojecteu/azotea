@@ -176,6 +176,8 @@ class CreateRoiFromImage:
         self.consent.check_raises()
         reader = self.factory.get_reader(path)
         metadata = reader.read_metadata(path)
+        if metadata.model is None:
+            raise MissingCameraModelError(f"{os.path.basename(path)}")
         rect = autocenter(metadata.raw_width, metadata.raw_height, form.width, form.height)
         roi_id = self.roi.create_from_image(rect, metadata)
         if as_default:

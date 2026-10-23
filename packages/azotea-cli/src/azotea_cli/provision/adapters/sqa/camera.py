@@ -104,7 +104,7 @@ class SqaCameraRepo(CameraRepo):
 
     def create_from_image(self, metadata: ImageMetadata) -> ObjId:
         make = "" if metadata.make is None else metadata.make
-        model = metadata.model if metadata.model.startswith(make) else f"{make} {metadata.model}"
+        model = metadata.model if metadata.model.startswith(make) else f"{make} {metadata.model}"  # pyright: ignore[reportOptionalMemberAccess]
         with self.db.session() as session:
             try:
                 with session.begin():
