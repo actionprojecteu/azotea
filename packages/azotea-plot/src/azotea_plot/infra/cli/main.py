@@ -22,10 +22,10 @@ from lica_raw.adapters import ImageReaderFactoryImpl
 # -------------
 from azotea_plot import __version__
 from azotea_plot.errors import AzoteaPlotError
-from azotea_plot.models import PlotForm, ScanForm
+from azotea_plot.models import PlotForm
 from azotea_plot.plotting.adapters.matplotlib import RfgPlotConfig, MplRawImagePlotter
 
-from azotea_plot.use_cases import batch_plot_images, plot_image
+from azotea_plot.use_cases import plot_image
 
 # ----------------
 # Module constants
@@ -66,18 +66,17 @@ def add_args(parser: ArgumentParser) -> None:
         help="single FITS file path",
     )
     iplot.add_argument(
-        "-x", "--width", type=int, default=500, help="Region of interest width [pixels]."
+        "-x", "--width", type=int, default=500, help="Region of interest width [pixels] (defaults to %(default)s)."
     )
     iplot.add_argument(
-        "-y", "--height", type=int, default=400, help="Region of interest height [pixels]."
+        "-y", "--height", type=int, default=400, help="Region of interest height [pixels] (defaults to %(default)s)."
     )
-    iplot.add_argument("--x1", type=int, default=None, help="Region of interest X origin [pixels].")
-    iplot.add_argument("--y1", type=int, default=None, help="Region of interest Y height [pixels].")
-    iplot.add_argument("--vmin", type=int, default=None, help="minumim pixel value to display")
-    iplot.add_argument("--vmax", type=int, default=None, help="maximum pixel value to display")
-    iplot.add_argument(
-        "--n-sigma", type=int, choices=range(1, 6), default=2, help="# of sigmas when autoscaling"
-    )
+    iplot.add_argument("--x1", type=int, default=None, help="Region of interest X origin [pixels] (defaults to %(default)s).")
+    iplot.add_argument("--y1", type=int, default=None, help="Region of interest Y height [pixels] (defaults to %(default)s).")
+    iplot.add_argument("--vmin", type=int, default=None, help="minumim pixel value to display (defaults to %(default)s).")
+    iplot.add_argument("--vmax", type=int, default=None, help="maximum pixel value to display (defaults to %(default)s).")
+    iplot.add_argument("--sigmas-min", choices=range(1, 6), default=1, help="autoscale display min value up to -n σ  (defaults to %(default)s).")
+    iplot.add_argument("--sigmas-max", choices=range(1, 6), default=1, help="autoscale display max value up to n σ (defaults to %(default)s).")
     iplot.set_defaults(func=cli_plot)
 
 
@@ -88,16 +87,15 @@ def cli_plot(args: Namespace) -> None:
         y1=args.y1,
         width=args.width,
         height=args.height,
-        n_sigma=args.n_sigma,
         vmin=args.vmin,
         vmax=args.vmax,
+        sigmas_min=args.sigmas_min,
+        sigmas_max=args.sigmas_max,
     )
     config = RfgPlotConfig()
     plotter = MplRawImagePlotter()
     if args.images_dir:
-        return
-        scan = ScanForm(images_dir=args.images_dir, depth=args.dir_depth)
-        batch_plot_image(scan, form, form, factory, plotter, config)
+        raise NotImplementedError
     else:
         plot_image(args.image_file, form, factory, plotter, config)
 

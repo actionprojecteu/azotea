@@ -47,24 +47,14 @@ EDGE_COLOR = {BayerIndex.R: "y", BayerIndex.Gr: "b", BayerIndex.Gb: "b", BayerIn
 
 plt.style.use("azotea_plot.plotting.adapters.matplotlib.global")
 
-def plot_contour_cmap(channels):
-    """Plot image color map of channels to display"""
-    return [CONTOUR_CMAP[ch] for ch in channels]
-
-
-def plot_layout(channels):
-    """Plot layout dimensions  as a function of channels to display"""
-    # returns (nrows, ncols)
-    return LAYOUT[len(channels)]
-
 
 def plot(axes: Axes, data: ImagePlotSpec) -> None:
     cmap = IMAGE_CMAP[data.bayer]
     edgecolor = EDGE_COLOR[data.bayer]
-    axes.set_title(rf"{data.bayer.name} channel: {data.section} $\mu={data.mean:.2f}, \sigma={data.stddev:.2f}$")
+    axes.set_title(rf"{data.bayer.name} channel: {data.section} $\mu={data.section_mean:.2f}, \sigma={data.section_stddev:.2f}$")
     # we choose an statistical visualization or else the min max/data range
-    vmax = data.mean + 3 * data.stddev if data.display_max is None else data.display_max
-    vmin = data.mean - 1 * data.stddev if data.display_min is None else data.display_min
+    vmax = data.image_mean + data.image_sigmas_max * data.image_stddev if data.image_max is None else data.image_max
+    vmin = data.image_mean - data.image_sigmas_min * data.image_stddev if data.image_min is None else data.image_min
     img = axes.imshow(data.image, cmap=cmap, vmin=vmin, vmax=vmax)
     # Create the Rectangle patch for the standard ROI
     rect = patches.Rectangle(
@@ -79,7 +69,7 @@ def plot(axes: Axes, data: ImagePlotSpec) -> None:
     axes.add_patch(rect)
     divider = make_axes_locatable(axes)
     cax = divider.append_axes("right", size="5%", pad=0.10)
-    axes.get_figure().colorbar(img, cax=cax, orientation="vertical")
+    axes.get_figure().colorbar(img, cax=cax, orientation="vertical")  # pyright: ignore[reportOptionalMemberAccess]
 
 class MplRawImagePlotter(RawImagePlotter):
 

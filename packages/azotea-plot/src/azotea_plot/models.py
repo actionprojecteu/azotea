@@ -10,6 +10,7 @@ class PlotForm(NamedTuple):
     y1: int | None
     width: int
     height: int
-    n_sigma: float
     vmin: int | None
     vmax: int | None
+    sigmas_min: int
+    sigmas_max: int

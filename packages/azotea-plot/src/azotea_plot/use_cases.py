@@ -9,20 +9,15 @@
 import logging
 import os
 
-from matplotlib.cm import Reds
 import numpy as np
 from lica_raw import BayerIndex, ImageReaderFactory, Rect, autocenter
 
-from .filesystem import scan_images
-from .models import PlotForm, ScanForm
+from .models import PlotForm
 from .plotting.models import ImagePlotSpec
 from .plotting.ports import PlotConfig, RawImagePlotter
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
-
-# TENG QUE PENSAR ALGO PARA ESTO ....
-EXTENSIONS = (".fit", ".fits", ".fts", ".cr2")  # case-insensitive
 
 
 def plot_image(
@@ -40,56 +35,64 @@ def plot_image(
         section = Rect(form.x1, form.y1, form.x1 + form.width, form.y1 + form.height)
     with reader.read_pixels(path) as pixels:
         red = pixels.red(None)
+        section_red =  pixels.red(section)
         green_r = pixels.greenr(None)
+        section_green_r = pixels.greenr(section)
         blue = pixels.blue(None)
+        section_blue = pixels.blue(section)
         green_b = pixels.greenb(None)
+        section_green_b = pixels.greenb(section)
         red = ImagePlotSpec(
             bayer=BayerIndex.R,
             image=red,
+            image_mean=np.mean(red),
+            image_stddev=np.std(red),
+            image_min=form.vmin,
+            image_max=form.vmax,
+            image_sigmas_min=form.sigmas_min,
+            image_sigmas_max=form.sigmas_max,
             section=section,
-            mean=np.mean(red),
-            stddev=np.std(red),
-            display_min=form.vmin,
-            display_max=form.vmax,
+            section_mean=np.mean(section_red),
+            section_stddev=np.std(section_red),
         )
         green_r = ImagePlotSpec(
             bayer=BayerIndex.Gr,
             image=green_r,
+            image_mean=np.mean(green_r),
+            image_stddev=np.std(green_r),
+            image_min=form.vmin,
+            image_max=form.vmax,
+            image_sigmas_min=form.sigmas_min,
+            image_sigmas_max=form.sigmas_max,
             section=section,
-            mean=np.mean(green_r),
-            stddev=np.std(green_r),
-            display_min=form.vmin,
-            display_max=form.vmax,
+            section_mean=np.mean(section_green_r),
+            section_stddev=np.std(section_green_r),
         )
         blue = ImagePlotSpec(
             bayer=BayerIndex.B,
             image=blue,
+            image_mean=np.mean(blue),
+            image_stddev=np.std(blue),
+            image_min=form.vmin,
+            image_max=form.vmax,
+            image_sigmas_min=form.sigmas_min,
+            image_sigmas_max=form.sigmas_max,
             section=section,
-            mean=np.mean(blue),
-            stddev=np.std(blue),
-            display_min=form.vmin,
-            display_max=form.vmax,
+            section_mean=np.mean(section_blue),
+            section_stddev=np.std(section_blue),
         )
         green_b = ImagePlotSpec(
             bayer=BayerIndex.Gb,
             image=green_b,
+            image_mean=np.mean(green_b),
+            image_stddev=np.std(green_b),
+            image_min=form.vmin,
+            image_max=form.vmax,
+            image_sigmas_min=form.sigmas_min,
+            image_sigmas_max=form.sigmas_max,
             section=section,
-            mean=np.mean(green_b),
-            stddev=np.std(green_b),
-            display_min=form.vmin,
-            display_max=form.vmax,
+            section_mean=np.mean(section_green_b),
+            section_stddev=np.std(section_green_b),
         )
         data = (red, green_r, blue, green_b)
         plotter.plot(data, config, title=os.path.basename(path))
-
-
-def batch_plot_images(
-    scan: ScanForm,
-    form: PlotForm,
-    factory: ImageReaderFactory,
-    plotter: RawImagePlotter,
-    config: PlotConfig,
-) -> None:
-    paths = scan_images(scan.images_dir, scan.depth, EXTENSIONS)
-    for path in paths:
-        plot_image(path, form, factory, plotter, config)
