@@ -9,6 +9,7 @@
 import logging
 import os
 
+from matplotlib.cm import Reds
 import numpy as np
 from lica_raw import BayerIndex, ImageReaderFactory, Rect, autocenter
 
@@ -38,43 +39,43 @@ def plot_image(
     else:
         section = Rect(form.x1, form.y1, form.x1 + form.width, form.y1 + form.height)
     with reader.read_pixels(path) as pixels:
-        r = pixels.red(None)
-        gr = pixels.greenr(None)
-        b = pixels.blue(None)
-        gb = pixels.greenb(None)
+        red = pixels.red(None)
+        green_r = pixels.greenr(None)
+        blue = pixels.blue(None)
+        green_b = pixels.greenb(None)
         red = ImagePlotSpec(
             bayer=BayerIndex.R,
-            image=r,
+            image=red,
             section=section,
-            mean=np.mean(r),
-            stddev=np.std(r),
+            mean=np.mean(red),
+            stddev=np.std(red),
             display_min=form.vmin,
             display_max=form.vmax,
         )
         green_r = ImagePlotSpec(
             bayer=BayerIndex.Gr,
-            image=gr,
+            image=green_r,
             section=section,
-            mean=np.mean(gr),
-            stddev=np.std(gr),
+            mean=np.mean(green_r),
+            stddev=np.std(green_r),
             display_min=form.vmin,
             display_max=form.vmax,
         )
         blue = ImagePlotSpec(
             bayer=BayerIndex.B,
-            image=b,
+            image=blue,
             section=section,
-            mean=np.mean(b),
-            stddev=np.std(b),
+            mean=np.mean(blue),
+            stddev=np.std(blue),
             display_min=form.vmin,
             display_max=form.vmax,
         )
         green_b = ImagePlotSpec(
             bayer=BayerIndex.Gb,
-            image=gb,
+            image=green_b,
             section=section,
-            mean=np.mean(gb),
-            stddev=np.std(gb),
+            mean=np.mean(green_b),
+            stddev=np.std(green_b),
             display_min=form.vmin,
             display_max=form.vmax,
         )

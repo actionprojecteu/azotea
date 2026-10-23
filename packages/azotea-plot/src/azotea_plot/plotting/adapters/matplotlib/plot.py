@@ -52,16 +52,6 @@ def plot_contour_cmap(channels):
     return [CONTOUR_CMAP[ch] for ch in channels]
 
 
-def plot_image_cmap(channels):
-    """Plot image color map of channels to display"""
-    return [IMAGE_CMAP[ch] for ch in channels]
-
-
-def plot_edge_color(channels):
-    """Plot color map of channels to display"""
-    return [EDGE_COLOR[ch] for ch in channels]
-
-
 def plot_layout(channels):
     """Plot layout dimensions  as a function of channels to display"""
     # returns (nrows, ncols)
@@ -69,15 +59,13 @@ def plot_layout(channels):
 
 
 def plot(axes: Axes, data: ImagePlotSpec) -> None:
-    #img_cmap = plot_image_cmap(channels)[i]
-    #edgecolor = plot_edge_color(channels)[i]
-
+    cmap = IMAGE_CMAP[data.bayer]
+    edgecolor = EDGE_COLOR[data.bayer]
     axes.set_title(rf"{data.bayer.name} channel: {data.section} $\mu={data.mean:.2f}, \sigma={data.stddev:.2f}$")
     # we choose an statistical visualization or else the min max/data range
     vmax = data.mean + 3 * data.stddev if data.display_max is None else data.display_max
     vmin = data.mean - 1 * data.stddev if data.display_min is None else data.display_min
-    #im = axes.imshow(data.image, cmap=img_cmap, vmin=vmin, vmax=vmax)
-    im = axes.imshow(data.image, vmin=vmin, vmax=vmax)
+    img = axes.imshow(data.image, cmap=cmap, vmin=vmin, vmax=vmax)
     # Create the Rectangle patch for the standard ROI
     rect = patches.Rectangle(
         data.section.origin,
@@ -85,13 +73,13 @@ def plot(axes: Axes, data: ImagePlotSpec) -> None:
         data.section.height,
         linewidth=1,
         linestyle="--",
-        edgecolor=EDGE_COLOR[data.bayer],
+        edgecolor=edgecolor,
         facecolor="none",
     )
     axes.add_patch(rect)
     divider = make_axes_locatable(axes)
     cax = divider.append_axes("right", size="5%", pad=0.10)
-    axes.get_figure().colorbar(im, cax=cax, orientation="vertical")
+    axes.get_figure().colorbar(img, cax=cax, orientation="vertical")
 
 class MplRawImagePlotter(RawImagePlotter):
 
