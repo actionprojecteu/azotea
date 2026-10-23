@@ -24,6 +24,8 @@ from azotea_plot import __version__
 from azotea_plot.errors import AzoteaPlotError
 from azotea_plot.models import PlotForm, ScanForm
 from azotea_plot.plotting.adapters.mock import MockPlotConfig, MockRawImagePlotter
+from azotea_plot.plotting.adapters.matplotlib import RfgPlotConfig, MplRawImagePlotter
+
 from azotea_plot.use_cases import batch_plot_images, plot_image
 
 # ----------------
@@ -91,8 +93,8 @@ def cli_plot(args: Namespace) -> None:
         vmin=args.vmin,
         vmax=args.vmax,
     )
-    config = MockPlotConfig()
-    plotter = MockRawImagePlotter()
+    config = RfgPlotConfig()
+    plotter = MplRawImagePlotter()
     if args.images_dir:
         return
         scan = ScanForm(images_dir=args.images_dir, depth=args.dir_depth)

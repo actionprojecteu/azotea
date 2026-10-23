@@ -11,11 +11,10 @@ from typing import NamedTuple
 # ---------------------
 # Third party libraries
 # ---------------------
-from lica_raw import IntArray2D, Rect
-
+from lica_raw import IntArray2D, Rect, BayerIndex
 
 class ImagePlotSpec(NamedTuple):
-    title: str
+    bayer: BayerIndex
     image: IntArray2D
     section: Rect
     mean: float

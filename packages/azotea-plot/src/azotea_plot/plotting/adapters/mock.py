@@ -23,7 +23,7 @@ class MockPlotConfig(PlotConfig):
 
 
 class MockRawImagePlotter(RawImagePlotter):
-    def plot(self, data: Sequence[ImagePlotSpec], config: PlotConfig) -> None:
+    def plot(self, data: Sequence[ImagePlotSpec], config: PlotConfig, title: str | None = None) -> None:
         log.debug("calling MockPlotConfig.apply()")
         config.apply()
         log.debug(data)

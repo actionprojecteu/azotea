@@ -3,7 +3,5 @@
 * probar azotea con la BD de Hilera 
 * ver como funciona alembic
 * versiones actual de azotea?
-
-lica-raw:
-* autocenter -> funcion de lica-raw. Añadir en el README.md
-* renombrar ImageMetadata.width a raw_width  ImageMetadata.height a raw_height
+* ObjId no alias de int sino un tipo nuevo de verdad class ObjId(NamedTuple): int id
+- Afecta a todos los adaptadores para hacer masrshall y unmarshall

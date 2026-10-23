@@ -19,7 +19,7 @@ class RfgPlotConfig(PlotConfig):
     def apply(self):
         mpl.rcParams["text.usetex"] = False
         plt.rcParams["font.family"] = "sans-serif"
-        plt.rcParams["font.sans-serif"] = ["Verdana"]
+        plt.rcParams["font.sans-serif"] = ["DejaVu Sans"]
         plt.rcParams["font.size"] = 8
         plt.rcParams["lines.linewidth"] = 4.0
         plt.rcParams["axes.labelsize"] = "small"

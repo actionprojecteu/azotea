@@ -7,9 +7,10 @@
 # standard library
 # ----------------
 import logging
+import os
 
 import numpy as np
-from lica_raw import ImageReaderFactory, Rect, autocenter
+from lica_raw import BayerIndex, ImageReaderFactory, Rect, autocenter
 
 from .filesystem import scan_images
 from .models import PlotForm, ScanForm
@@ -42,7 +43,7 @@ def plot_image(
         b = pixels.blue(None)
         gb = pixels.greenb(None)
         red = ImagePlotSpec(
-            title="R",
+            bayer=BayerIndex.R,
             image=r,
             section=section,
             mean=np.mean(r),
@@ -51,7 +52,7 @@ def plot_image(
             display_max=form.vmax,
         )
         green_r = ImagePlotSpec(
-            title="Gr",
+            bayer=BayerIndex.Gr,
             image=gr,
             section=section,
             mean=np.mean(gr),
@@ -60,7 +61,7 @@ def plot_image(
             display_max=form.vmax,
         )
         blue = ImagePlotSpec(
-            title="B",
+            bayer=BayerIndex.B,
             image=b,
             section=section,
             mean=np.mean(b),
@@ -69,7 +70,7 @@ def plot_image(
             display_max=form.vmax,
         )
         green_b = ImagePlotSpec(
-            title="Gb",
+            bayer=BayerIndex.Gb,
             image=gb,
             section=section,
             mean=np.mean(gb),
@@ -78,7 +79,7 @@ def plot_image(
             display_max=form.vmax,
         )
         data = (red, green_r, blue, green_b)
-        plotter.plot(data, config)
+        plotter.plot(data, config, title=os.path.basename(path))
 
 
 def batch_plot_images(

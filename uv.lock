@@ -74,7 +74,7 @@ requires-dist = [
     { name = "lica-cli", specifier = ">=0.1" },
     { name = "lica-raw", extras = ["exif", "fits"], specifier = ">=0.3" },
     { name = "lica-sqa", extras = ["decouple"], specifier = ">=0.1" },
-    { name = "lica-tables", extras = ["tabulate"], specifier = ">=0.1" },
+    { name = "lica-tables", extras = ["tabulate"], specifier = ">=0.2" },
 ]
 
 [[package]]
