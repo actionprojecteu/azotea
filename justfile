@@ -392,7 +392,7 @@ plot-exif:
         --width 500 --height 400
     uv run azoplot --console --log-level info --trace stats \
         --image-file ${IMAGES}/2020_12_1200_02_329999.CR2 \
-        --x1 60 --y1 50 --width 500 --height 400
+        --x1 60 --y1 50 --width 500 --height 400 --vmin 900 --vmax 1100
 
 [private]
 check_mnt mnt:
