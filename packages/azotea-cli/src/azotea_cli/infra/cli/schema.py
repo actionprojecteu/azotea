@@ -225,15 +225,16 @@ def add_args(parser: ArgumentParser) -> None:
 
 
 def cli_main(args: Namespace) -> None:
-
     if args.log_level == LogLevel.DEBUG:
         sqa_logging(True)
     db.init()
-    with db.engine.begin():
-        Model.metadata.drop_all(bind=db.engine)
-        Model.metadata.create_all(bind=db.engine)
+    try:
+        with db.engine.begin():
+            Model.metadata.drop_all(bind=db.engine)
+            Model.metadata.create_all(bind=db.engine)
         args.func(args)
-    db.engine.dispose()
+    finally:
+        db.engine.dispose()
 
 
 def main():
