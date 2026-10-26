@@ -70,16 +70,7 @@ commented  `scan_non_empty_dirs()`
 
 ### 13. `azoschema` mezcla DDL y datos en una transacción
 
-En `schema.py`:
-
-```python
-with db.engine.begin():
-    Model.metadata.drop_all(bind=db.engine)
-    Model.metadata.create_all(bind=db.engine)
-    args.func(args)
-```
-
-`args.func()` abre sus propias sesiones y transacciones mientras la transacción externa sigue abierta. En SQLite es una receta para `database is locked`; además, `drop_all()`/`create_all()` con DDL dentro de una transacción no es portátil. Haz el reinicializado y la carga de dimensiones en fases separadas.[^1_1]
+Fixed en local
 
 ### 14. Inconsistencia de columna `height` / `length`
 
