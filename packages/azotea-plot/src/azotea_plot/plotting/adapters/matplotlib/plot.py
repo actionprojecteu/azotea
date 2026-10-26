@@ -13,10 +13,10 @@ from math import ceil, sqrt
 # Third party libraries
 # ---------------------
 from lica_raw import BayerIndex
+from matplotlib import patches
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import matplotlib.patches as patches
 
 # ----------------
 # Own dependencies
