@@ -19,7 +19,7 @@ class UnknownSoftwareCreatorError(AzoteaFitsError):
 
 
 class MissingFitsFileError(AzoteaFitsError):
-    """Unknown FITS software creator"""
+    """Missing FITS file"""
 
 
 class ReadMetadataError(AzoteaFitsError):

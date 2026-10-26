@@ -110,9 +110,9 @@ class SharpCapMetadataFix(GenericMetadataFix):
         old_keyw_x = "BAYOFFX"
         old_keyw_y = "BAYOFFY"
         new_keyw_x = "XBAYROFF"
-        new_keyw_y = "XBAYROFF"
+        new_keyw_y = "YBAYROFF"
         value_x = header.get(old_keyw_x)
-        value_y = header.get(old_keyw_x)
+        value_y = header.get(old_keyw_y)
         first_time = all([value_x is not None, value_y is not None])
         if first_time:
             del header[old_keyw_x]

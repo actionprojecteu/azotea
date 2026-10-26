@@ -1,214 +1,213 @@
-# AZOFITS
+# azotea_fits
 
-`azofits` is a ***FITS HEADER batch editor for AZOTEA*** entirely written in Python.
-It is tuned to the FITS keywords that `azotea` processing pipeline needs.
+`azotea_fits` is a FITS image pre-processor for the **AZOTEA** program.
 
-FITS is a very flexible file frmat for astronomical images and very few keywords
-have been standarized. Amateur astroimaging software flourished in the 90s
-and some FITS keywords proposals were made for interoperatbility for ASCOM programs.
+Its purpose is to adapt FITS headers produced by different image-capture applications to the metadata expected by AZOTEA. The program does not modify image data; it works on the headers of the primary HDU.
 
-Diffraction Limited's Maxim DL software [compiled a series of FITS keyword definitions](https://cdn.diffractionlimited.com/help/maximdl/FITS_File_Header_Definitions.htm) for imaging and amateur observatoty neeeds. 
-Whenever possible, `azotea` reuses these keywords.
+## Use cases
 
-CCD/CMOS image adquistion software already produces images in FITS format, either for B&W images or RAW color images.
-Each image adquistion software has its own convention and idiosyncrasies, so `azofits` was written to cope with this and supply trouble-free FITS images to `azotea`.
+`azotea_fits` supports two use cases:
 
-# Table of Contents
+1. **Insert new keywords** that do not already exist in the original FITS file.
+2. **Modify or normalize existing keywords** into the format expected by AZOTEA.
 
-* [AZOTEA FITS keywords](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#azoteaa-fits-keywords)
-* [Usage](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#usage)
-    - [Examples](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#examples)
-* [Miscelanea](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#miscelanea)
+The second use case is only possible when the FITS header contains the `SWCREATE` keyword, which identifies the software that created the file. Therefore, if a file does not contain `SWCREATE`, the first step should be to assign it using the `creator` command.
 
-# Instalation
+The currently supported software creators are:
 
-In the same **activated virtual environment**  where azotea-cli is instaled;
+- `SharpCap`
+- `CapturaFits`
+
+For any other `SWCREATE` value, or when the keyword is missing, a generic editor is used. The generic editor can insert new keywords, but it cannot apply creator-specific corrections.
+
+Adding support for a new FITS creator consists of implementing its metadata-fix and metadata-insert operations and registering them in the editor factory.
+
+## Installation
 
 ```bash
 pip install azotea-fits
 ```
 
-Aster installation, type `azofits --help` to see the complete list of options.
-
-# AZOTEA FITS keywords
-
-| Header   | Units | Description | Notes
-|:--------:| :---: | ----------- | -------
-|`SWCREATE`|       | Image capture software (i.e: `SharpCap`).
-|`SWMODIFY`|       | Image editing sofware (always `azofits`).
-|`BAYERPAT`|       | Camera Bayer pattern (`RGGB`, `BGGR`, `GRBG`, `GBRG`).
-|`INSTRUME`|       | Camera model (i.e. `ZWO ASI178MC`).
-|`DATE-OBS`|       | Date time in ISO 8601 format | See [Note 1](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#note-1).
-|`ÈXPTIME` | sec.  | Exposure time.
-|`PEDESTAL`| ADUs  | Global electronic bias. Same for all channels.
-|`FOCALLEN`| mm.   | Focal length.
-|`APTDIA`  | mm.   | Aperture diameter.
-|`XPIXSZ`  | um.   | Horizontal pixel size.
-|`YPIXSZ`  | um.   | Vertical pixel size.
-|`LOG-GAIN`| 0.1 dB| Logaritmic gain. | See [Note 2](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#note-2).
-|`IMAGETYP`|       | Image type | See [Note 3](https://github.com/actionprojecteu/azotea-cli/blob/main/azofits.md#note-3).
-
-## Note 1:
-`azofits` allows both `YYYY-MM-DDTHH:MM:SS` or `YYYY-MM-DDTHH:MM:SS.fffff`  with up to 6 seconds decimals.
-
-## Note 2:
-The gain in ZWO cameras is expressed in a logaritmic scale gain with 0.1 dB units, that is:
-```
-LOG-GAIN = 100 * log10(G)
-```
-Where `G` is the internal amplifier gain of the analog circuitry.
-This is a new keyword, not present in the [Maxim DL FITS specification](https://cdn.diffractionlimited.com/help/maximdl/FITS_File_Header_Definitions.htm) and 
-not to be confused  with the `EGAIN` keyword which specifies a "gain" (conversion factor) in e-/ADU.
-
-## Note 3:
-[Maxim DL FITS specifications](https://cdn.diffractionlimited.com/help/maximdl/FITS_File_Header_Definitions.htm) list as values for this keyword the following strings:
-* `Light Frame` for monocrome images
-* `Tricolor Image` for images taken by RGB color cameras
-* `Bias Frame`
-* `Dark Frame` 
-* `Flat Frame`
-
-`azofits` only uses:
-* `LIGHT` for RGB color images
-* `BIAS`
-* `DARK` 
-* `FLAT`
-
-
-# Usage
-
-## General behaviour
-
-* All FITS edition options are optional. However, if passed, they will overwrite the existing FITS keyword or create a new one.
-* A `HISTORY` keyword will be added describing each keyword change.
-* Once the FITS image is edited and `SWMODIFY` (=`azofits`) is added, no further edition is possible (*Exception: --force option*)
-
-## Generic options
-```bash
-AZOTEA FITS image pre-processor
-
-positional arguments:
-  {edit,creator,view}
-    edit                edit command
-    creator             sw creator commands
-    view                view metadata command
-
-options:
-  -h, --help            show this help message and exit
-  --version             show program's version number and exit
-  --console             Log to console.
-  --log-file <FILE>     Log to file.
-  --verbose             Verbose output.
-  --quiet               Quiet output.
-  --trace               Show exception stack trace.
-  --dir-depth DIR_DEPTH
-                        Images directory depth, 8 by default, 0=scan only base directory
-  -d <path>, --images-dir <path>
-                        Base directory to edit FITS files
-  -f <path>, --image-file <path>
-                        single FITS file path
-```
-
-## Software creator options
-
-For the time being `azofits` have special support for `SharpCap` and `CapturaFits` image producer software.
-More can be added on requests. It si important to set the proper keyword in place before editing.
-`SharpCap` addes the `SWCREATE` keyword, `CapturaFits` does not.
+The main CLI entry point is:
 
 ```bash
-options:
-  -h, --help            show this help message and exit
-  --set {sharpcap,capturafits}
-                        Set the name of software that created the FITS files
+azofits --help
 ```
 
-## FITS editing options
+## Basic operation
 
-Editing the relevant keywords for AZOTEA.
+All commands support two input modes:
+
+- `-f`, `--image-file <path>`: process a single FITS file.
+- `-d`, `--images-dir <path>`: recursively process all FITS files found below a directory.
+
+The maximum search depth is controlled with:
 
 ```bash
-  --camera CAMERA       Camera model
-  --comment COMMENT     Optional comment keyword to add
-  --bayer-pattern {RGGB,BGGR,GRBG,GBRG}
-                        Bayer pattern layout
-  --gain GAIN           CMOS detector GAIN settings
-  --bias BIAS           Global Bias for every image
-  --x-pixsize X_PIXSIZE
-                        Pixel width in um.
-  --y-pixsize Y_PIXSIZE
-                        Pixel height in um.
-  --image-type {BIAS,DARK,FLAT,LIGHT}
-                        Image type
-  --diameter DIAMETER   Optics diameter in mm.
-  --focal-length FOCAL_LENGTH
-                        Focal length in mm.
-  --date-obs <YYYY-MM-DDTHH:MM:SS>
-                        UTC Observation date.
-  --exptime EXPTIME     Exposure time in sec.
+--dir-depth <N>
 ```
 
-## Examples
+The default value is `8`. A value of `0` means that only files directly inside the base directory are processed.
 
-### SharpCap FITS images
+The recognized file extensions are:
 
-SharpCap FITS images have a few issues that are edited/corrected by `azofits`:
-* It uses the older `BAYEROFX`, `BAYOFFY` keywords, which are substituted by `XBAYROFF`, `YBAYROFF`
-* `DATE-OBS` timestamp have seconds with excess decimals, so the timestamp is fixed.
-* `BAYERPAT` uses a bottom-up pattern convention, so the 4-letter pattern code is flipped.
-* CMOS camera gain keyword is not included in the FITS file. However, it is included in a separate
-metadata XXXX_CameraSettings.txt file for each XXXX.fits image. To  properly include the CMOS GAIN, `azofits` needs this additional metadata file alongside with the FITS file.
-
-Fortunately, SharpCap FITS images already include `SWCREATE` so they can be properly detected and there is no need
-to specify it in the command line.
-
-The command line is shown below:
-
-```bash
-azofits --console --images-dir ../images/Zamorano-Villaverde-del-Ducado/FITS --bias 64 --diameter 10 --focal-length 35 
+```text
+.fit
+.fits
+.fts
 ```
 
-*Note: values are just ficticuous examples*
+Extension matching is case-insensitive.
 
-We specify a default optics configuration, as the FITS headers did not include this information
+## Commands
 
-### captura-fits FITS images
-
-This image adquistion software, developed by Alberto Castellon, is used in meteor & fireball detection. 
-It includes a minimalistic FITS keyword set and encodes the observation date & exposure time in the file name as `yyyy-mm-dd.exptime.fits`
-where the exposure time is given in milliseconds. `azofits` handle this case too.
-
-The command line is shown below:
+### `creator`: set the FITS software creator
 
 ```bash
-azofits --console --images-dir images/Zamorano-Villaverde-del-Ducado/FITS creator --set capturafits
-azofits --console --images-dir images/Zamorano-Villaverde-del-Ducado/FITS --camera ZWO ASI178MC --bayer-pattern RGGB --gain 150 --bias 64 --diameter 10 --focal-length 35
+azofits -f image.fits creator --set sharpcap
 ```
-*Note: values are just ficticuous examples*
 
-Note that, except for the timestamp and exposition time, we have to specify almost everything, even the software creation tag, which also flags `azofits` to forward thos edition to the appropiate internal "capturafits driver"
-
-## Using `azofits` ,with `azotool` & `azotea`
-
-Note that `azofits` must *always* be used before invoking `azotea`.
-Once FITS images are pre-procesed by `azofits`, camera and ROI metadata creation in the AZOTEA database creation can be 
-made from FITS images, as shown in the example below.
+Or, for a directory tree:
 
 ```bash
-#!/bin/bash
-# Edit FITS headers with AZOFITS
-IMAGES=images/Zamorano-Villaverde-del-Ducado/FITS
-azofits --console --images-dir ${IMAGES} creator --set capturafits
-azofits --console --images-dir ${IMAGES}/202201 --camera ZWO ASI178MC \
-        --bayer-pattern RGGB --gain 150 --bias 64 --diameter 10 --focal-length 35
+azofits -d ./night_20261026 creator --set capturafits
+```
 
-azotool --console  camera create --default \
-        --from-image ${IMAGES}/202201/20220101-183017.10000.fits
+Allowed values are:
 
-azotool --console  roi create --default --width 500 --height 400 \
-        --from-image ${IMAGES}/202201/20220101-183017.10000.fits
+```text
+sharpcap
+capturafits
+```
 
-# Load images in AZOTEA database and compute statistics
-azotea --console --images-dir ${IMAGES}/202201
+This command writes or updates the following FITS keyword:
+
+```text
+SWCREATE
+```
+
+It should be run before attempting to apply creator-specific corrections. Without `SWCREATE`, `azotea_fits` cannot select the appropriate adapter and can only perform generic metadata insertions.
+
+### `view`: inspect metadata
+
+```bash
+azofits -f image.fits view
+```
+
+For a directory:
+
+```bash
+azofits -d ./night_20261026 view
+```
+
+This command displays a table with the FITS keywords relevant to AZOTEA, including:
+
+| Field | FITS keyword |
+|---|---|
+| Camera | `INSTRUME` |
+| Bayer pattern | `BAYERPAT` |
+| Gain | `LOG_GAIN` |
+| Bias | `PEDESTAL` |
+| Pixel size X | `XPIXSIZE` |
+| Pixel size Y | `YPIXSIZE` |
+| Image type | `IMAGETYP` |
+| Aperture diameter | `APTDIA` |
+| Focal length | `FOCALLEN` |
+| Observation date | `DATE-OBS` |
+| Exposure time | `EXPTIME` |
+| Software creator | `SWCREATE` |
+
+### `edit`: insert or update metadata
+
+```bash
+azofits -f image.fits edit \
+  --camera "ZWO ASI178MM" \
+  --gain 120 \
+  --bias 100 \
+  --x-pixsize 2.8 \
+  --y-pixsize 2.8 \
+  --image-type light \
+  --diameter 200 \
+  --focal-length 1000 \
+  --date-obs "2026-10-26T22:15:00" \
+  --exptime 30 \
+  --comment "Preprocessed with azofits"
+```
+
+To process a complete directory:
+
+```bash
+azofits -d ./night_20261026 edit \
+  --camera "ZWO ASI178MM" \
+  --gain 120 \
+  --bias 100 \
+  --x-pixsize 2.8 \
+  --y-pixsize 2.8 \
+  --image-type light \
+  --diameter 200 \
+  --focal-length 1000 \
+  --date-obs "2026-10-26T22:15:00" \
+  --exptime 30
+```
+
+Only the keywords associated with options explicitly provided on the command line are modified.
+
+## `edit` options
+
+| Option | FITS keyword | Unit / format |
+|---|---|---|
+| `--camera` | `INSTRUME` | Camera model |
+| `--bayer-pattern` | `BAYERPAT` | Bayer pattern |
+| `--gain` | `LOG_GAIN` | Gain in logarithmic scale |
+| `--bias` | `PEDESTAL` | Global bias level |
+| `--x-pixsize` | `XPIXSIZE` | Pixel width, µm |
+| `--y-pixsize` | `YPIXSIZE` | Pixel height, µm |
+| `--image-type` | `IMAGETYP` | Image type |
+| `--diameter` | `APTDIA` | Optics diameter, mm |
+| `--focal-length` | `FOCALLEN` | Focal length, mm |
+| `--date-obs` | `DATE-OBS` | UTC date, `YYYY-MM-DDTHH:MM:SS` |
+| `--exptime` | `EXPTIME` | Exposure time, s |
+| `--comment` | `COMMENT` | Optional comment |
+
+The values accepted by `--bayer-pattern` and `--image-type` come from the `BayerPattern` and `ImageType` enumerations defined by `lica_raw`.
+
+The FITS keyword conventions referenced in external documentation remain valid. However, `azotea_fits` does not necessarily use those specific values for `IMAGETYP`; it uses the values defined by `ImageType` in `lica_raw`.
+
+## Creator-specific corrections
+
+In addition to the insertions requested on the command line, the `edit` command applies automatic corrections according to the software creator identified by `SWCREATE`.
+
+### SharpCap
+
+For files created by SharpCap, `azotea_fits` can:
+
+- Read the camera model and gain from the auxiliary `*.CameraSettings.txt` file.
+- Insert `INSTRUME` and `LOG_GAIN` when they are missing.
+- Round `XPIXSIZE` and `YPIXSIZE` to two decimal places.
+- Normalize Bayer-offset keywords.
+- Correct the Bayer pattern when required.
+- Remove microseconds from `DATE-OBS` when the value includes them.
+
+### CapturaFits
+
+For files created by CapturaFits, `azotea_fits` can:
+
+- Derive the observation date from the file name.
+- Derive the exposure time from the file name.
+- Insert `DATE-OBS` and `EXPTIME` when they are missing.
+
+## Change history
+
+Every relevant modification is recorded in the FITS header using `HISTORY` entries.
+
+To avoid generating a useless history, if the current value of a keyword already matches the value to be written, the header is not modified and no `HISTORY` entry is added.
+
+Example generated entries:
+
+```text
+HISTORY INSTRUME: Old Camera => ZWO ASI178MM by azofits
+HISTORY EXPTIME: 30.5 => 30.0 by azofits
+HISTORY added DATE-OBS keyword
 ```
 
 # Miscelanea

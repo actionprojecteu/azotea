@@ -9,10 +9,16 @@
 import logging
 import os
 
+# ---------------------
+# Third party libraries
+# ---------------------
 from astropy.io import fits
-from azotea_cli.common.filesystem import scan_images
 from lica_tables import DisplayService
 
+# ----------------
+# Own dependencies
+# ----------------
+from .filesystem import scan_images
 from .models import EXTENSIONS, FitsForm, ScanForm
 from .ports import EditorFactory
 

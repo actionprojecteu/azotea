@@ -14,6 +14,7 @@ from datetime import datetime
 from typing import Any
 
 from astropy.io.fits import Header
+from lica_raw import BayerPattern, ImageType
 from lica_raw.adapters.fits import (
     APTDIA,
     BAYERPAT,
@@ -29,7 +30,6 @@ from lica_raw.adapters.fits import (
     XPIXSIZE,
     YPIXSIZE,
 )
-from lica_raw import BayerPattern, ImageType
 
 from ..models import SWCREATOR, FitsData, FitsKeyword
 from ..ports import MetadataFix, MetadataInsert, MetadataLookup
@@ -68,47 +68,36 @@ class GenericMetadataFix(MetadataFix):
 
     def camera(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place camera model editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def gain(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place CMOS gain editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def xpixsize(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place 'x' pixel size editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def ypixsize(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place 'y' pixel size editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def bayer(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place bayer pattern editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def bias(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place overal biass level editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def image_type(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place image type editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def diameter(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place aperture diameter editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def focal_length(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place focal editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def exptime(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place exposure time editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def date_obs(self, header: Header, history: MutableSequence[str | None]) -> None:
         """In place observation date editing. Changes are annotated in the history mutable sequence"""
-        pass
 
     def add_history(self, header: Header, history: Sequence[str | None]) -> None:
         """Add the in-place edition history"""
@@ -228,7 +217,8 @@ class GenericMetadataInsert(MetadataInsert):
         msg = None
         if value is None:
             return msg
-        old_value = str(header.get(keyword))
+        old_value = header.get(keyword)
+        old_value = str(old_value) if old_value is not None else None
         if old_value is None:
             header[keyword] = value
             msg = f"added {keyword} keyword"

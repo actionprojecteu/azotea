@@ -43,7 +43,7 @@ class CapturaFitsMetadataFix(GenericMetadataFix):
         exptime = header.get(EXPTIME)
         if exptime is None:
             header[EXPTIME] = (self.exposure, "[s]")
-            msg = f"added {DATE_OBS} keyword"
+            msg = f"added {EXPTIME} keyword"
             log.info(msg)
             history.append(msg)
 
