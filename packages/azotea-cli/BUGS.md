@@ -2,26 +2,12 @@
 
 ### 1. `RegisterImages` no captura dos errores propios
 
-En `operation/use_cases/register.py`, `_validate()` puede lanzar `MissingCameraModelError` y `MissingExptimeError`, pero el bucle de registro solo captura `CameraMissingError`, `MissingTimestampError`, `CameraNotDefaultError` y `ReadMetadataError`. Una sola imagen sin modelo o sin tiempo de exposición aborta todo el batch en lugar de saltarse esa imagen.[^1_1]
-
-```python
-except (
-    CameraMissingError,
-    MissingTimestampError,
-    CameraNotDefaultError,
-    MissingCameraModelError,   # falta
-    MissingExptimeError,       # falta
-    ReadMetadataError,
-) as e:
-    ...
-```
+ok
 
 
 ### 2. `--depth` por defecto rompe `azotea batch`
 
-En `infra/cli/azotea.py`, `--depth` tiene `default=None`, pero `RegisterForm.depth` está anotado como `int` y `scan_images()` hace `current_depth > depth`. Ejecutar `azotea batch --images-dir ...` sin `--depth` lanza `TypeError: '>' not supported between instances of 'int' and 'NoneType'`.[^1_1]
-
-Además, `--images-dir` también tiene `default=None`; sin él, `scan_images(None, ...)` fallará al resolver el path. Debe ser obligatorio o validarse antes.[^1_1]
+ok
 
 ### 3. Doble `commit()` en `SqaImagesRepo._save_one_by_one`
 
@@ -40,65 +26,30 @@ with session.begin():
 
 ### 4. `_update()` no persiste los cambios
 
-En `SqaImagesRepo._update()` se modifican `existing.name` y `existing.directory`, pero la sesión se abre sin `session.begin()` ni `commit()`:
+ok
 
-```python
-with self.db.session() as session:
-    ...
-    existing.name = image.name
-    existing.directory = image.directory
-    session.add(existing)
-```
-
-Al cerrar la sesión sin transacción confirmada, las rutas corregidas probablemente se pierden. Envuelve el bloque en `with session.begin():`.[^1_1]
 
 ### 5. `return` en vez de `continue` en `_update()`
 
-Dentro del bucle:
-
-```python
-if existing is None:
-    log.warning(...)
-    return
-```
-
-Esto abandona todo el proceso de actualización al encontrar la primera imagen cuyo hash no existe, en vez de continuar con las restantes. Debe ser `continue`.[^1_1]
+ok
 
 ### 6. `TimeIterator` puede entrar en bucle infinito
-
-En `infra/cli/schema.py`, `TimeIterator` termina sólo cuando `self.current == self.limit`. Si `--seconds` no divide exactamente 86 400 —por ejemplo, 7 segundos—, el iterador salta el límite y nunca se detiene. Usa:
-
-```python
-if x >= self.limit:
-    raise StopIteration
-```
-
-También conviene validar que `86400 % step_seconds == 0`.[^1_1]
+ok
 
 ### 7. `camera switch` no tiene handler
 
-En `azotool.py`, el subcomando `camera switch` se declara y añade `--model`, pero no hay `set_defaults(func=...)` ni función CLI asociada. Al ejecutarlo, `args.func` será `None` y `cli_main()` fallará con `TypeError: 'NoneType' object is not callable`.[^1_1]
-
+ok
 ## Bugs funcionales importantes
 
 ### 8. `time_id` supone resolución de 1 segundo
-
-`SqaImagesRepo.date_time_ids()` genera siempre:
-
-```python
-time_id = int(tstamp.strftime("%H%M%S"))
-```
-
-Pero `azoschema time --seconds N` permite poblar `time_t` con pasos mayores de 1 segundo. Con `--seconds 2`, un timestamp con segundo impar —por ejemplo, `00:00:01`— produce un `time_id` inexistente y violará la FK hacia `time_t`. O fijas la resolución a 1 segundo, o calculas el ID redondeando al paso configurado.[^1_1]
+ok
 
 ### 9. `--publish` se acepta pero no hace nada
 
 En `azotea batch`, la opción `--publish` se declara y la documentación la usa, pero `cli_batch()` sólo comprueba `--only-publish`; en el camino normal ejecuta registro y estadísticas y ignora `--publish` silenciosamente. Además, `--only-publish` lanza `NotImplementedError`, que no es `AzoteaError`, por lo que escapará como traceback en vez del manejo de errores previsto.[^1_1]
 
 ### 10. El filtro de imágenes pendientes incluye calibraciones
-
-`pending_processing_by()` selecciona cualquier imagen sin fila en `sky_brightness_t`, sin filtrar por `ImageType.LIGHT`. Tras registrar bias, darks y flats, `ComputeSkyStatistics` intentará medir “cielo” también sobre ellos. Filtra por `imagetype == ImageType.LIGHT` y, probablemente, por `flagged == False`.[^1_1]
-
+ok
 ### 11. Deduplicación de ficheros por `set` pierde orden y puede no detectar duplicados
 
 En `RegisterImages.execute()`:

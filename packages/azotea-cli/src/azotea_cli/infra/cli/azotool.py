@@ -26,7 +26,6 @@ from lica_tables.adapters.tabulate import StdoutDisplay
 # ---------------
 from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError, RepositoryError
-
 from azotea_cli.provision import (
     CameraForm,
     DefaultOpticsForm,
@@ -241,13 +240,6 @@ def add_args(parser: ArgumentParser) -> None:
     )
     camera_given_by.set_defaults(func=cli_camera_given_by)
 
-    camswi = subparser.add_parser(
-        "switch", help="Switch default camera to an existing model in the database"
-    )
-    # This si none bty default becaiuse of the exclusev group (--as-given | --from-image)
-    camswi.add_argument(
-        "--model", type=str, default=None, help="Camera Model (taken from EXIF data)"
-    )
 
     # -------------------------------------
     # Create second level parsers for 'roi'

@@ -6,8 +6,8 @@
 # ----------------
 # standard library
 # ----------------
-import sys
 import logging
+import sys
 import uuid
 from argparse import ArgumentParser, Namespace
 from datetime import datetime, timedelta
@@ -16,11 +16,11 @@ from itertools import batched
 # ---------------------
 # Third party libraries
 # ---------------------
-#from lica.cli import execute
+# from lica.cli import execute
 from lica_cli import parse_args, run_cli
 from lica_cli.validate import vdate
-from lica_log.adapters.default import DefaultLogger
 from lica_log import LogLevel
+from lica_log.adapters.default import DefaultLogger
 from lica_sqa import Model, sqa_logging
 from lica_sqa.adapters.decouple import DcplDatabase
 
@@ -28,7 +28,7 @@ from lica_sqa.adapters.decouple import DcplDatabase
 # Own dependecies
 # ---------------
 from azotea_cli import __version__
-from azotea_cli.infra.sqlalchemy import  Config, Date, Time
+from azotea_cli.infra.sqlalchemy import Config, Date, Time
 
 # ----------------
 # Module constants
@@ -53,6 +53,7 @@ db = DcplDatabase("DATABASE_URL")
 # Auxiliary functions
 # -------------------
 
+
 def since() -> ArgumentParser:
     parser = ArgumentParser(add_help=False)
     parser.add_argument(
@@ -65,6 +66,7 @@ def since() -> ArgumentParser:
     )
     return parser
 
+
 def until() -> ArgumentParser:
     parser = ArgumentParser(add_help=False)
     parser.add_argument(
@@ -74,19 +76,6 @@ def until() -> ArgumentParser:
         default=END_DATE,
         metavar="<YYYY-MM-DD>",
         help="End date for Date dimension (default %(default)s)",
-    )
-    return parser
-
-
-def seconds() -> ArgumentParser:
-    parser = ArgumentParser(add_help=False)
-    parser.add_argument(
-        "-e",
-        "--seconds",
-        type=int,
-        choices=[i for i in range(1, 61)],
-        default=1,
-        help="Default seconds resolution (default %(default)s)",
     )
     return parser
 
@@ -112,8 +101,8 @@ def julian_day(date: datetime) -> float:
 
 
 class TimeIterator:
-    def __init__(self, step_seconds=1):
-        self.step = timedelta(seconds=step_seconds)
+    def __init__(self):
+        self.step = timedelta(seconds=1)
         self.current = datetime(
             year=2000, month=1, day=1, hour=0, minute=0, second=0, microsecond=0
         )
@@ -124,7 +113,7 @@ class TimeIterator:
 
     def __next__(self) -> datetime:
         x = self.current
-        if x == self.limit:
+        if x >= self.limit:
             raise StopIteration
         self.current += self.step
         return x
@@ -175,15 +164,14 @@ def cli_populate_date(args: Namespace) -> None:
     )
     for i, batch in enumerate(batched(date_objs, args.batch_size), start=1):
         log.info("Writing Date batch #%d (%d records)", i, len(batch))
-        with db.session() as session:
-            with session.begin():
-                for obj in batch:
-                    session.add(obj)
+        with db.session() as session, session.begin():
+            for obj in batch:
+                session.add(obj)
 
 
 def cli_populate_time(args: Namespace) -> None:
     log.info("Generating Time values")
-    time_iterator = TimeIterator(step_seconds=args.seconds)
+    time_iterator = TimeIterator()
     time_objs = (
         Time(
             time_id=t.hour * 10000 + t.minute * 100 + t.second,
@@ -197,19 +185,17 @@ def cli_populate_time(args: Namespace) -> None:
     )
     for i, batch in enumerate(batched(time_objs, args.batch_size), start=1):
         log.info("Writing Time batch #%d (%d records)", i, len(batch))
-        with db.session() as session:
-            with session.begin():
-                for obj in batch:
-                    session.add(obj)
+        with db.session() as session, session.begin():
+            for obj in batch:
+                session.add(obj)
 
 
 def cli_populate_config(args: Namespace) -> None:
     id = Config(section="database", property="uuid", value=str(uuid.uuid4()))
     version = Config(section="database", property="version", value="03")
-    with db.session() as session:
-        with session.begin():
-            session.add(id)
-            session.add(version)
+    with db.session() as session, session.begin():
+        session.add(id)
+        session.add(version)
 
 
 def cli_populate_all(args: Namespace) -> None:
@@ -225,12 +211,14 @@ def add_args(parser: ArgumentParser) -> None:
     )
     p.set_defaults(func=cli_populate_date)
     p = subparser.add_parser(
-        "time", parents=[seconds(), batch()], help="Load initial Time values"
+        "time",
+        parents=[batch()],
+        help="Load initial Time values",
     )
     p.set_defaults(func=cli_populate_time)
     p = subparser.add_parser(
         "all",
-        parents=[since(), until(), seconds(), batch()],
+        parents=[since(), until(), batch()],
         help="Load all initial values",
     )
     p.set_defaults(func=cli_populate_all)

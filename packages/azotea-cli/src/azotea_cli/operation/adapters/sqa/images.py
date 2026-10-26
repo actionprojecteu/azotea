@@ -14,9 +14,9 @@ from datetime import datetime
 # ---------------------
 # Third party libraries
 # ---------------------
+from lica_sqa import Database
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from lica_sqa import Database
 
 # ---------------
 # Own dependecies
@@ -24,9 +24,10 @@ from lica_sqa import Database
 from azotea_cli.common.types import ObjId
 from azotea_cli.infra.sqlalchemy import Image, SkyBrightness
 
+from ...models import ImageForm
+
 # from ...errors import
 from ...ports import ImagesRepo
-from ...models import ImageForm
 
 # -----------------------
 # Module global variables
@@ -75,7 +76,7 @@ class SqaImagesRepo(ImagesRepo):
         self,
         images: Sequence[ImageForm],
     ) -> None:
-        with self.db.session() as session:
+        with self.db.session() as session, session.begin():
             for image in images:
                 sql =  select(Image).where(Image.hash == image.hash)
                 existing = session.scalars(sql).one_or_none()
@@ -84,7 +85,7 @@ class SqaImagesRepo(ImagesRepo):
                         "Integrity error but no existing image found for hash %s",
                         image.hash,
                     )
-                    return
+                    continue
                 log.warning(
                     "Changing image path from %s to %s",
                     os.path.join(existing.directory, existing.name),
@@ -95,17 +96,16 @@ class SqaImagesRepo(ImagesRepo):
                 session.add(existing)
 
     def _save_one_by_one(self, images: Sequence[ImageForm]) -> None:
-        existing_images = list()
+        existing_images = []
         for image in images:
-            with self.db.session() as session:
-                with session.begin():
-                    session.add(self._translate(image))
-                    try:
-                        log.info("retrying %s", image.name)
-                        session.commit()
-                    except IntegrityError:
-                        session.rollback()
-                        existing_images.append(image)
+            with self.db.session() as session, session.begin():
+                session.add(self._translate(image))
+                try:
+                    log.info("retrying %s", image.name)
+                    session.commit()
+                except IntegrityError:
+                    session.rollback()
+                    existing_images.append(image)
         self._update(existing_images)
 
 

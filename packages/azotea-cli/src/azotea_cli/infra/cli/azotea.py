@@ -6,17 +6,18 @@
 # ----------------
 # standard library
 # ----------------
-import sys
 import logging
+import sys
 from argparse import ArgumentParser, Namespace
 
 # ---------------------
 # Third party libraries
 # ---------------------
 from lica_cli import parse_args, run_cli
+from lica_cli.validate import vdir
 from lica_log.adapters.default import DefaultLogger
-from lica_sqa.adapters.decouple import DcplDatabase
 from lica_raw.adapters import ImageReaderFactoryImpl
+from lica_sqa.adapters.decouple import DcplDatabase
 from lica_tables.adapters.tabulate import StdoutDisplay
 
 # ---------------
@@ -24,8 +25,6 @@ from lica_tables.adapters.tabulate import StdoutDisplay
 # ---------------
 from azotea_cli import __version__
 from azotea_cli.common.errors import AzoteaError, RepositoryError
-
-
 from azotea_cli.operation.adapters import SqaImagesRepo, SqaSkyBrightnessRepo
 from azotea_cli.operation.models import RegisterForm
 from azotea_cli.operation.use_cases import ComputeSkyStatistics, RegisterImages
@@ -78,14 +77,14 @@ def add_args(parser: ArgumentParser) -> None:
 
     parser_batch.add_argument(
         "--images-dir",
-        type=str,
-        default=None,
+        type=vdir,
+        required=True,
         action="store",
         metavar="<path>",
         help="Images working directory",
     )
     parser_batch.add_argument(
-        "--depth", type=int, default=None, help="Specify images dir max. scanning depth"
+        "--depth", type=int, default=8, help="Specify images dir max. scanning depth (defaults to %(default)s)"
     )
     group = parser_batch.add_mutually_exclusive_group()
     group.add_argument("--only-sky", action="store_true", help="only compute sky background")

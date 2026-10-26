@@ -12,9 +12,10 @@ from collections.abc import Sequence
 # ---------------------
 # Third party libraries
 # ---------------------
+from lica_raw import ImageType
+from lica_sqa import Database
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from lica_sqa import Database
 
 # ---------------
 # Own dependecies
@@ -53,9 +54,8 @@ class SqaSkyBrightnessRepo(SkyBrightnessRepo):
     def _save_one_by_one(self, statistics: Sequence[SkyStatsForm]) -> None:
         for stats in statistics:
             try:
-                with self.db.session() as session:
-                    with session.begin():
-                        session.add(self._translate(stats))
+                with self.db.session() as session, session.begin():
+                    session.add(self._translate(stats))
             except IntegrityError:
                 log.warning(
                     "Skipping stats already present or violating a constraint: (image_id %s)",
@@ -79,7 +79,7 @@ class SqaSkyBrightnessRepo(SkyBrightnessRepo):
         sql = select(Image.image_id).where(
             Image.observer_id == observer_id.id,
             ~select(SkyBrightness.image_id)
-            .where(SkyBrightness.image_id == Image.image_id)
+            .where(SkyBrightness.image_id == Image.image_id, Image.imagetype == ImageType.LIGHT)
             .exists(),
         )
         with self.db.session() as session:

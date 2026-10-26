@@ -8,14 +8,23 @@
 # ----------------
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from itertools import batched
 
 # ---------------------
 # Third party libraries
 # ---------------------
-from lica_raw import ImageReaderFactory, ImageMetadata, ImageType
+from lica_raw import ImageMetadata, ImageReaderFactory, ImageType
 from lica_raw.errors import ReadMetadataError
+
+from azotea_cli.common.filesystem import hash_func, scan_images
+from azotea_cli.operation.errors import (
+    CameraNotDefaultError,
+    MissingExptimeError,
+    MissingTimestampError,
+)
+from azotea_cli.operation.models import ImageForm, RegisterForm
+from azotea_cli.operation.ports import ImagesRepo
 
 # ---------------
 # Own dependecies
@@ -28,11 +37,6 @@ from azotea_cli.provision.ports import (
     ObserverRepo,
     OpticsRepo,
 )
-
-from azotea_cli.common.filesystem import hash_func, scan_images
-from azotea_cli.operation.errors import CameraNotDefaultError, MissingTimestampError, MissingExptimeError
-from azotea_cli.operation.ports import ImagesRepo
-from azotea_cli.operation.models import ImageForm, RegisterForm
 
 # -----------------------
 # Module global variables
@@ -73,8 +77,6 @@ class RegisterImages:
         if metadata.imagetyp is None:
             metadata.imagetyp = ImageType.LIGHT
 
-
-
     def _one_pass(self, path: str) -> ImageForm:
         reader = self.factory.get_reader(path)
         metadata = reader.read_metadata(path)
@@ -105,7 +107,7 @@ class RegisterImages:
     def execute(self, form: RegisterForm) -> None:
         self.consent.check_raises()
         log.info("starting registration process")
-        self.session = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+        self.session = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
         self.optics_info = self.optics.load()
         self.camera_id = self.camera.get_default()
         self.location_id = self.location.get_default()
@@ -127,7 +129,14 @@ class RegisterImages:
                         "registering %s [%d/%d] (%d%%)", os.path.basename(path), i, n_selected, perc
                     )
                     image = self._one_pass(path)
-                except (CameraMissingError, MissingTimestampError, CameraNotDefaultError, ReadMetadataError) as e:
+                except (
+                    CameraMissingError,
+                    MissingTimestampError,
+                    CameraNotDefaultError,
+                    MissingCameraModelError,
+                    MissingExptimeError,
+                    ReadMetadataError,
+                ) as e:
                     n_skipped += 1
                     log.warning("%s, skipping", e)
                     continue
