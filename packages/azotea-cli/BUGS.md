@@ -64,7 +64,7 @@ newfiles = list(set(inputfiles) - set(storedfiles))
 
 ### 12. `scan_non_empty_dirs()` no poda el recorrido
 
-`os.walk()` recorre el árbol completo aunque `depth` sea 0; el filtro posterior sólo descarta resultados. Para árboles grandes es un problema de rendimiento, y el cálculo con `split(os.sep)` es frágil con rutas absolutas y separadores. `scan_images()` sí poda `_dir_names`, pero el otro escáner no.[^1_1]
+commented  `scan_non_empty_dirs()`
 
 ## Problemas de esquema y arranque
 
@@ -100,13 +100,4 @@ El modelo ORM define `Camera.height`, pero la migración de datos crea la column
 
 ## Prioridad sugerida
 
-1. Corregir las excepciones no capturadas en `RegisterImages` y el `--depth=None`.
-2. Arreglar la transacción y el `return` de `SqaImagesRepo`.
-3. Decidir y aplicar una única resolución temporal para `time_id`.
-4. Filtrar `LIGHT` antes de calcular estadísticas.
 5. Implementar o eliminar explícitamente `--publish` / `--only-publish`.
-6. Añadir handler a `camera switch` y resolver `height` vs. `length`.
-
-<div align="center">⁂</div>
-
-[^1_1]: dumppy.txt

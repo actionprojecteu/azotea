@@ -11,7 +11,9 @@ import os
 from collections.abc import Iterable
 from pathlib import Path
 
-
+# `os.walk()` recorre el árbol completo aunque `depth` sea 0; el filtro posterior sólo descarta resultados.
+# Para árboles grandes es un problema de rendimiento, y el cálculo con `split(os.sep)`
+# es frágil con rutas absolutas y separadores.
 def scan_non_empty_dirs(root_dir: str, depth: int | None = None):
     if os.path.basename(root_dir) == "":
         root_dir = root_dir[:-1]
