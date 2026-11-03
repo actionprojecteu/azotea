@@ -1,6 +1,6 @@
 [project]
 name = "azotea-fits"
-version = "0.1.0"
+version = "2.0.0"
 description = "FITS files pre-processor for AZOTEA"
 readme = "README.md"
 requires-python = ">=3.12"
