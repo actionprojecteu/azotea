@@ -17,6 +17,10 @@ config = context.config
 # manually added
 database_url =  decouple.config("DATABASE_URL")
 if database_url:
+    # DcplDatabase("DATABASE_URL") y el troceado prefix, suffix = url.split("://")
+    # que antepone un base_dir local asumen un fichero.
+    # Con sqlite+libsql://host/?authToken=...
+    # ese Path no tiene sentido y la URL queda incorrecta.
     prefix, suffix = database_url.split("://")
     base_dir = Path(__file__).resolve().parent.parent.parent.parent
     database_url = f"{prefix}:///{base_dir}{suffix}"

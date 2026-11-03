@@ -394,6 +394,14 @@ plot-exif:
         --image-file ${IMAGES}/2020_12_1200_02_329999.CR2 \
         --x1 60 --y1 50 --width 500 --height 400 --vmin 900 --vmax 1100
 
+plotfits:
+    #!/usr/bin/env bash
+    set -exuo pipefail
+    IMAGES=images/FITS/sharpcap
+    uv run azoplot --console --log-level info  --trace stats \
+        --image-file ${IMAGES}/Capture_00008.fits \
+        --width 500 --height 400
+
 [private]
 check_mnt mnt:
     #!/usr/bin/env bash
