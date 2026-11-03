@@ -98,14 +98,13 @@ class SqaImagesRepo(ImagesRepo):
     def _save_one_by_one(self, images: Sequence[ImageForm]) -> None:
         existing_images = []
         for image in images:
-            with self.db.session() as session, session.begin():
-                session.add(self._translate(image))
-                try:
+            try:
+                with self.db.session() as session, session.begin():
+                    session.add(self._translate(image))
                     log.info("retrying %s", image.name)
-                    session.commit()
-                except IntegrityError:
-                    session.rollback()
-                    existing_images.append(image)
+            except IntegrityError:
+                existing_images.append(image)
+                continue
         self._update(existing_images)
 
 
