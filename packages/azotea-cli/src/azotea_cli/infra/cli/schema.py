@@ -22,7 +22,7 @@ from lica_cli.validate import vdate
 from lica_log import LogLevel
 from lica_log.adapters.default import DefaultLogger
 from lica_sqa import Model, sqa_logging
-from lica_sqa.adapters.decouple import DcplDatabase
+from lica_sqa.adapters.decouple import Database, DcplDatabase
 
 # ---------------
 # Own dependecies
@@ -46,8 +46,6 @@ END_DATE = datetime(year=2050, month=12, day=31, hour=23, minute=59, second=59, 
 
 # get the module logger
 log = logging.getLogger(__name__.split(".")[-1])
-# create the database object
-db = DcplDatabase("DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
@@ -141,7 +139,7 @@ class DateIterator:
 # -------------
 
 
-def cli_populate_date(args: Namespace) -> None:
+def cli_populate_date(db: Database, args: Namespace) -> None:
     log.info("Generating Date values")
     date_iterator = DateIterator(from_date=args.since, to_date=args.until)
     date_objs = (
@@ -169,7 +167,7 @@ def cli_populate_date(args: Namespace) -> None:
                 session.add(obj)
 
 
-def cli_populate_time(args: Namespace) -> None:
+def cli_populate_time(db: Database, args: Namespace) -> None:
     log.info("Generating Time values")
     time_iterator = TimeIterator()
     time_objs = (
@@ -190,7 +188,7 @@ def cli_populate_time(args: Namespace) -> None:
                 session.add(obj)
 
 
-def cli_populate_config(args: Namespace) -> None:
+def cli_populate_config(db: Database, args: Namespace) -> None:
     id = Config(section="database", property="uuid", value=str(uuid.uuid4()))
     version = Config(section="database", property="version", value="03")
     with db.session() as session, session.begin():
@@ -198,10 +196,10 @@ def cli_populate_config(args: Namespace) -> None:
         session.add(version)
 
 
-def cli_populate_all(args: Namespace) -> None:
-    cli_populate_date(args)
-    cli_populate_time(args)
-    cli_populate_config(args)
+def cli_populate_all(db: Database, args: Namespace) -> None:
+    cli_populate_date(db, args)
+    cli_populate_time(db, args)
+    cli_populate_config(db, args)
 
 
 def add_args(parser: ArgumentParser) -> None:
@@ -227,14 +225,17 @@ def add_args(parser: ArgumentParser) -> None:
 def cli_main(args: Namespace) -> None:
     if args.log_level == LogLevel.DEBUG:
         sqa_logging(True)
-    db.init()
+    db = None
     try:
+        db = DcplDatabase("DATABASE_URL")
+        db.init()
         with db.engine.begin():
             Model.metadata.drop_all(bind=db.engine)
             Model.metadata.create_all(bind=db.engine)
-        args.func(args)
+        args.func(db, args)
     finally:
-        db.engine.dispose()
+        if db is not None:
+            db.engine.dispose()
 
 
 def main():

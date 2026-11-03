@@ -18,7 +18,7 @@ from lica_cli.validate import vdate, vfile, vnat
 from lica_log.adapters.default import DefaultLogger
 from lica_raw import BayerPattern, HeaderType
 from lica_raw.adapters import ImageReaderFactoryImpl
-from lica_sqa.adapters.decouple import DcplDatabase
+from lica_sqa.adapters.decouple import Database, DcplDatabase
 from lica_tables.adapters.tabulate import StdoutDisplay
 
 # ---------------
@@ -80,9 +80,6 @@ DESCRIPTION = "AZOTEA provision tool"
 
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
-# create the database object
-db = DcplDatabase("DATABASE_URL")
-
 # -------------------
 # Auxiliary functions
 # -------------------
@@ -346,13 +343,13 @@ def add_args(parser: ArgumentParser) -> None:
     imgview.set_defaults(func=cli_img_summary)
 
 
-def cli_consent(args: Namespace) -> None:
+def cli_consent(db: Database, args: Namespace) -> None:
     consent = SqaConsentRepo(db)
     display = StdoutDisplay()
     consent_view_and_agree(consent, display, args.agree)
 
 
-def cli_location(args: Namespace) -> None:
+def cli_location(db: Database, args: Namespace) -> None:
     location = SqaLocationRepo(db)
     consent = SqaConsentRepo(db)
     form = LocationForm(
@@ -366,7 +363,7 @@ def cli_location(args: Namespace) -> None:
     use_case.execute(form, args.default)
 
 
-def cli_optics(args: Namespace) -> None:
+def cli_optics(db: Database, args: Namespace) -> None:
     optics = SqaOpticsRepo(db)
     consent = SqaConsentRepo(db)
     form = DefaultOpticsForm(
@@ -377,7 +374,7 @@ def cli_optics(args: Namespace) -> None:
     use_case.execute(form)
 
 
-def cli_camera_given_by(args: Namespace) -> None:
+def cli_camera_given_by(db: Database, args: Namespace) -> None:
     log.debug(args)
     camera = SqaCameraRepo(db)
     consent = SqaConsentRepo(db)
@@ -397,7 +394,7 @@ def cli_camera_given_by(args: Namespace) -> None:
     use_case.execute(form, args.default)
 
 
-def cli_camera_from_image(args: Namespace) -> None:
+def cli_camera_from_image(db: Database, args: Namespace) -> None:
     log.debug(args)
     camera = SqaCameraRepo(db)
     consent = SqaConsentRepo(db)
@@ -407,7 +404,7 @@ def cli_camera_from_image(args: Namespace) -> None:
     use_case.execute(args.image, args.default)
 
 
-def cli_roi_given_by(args: Namespace) -> None:
+def cli_roi_given_by(db: Database, args: Namespace) -> None:
     roi = SqaRoiRepo(db)
     consent = SqaConsentRepo(db)
     form = RoiForm(x1=args.x1, y1=args.y1, x2=args.x2, y2=args.y2, comment=args.comment)
@@ -415,7 +412,7 @@ def cli_roi_given_by(args: Namespace) -> None:
     use_case.execute(form, args.default)
 
 
-def cli_roi_from_image(args: Namespace) -> None:
+def cli_roi_from_image(db: Database, args: Namespace) -> None:
     roi = SqaRoiRepo(db)
     factory = ImageReaderFactoryImpl()
     consent = SqaConsentRepo(db)
@@ -424,7 +421,7 @@ def cli_roi_from_image(args: Namespace) -> None:
     use_case.execute(args.image, form, args.default)
 
 
-def cli_observer(args: Namespace) -> None:
+def cli_observer(db: Database, args: Namespace) -> None:
     observer = SqaObserverRepo(db)
     consent = SqaConsentRepo(db)
     form = ObserverForm(
@@ -444,7 +441,7 @@ def cli_observer(args: Namespace) -> None:
         use_case.execute(form, args.default)
 
 
-def cli_sky_export(args: Namespace) -> None:
+def cli_sky_export(db: Database, args: Namespace) -> None:
     consent = SqaConsentRepo(db)
     reporter = SqaReportsService(db)
     observer = SqaObserverRepo(db)
@@ -468,7 +465,7 @@ def cli_sky_export(args: Namespace) -> None:
         pass
 
 
-def cli_sky_summary(args: Namespace) -> None:
+def cli_sky_summary(db: Database, args: Namespace) -> None:
     consent = SqaConsentRepo(db)
     observer = SqaObserverRepo(db)
     summarizer = SqaSummaryService(db)
@@ -477,7 +474,7 @@ def cli_sky_summary(args: Namespace) -> None:
     use_case.execute()
 
 
-def cli_img_summary(args: Namespace) -> None:
+def cli_img_summary(db: Database, args: Namespace) -> None:
     consent = SqaConsentRepo(db)
     observer = SqaObserverRepo(db)
     summarizer = SqaSummaryService(db)
@@ -487,16 +484,20 @@ def cli_img_summary(args: Namespace) -> None:
 
 
 def cli_main(args: Namespace) -> None:
+    db = None
     try:
+        # create the database object
+        db = DcplDatabase("DATABASE_URL")
         db.init()
-        args.func(args)
+        args.func(db, args)
     except RepositoryError as e:
         log.critical(e)
         StdoutDisplay().show(str(e))
     except AzoteaError as e:
         log.critical(e)
     finally:
-        db.engine.dispose()
+        if db is not None:
+            db.engine.dispose()
 
 
 def main():

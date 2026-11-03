@@ -17,7 +17,7 @@ from lica_cli import parse_args, run_cli
 from lica_cli.validate import vdir
 from lica_log.adapters.default import DefaultLogger
 from lica_raw.adapters import ImageReaderFactoryImpl
-from lica_sqa.adapters.decouple import DcplDatabase
+from lica_sqa.adapters.decouple import Database, DcplDatabase
 from lica_tables.adapters.tabulate import StdoutDisplay
 
 # ---------------
@@ -50,7 +50,6 @@ DESCRIPTION = "AZOTEA image processing tool"
 # get the root logger
 log = logging.getLogger(__name__.split(".")[-1])
 # create the database object
-db = DcplDatabase("DATABASE_URL")
 
 # -------------------
 # Auxiliary functions
@@ -95,7 +94,7 @@ def add_args(parser: ArgumentParser) -> None:
     parser_batch.set_defaults(func=cli_batch)
 
 
-def cli_batch(args: Namespace) -> None:
+def cli_batch(db: Database, args: Namespace) -> None:
     consent = SqaConsentRepo(db)
     camera = SqaCameraRepo(db)
     location = SqaLocationRepo(db)
@@ -136,16 +135,19 @@ def cli_batch(args: Namespace) -> None:
 
 
 def cli_main(args: Namespace) -> None:
+    db = None
     try:
+        db = DcplDatabase("DATABASE_URL")
         db.init()
-        args.func(args)
+        args.func(db, args)
     except RepositoryError as e:
         log.critical(e)
         StdoutDisplay().show(str(e))
     except AzoteaError as e:
         log.critical(e)
     finally:
-        db.engine.dispose()
+        if db is not None:
+            db.engine.dispose()
 
 
 def main():
